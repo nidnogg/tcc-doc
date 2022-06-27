@@ -97,14 +97,16 @@ Há pelo menos dez anos os ataques cibernéticos vem aumentando, tendo grande im
 Aplicações web quando são desenvolvidas sem ter segurança da informação no seu cerne possibilita perda de ativos, inoperabilidade de serviços, exposição de dados sensíveis e comprometimento de sistemas. 
 A Open Web Application Security Project (OWASP) é uma fundação sem fins lucrativos cujo objetivo é aprimorar a segurança do software. A organização fornece projeto de código livre, vasta comunidade ativa, conferências, treinamentos e boas práticas. Uma das iniciativas é o OWASP TOP 10, que significa as 10 vulnerabilidades mais comuns:
 
-Injeção;
-Broken Authentication;
-Broken Access Control;
+1) Injeção;
+2) Broken Authentication;
+3) Exposição de Dados Sensíveis;
+4) Entidades Externas de XML;
+5) Broken Access Control;
+6) Configurações Incorretas de Segurança;
 Design inseguro;
-Segurança desconfigurada;
 Componentes vulneráveis e desatualizados;
 Falhas de identificação e autenticação;
-Falhas de integradade de software e dados;
+Falhas de integridade de software e dados;
 Falhas de monitoramento e security logging;
 Server-Side Request Forgery (SSRF).
 
@@ -114,13 +116,35 @@ Uma das formas mais conhecidas de injeçao é o SQL Injection. Aplicações vuln
 É fundamental para mitigar as injeções ter uma validação dos caracteres e declarações válidas ao receber uma entrada de dados na aplicação web.
 
 Broken Authentication
+Broken Authentication é um conjunto de métodos em que os atacantes podem ganhar as credenciais de usuário ou sequestrar sessões de usuário. Senhas fracas ou facilmente adivinháveis, senhas armazenadas indevidamente sem serem transformadas em hashes, IDs de sessão expostos em URLS, ataques de fixação de ID de sessão e transmissão não-criptografada http.
+Para mitigar problemas dessa natureza são indicadas medidas como armazenar senhas com hash, garantir que IDs de sessão não estão expostos nas URLS, configurar timeouts nas sessões, não permitir recriação de sessões expiradas, não transmitir senhas em canais sem criptografia, utilizar senhas com tamanho mínimo e determinada complexidade, ocultar nomes de usuário e senha em mensagens de erro devido a login mal sucedido e assegurar proteção contra brute force após cinco tentativas falhas.
 
+Exposição de Dados Sensíveis
+Aplicações web que não protegem senhas, informações financeiras ou relativas servindo potencialmente para criminosos obterem acesso não autorizado a contas de usuário, efetuar ações fraudulentas como compras online com informações roubadas ou extorquir vítimas com dados sensíveis. Dados sensíveis expostos podem causar perdas financeiras, ferir a reputação de corporações que tiveram seus dados vazados ou ativos expostos, levando as empresas a pagarem despesas para investigação sobre o incidente de segurança. Para proteger-se desse tipo de ataque são necessários softwares de acordo com a legislação do país e da industria, uma vez que ignorar a possibilidade de exposição de dados sensíveis leva a desastres financeiros de grandes proporções. 
+
+Entidades Externas de XML
+Um tipo particular de injeção, também conhecido como injeção XXE, ocorre quando atacantes abusam dos parses XML utilizados em servidores web através do envio de documentos XML cuidadosamente forjados que caso sejam processados levam à negação de servição, execução remota de código arbitrário ou requisições forjadas do lado do servidor.
+Por exemplo, um atacante pode enviar um payload especialmente forjado para um servidor web, o servidor web envia para um parser XML, o parser XML por sua vez devolve o caminho do arquivo para o servidor, que devolve para o agente malicioso.
+
+\begin{verbatim}
+    <?xml version="1.0" ?>
+    <!DOCTYPE passws [
+    <!ELEMENT passwd ANY>
+    <!ENTITY passwd SYSTEM "file:///etc/passwd">
+    ]>
+
+    <passwd>&xxe;</passwd>
+\end{verbatim}
+
+Existem duas variantes de ataques XXE, sendo a primeira conhecida como in-band, onde o atacante forja um documento XML malicioso e o submete através da rede para ser processado e recebe uma resposta instantânea, enquanto a outra variante chamada out-of-band ocorre quando o atacante forja um documento XML malicioso, submete, todavia não obtém resposta imediata do servidor web. Ataques out-of-band também são chamados de "blind XXE injection".
+É possível mitigar injeções XXE desativando o Document Type Definitions (DTD). 
 
 Broken Access Control
 Diversos vetores de ataque podem ser considerados Broken access control. Entre eles: burlar verificações de controle de acesso, editar contas de outros usuários, elevação de privilégios, configurações erroneas de CORS (Cross-Origin Resource Sharing) que permitem acesso não autorizado a APIs (Application Programming Interface) restritas, manipulação de metadados através de tokens de controle de acesso JWT (JSON Web Tokens) e acesso não autorizado a páginas web com usuário desprivilegiado, podendo levar ao controle de funções do modelo de negócio ou obtenção de (todos) os dados.
 É recomendado ter listas de controle de acesso e negar funcionalidades através de back-end, de forma que o usuário não tem acesso ou controle do código.
 
-
+Configurações Incorretas de Segurança (Security misconfigurations)
+Configurações errôneas de segurança podem expor aplicações a security threads. Portas administrativas abertas desnecessariamente, firewalls mal gerenciados, aplicações legadas tentando comunicar com outras aplicações inexistentes são alguns exemplos de possíveis ingerencias nas configurações de segurança. São necessários padrões de qualidade, revistos, testados e verificados com frequencia para reduzir a superficie de ataque que esse tipo de vulnerabilidade permite.
 
 
 TODO:
@@ -134,16 +158,7 @@ No final relacionar injeção com nosso trabalho
 Verificar se entrou/saiu algo do owasp moderno
 trocar os 2 blogs por livros ou artigos
 
-Referências:
 
-Understanding The Top 10 OWASP Vulnerabilities, Matthew Bach-Nutman
-https://arxiv.org/ftp/arxiv/papers/2012/2012.09960.pdf
-
-https://www.indusface.com/blog/10-common-web-application-security-mistakes/
-https://www.invicti.com/learn/out-of-band-sql-injection-oob-sqli/
-https://owasp.org/www-project-top-ten/
-
-https://d1wqtxts1xzle7.cloudfront.net/37607688/Journal_of_Computer_Science_IJCSIS__Vol._9_No._6_June_2011-with-cover-page-v2.pdf?Expires=1655676531&Signature=FVToQTw7ovULJUkVQdNOpusMs7iq4OGl3gaO2ahUyDDXHTr1NuQC15hcTwL4u4vbHuPF1ROBvFWJ7~vbYsWLc7X~8gT0DtTXxdbevJLOKWnEU9EwDXty0x9MT3Sv-5mo-fkFZrXMyv5k6ePjPEaxNyM8cTkenayq9nSht1A7UuR8iofziF2y0tYmDm9BPNUiUwwz~2qCKXvm4cUS5cJy0NMu2~n3apQOOfX-yg8OSV4sL8tlnYGSyUY7jd73jc-i5T81FaP7JUOcacSLj9g5ZZd5Nh4H-TGBjYWXAtwno32uXchFzxr~6L-fegPDZbWuApnUG2k6rOILf1~cgaQsqQ__&Key-Pair-Id=APKAJLOHF5GGSLRBV4ZA#page=51
 
 \section{Algoritmo Genético}
 
