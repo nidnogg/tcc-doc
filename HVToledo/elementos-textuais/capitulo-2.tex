@@ -54,18 +54,54 @@ A etapa seguinte, a de \textbf{Conducting}, é um tanto mais complexa composta d
 
 Por fim, há a etapa final \textbf{Reporting}, que é permite ao pesquisador exportar um relatório final com os principais resultados do Parsifal - selecionando os dados desejados. Esse relatório encontra-se nos apêndices.
 
-\subsection{Scopus + CAFe},
-O Scopus é o banco de dados disponibilizado pela Elsevier de citações e abstracts.
+\subsection{Scopus e CAFe}
+O Scopus é o banco de dados disponibilizado pela Elsevier de citações e abstracts. Com a exceção de alguns artigos encontrados gratuitamente em plataformas como o Google Scholar ou Research Gate grande maioria dos artigos coletados para os fins desse trabalho foram fornecidos através dessa plataforma.
 
-TO-DO printscreen do Scopus. CAFe. Dificuldades encontradas. (artigos não baixáveis etc) cafe bugado
+Quanto a essa plataforma, graças aos seus ricos metadados e facilidade de integração com o Parsifal, foi possível coletar cerca de 74 artigos para análise. Além disso, é garantido um acesso robusto através da identificação que a Universidade Federal providencia com a Comunidade Acadêmica Federada (também conhecida coma CAFe), um serviço de gestão de identidade que facilita acesso web à várias instituições de ensino e pesquisa brasileiras. 
+
+\begin{figure}[ht]
+    \centering
+    \caption{Pesquisa por área de interesse no Scopus}
+    \includegraphics[width=14cm]{figuras/scopus.png} 
+    \legend{Fonte: \href{https://www.scopus.com}{Scopus} (2022, p. TO-DO)}
+    \label{fig:internet} 
+\end{figure}
+
+\bigskip
+
+Infelizmente uma das grandes dificuldades encontradas foi uma considerável instabilidade por parte do sistema de login do CAFe, acarretando em diversos atrasos. É comum não funcionar por longos períodos de tempo. Fora isso, uma série de artigos mesmo após providenciados pelo Scopus requeriam autenticação fora da Universidade, impossibilitando até mesmo sua visualização. Alguns raros casos foram encontrados em plataformas como as anteriormente mencionadas (Google Scholar e afins).
 
 \section{nscanner}
+Essa solução, publicada apenas na forma de um artigo, provém de um estudo dirigido sobre uma série de outras ferramentas existentes hoje no mundo de \textit{Penetration Testing} (e de grande utilidade/notoriedade no mercado) como Metasploit, Wapiti e Acunetix. Trata-se de uma aplicação dinâmica, flexível e automatizada para detectar os ataques mais comuns e problemáticos em segurança de Informação, que são SQL Injection e Cross Site Scripting. É capaz também de detectar malware via machine learning para prevenir resultados que seriam falsos positivos.
+
+Há uma fase de testagem de vulnerabilidade em aplicação Web, e uma de escaneamento de arquivos. Todas as informações trabalhadas são armazenadas localmente, tornando desnecessário o uso de uma solução de Banco de Dados. 
+
+Para a primeira fase, as seguintes etapas são observadas pelo autor:
+\begin{alineas}
+\item Tendo sido estabelecida uma conexão com a internet, um usuário da ferramenta escolhe o tipo de vulnerabilidade que será testada. Após isso, ele fornece um endereço web ou de IP que armazena a aplicação que receberá os testes.
+\item Uma requisição com os dados fornecidos pelo usuário é feita ao web crawler do Nscanner, um script responsável por acessar a aplicação em si e realizar a verificação por vulnerabilidades. Ele busca o site da aplicação pelo domínio, usado para identificar o servidor armazenando tal site.
+\item Após isso, uma conexão com o servidor encontrado é requisitada pelo crawler, estabelecendo então uma ponte entre web crawler e servidor. Assim as páginas e componentes da aplicação em análise são navegadas e todas as partes com formulários são identificadas.
+\item Nessa etapa (a mais importante da pipeline), os bugs são identificados pelo Nscanner. A ferramenta injeta \textit{payloads} (isto é, entradas) de acordo com a seleção de vulnerabilidade do usuário no início do fluxo, em todas as partes críticas (formulários) visualizadas na análise anteriormente feita a fim de verificar se alguma delas omite erros fundamentais deixando passar uma vulnerabilidade. Espera-se que consuma um tempo por ser um processo iterativo. Finalmente é gerado um relatório que o usuário final pode optar por baixar para fins de histórico ou apenas visualizar no momento.
+\end{alineas}
+
+Enfim tem-se a segunda parte da proposta, de escaneamento de arquivos:
+\begin{alineas}
+\item É feito um upload de um arquivo/amostra que o usuário considera malicioso ao Nscanner.
+\item O principal componente da detecção de malware do Nscanner é acionado ao verificar que o upload foi bem sucedido, iniciando uma análise dinâmica. Por exemplo, um classificador de Machine Learning baseado no algoritmo de \textit{Random Forest}, treinado para detectar arquivos malware com uma série árvore de decisões geradas em seu treinamento. Verificando com sucesso algum caso em que a precisão seja suficiente para definir como malicioso, o arquivo é designado como tal e um relatório é gerado semelhantemente a etapa anterior para o usuário.
+\end{alineas}
+
+Embora seja uma ideia de projeto conveniente, percebem-se algumas falhas nessa implementação. Em particular, na etapa mais importante do fluxo de detecção de vulnerabilidades em aplicação web - há dois pontos críticos que o autor não cuidou de verificar: não há uma proposta suficientemente concreta para fornecer \textit{payloads} que testem a aplicação corretamente. Há uma série de aplicações no mercado que visam implementar isso, porém é um processo complexo. Fora isso, a diferença entre SQL injections e Cross Site Scripting (XSS) não garante necessariamente que os mesmos pontos críticos terão as mesmas vulnerabilidades. É frequente observar vulnerabilidades XSS em partes até impossíveis de se realizar injeções SQL.
+
+Com isso em consideração, somando o fato de que é uma ideia sem implementação qualquer fornecida pelo autor essa pesquisa foi considerada de baixo impacto para expansão e apenas avaliada.
+Referências: nscanner
+
+\section{GraphXSS}
+
+\section{PADReS}
 
 \section{WAF-A-MoLE}
 
-\subsection{Linear SVM}
 
-\subsection{Seção Terciária}
 
 Alíneas e subalíneas.
 \bigskip
