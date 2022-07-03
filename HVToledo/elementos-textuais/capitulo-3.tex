@@ -104,12 +104,9 @@ A Open Web Application Security Project (OWASP) é uma fundação sem fins lucra
 5) Broken Access Control;
 6) Configurações Incorretas de Segurança;
 7) Cross Site Scripting XSS;
-Design inseguro;
-Componentes vulneráveis e desatualizados;
-Falhas de identificação e autenticação;
-Falhas de integridade de software e dados;
-Falhas de monitoramento e security logging;
-Server-Side Request Forgery (SSRF).
+8) Deserialização Insegura
+9) Utilizar Componentes com Vulnerabilidades Conhecidas;
+10) Monitoramento e Logging Insuficientes.
 
 Injeção
 Forma de ataque ampla onde uma entrada de dados recebe caracteres não tratados que são executados pelo sistema com objetivo de alterar o funcionamento padrão do software.
@@ -148,6 +145,25 @@ Configurações Incorretas de Segurança (Security misconfigurations)
 Configurações errôneas de segurança podem expor aplicações a security threads. Portas administrativas abertas desnecessariamente, firewalls mal gerenciados, aplicações legadas tentando comunicar com outras aplicações inexistentes são alguns exemplos de possíveis ingerencias nas configurações de segurança. São necessários padrões de qualidade, revistos, testados e verificados com frequencia para reduzir a superficie de ataque que esse tipo de vulnerabilidade permite.
 
 Cross Site Scripting XSS
+Cross site scripting é uma técnica conhecida como XSS onde geralmente há uma injeção de scripts maliciosos na aplicações web, revelando dados sensíveis, serviços internos ou divulgação de cookies de usuários com privilégios.
+Existem três variantes de XSS: stored XSS, onde o atacante injeta um payload no webserver, de maneira que quando outro usuário faz a requisição para acessar a página, o payload irá ativar. Reflected XSS, quando o atacante injeta dados através de um método HTTP gerando uma resposta imediata na aplicação. Permite o malfeitor forjar uma URL específica que ao ser acessada pela vítima obtenha dados sensíveis, como os cookies. E por último a variante DOM Based XSS que consiste na inserção de código malicioso no DOM (Document Object Model), sem refletir no código-fonte HTML, sendo ativado apenas pelo console DOM.
+Dados obtidos de fontes não confiáveis devem ser devidamente validados e normalizados para evitar XSS.
+
+Deserialização Insegura
+Ataque que ocorre quando uma aplicação tenta transformar dados maliciosos, controlados pelo atacante, em estruturas de dados internas controladas pela aplicação. Payloads cuidadosamente forjados permitem tomar o controle de variáveis, funções e estados internos da aplicação. Geralmente esse tipo de ataque permite executar código remoto arbitrário e expor completamente o sistema da aplicação web.
+No código um array de itens são serializados em um fluxo de bytes onde são transportados e processados pelo back-end do website após a deserialização.
+O ataque de deserialização replica os objetos serializados, mas injetando código malicioso para ser processado pelo back-end.
+A mitigação para o ataque pode ser feito utilizando formatos seguros de data intercambiáveis como JSON ou YAML ao invés de formatos binários nativos, utilizando funções robustas de deserialização e bibliotecas, incluindo testes de integridade para o processamento de dados serializados e limitando o escopo e capacidades das operações serializadas.
+
+Utilizar Componentes com Vulnerabilidades Conhecidas
+Geralmente, atacantes não buscam descobrir vulnerabilidades inéditas, mas utilizar os exploits já conhecidos.
+Utilizar softwares ou hardwares específicos com vulnerabilidades documentadas, que foram descontinuados ou que atingiram o fim da vida útil aumenta a propensão de sofrer ataques já consolidados por usuários mal intencionados.
+Rastrear dependências, documentar de maneira adequada, remover dependências inúteis, eliminar código obsoleto e ter uma política de atualização de dependências, procedimentos e manutenção de software são medidas efetivas para mitigar esse tipo de ataque.
+
+Monitoramento e Logging Insuficientes
+Ausência de mecanismos de logging atrelados às melhores práticas para auxiliar no monitoramento e detecção de incidentes de segurança permitem atacantes conduzirem atividades sem serem detectados, fazendo com que a tarefa da detecção de incidentes e resposta seja muito mais difícil. Logs não são úteis apenas para rastrear as atividades do atacante ou detectar erros ou atividades anômalas. Logs também servem para auditorias e outros processos regulatórios.
+
+Injeção (em especial SQL) é uma das vulnerabilidades mais comuns, de baixa complexidade para o atacante e historicamente impactante, o que motivou o trabalho em aprofundar em um problema subestimado por desenvolvedores, que tem impactos profundos na confiabilidade, integridade e disponibilidade de um serviço web.
 
 Referências:
 
@@ -180,7 +196,30 @@ trocar os 2 blogs por livros ou artigos
 
 \section{Algoritmo Genético}
 
-Explicar mutation rounds, funcionamento de pool e como fuzzer se encaixaria
+TODO Explicar mutation rounds, funcionamento de pool e como fuzzer se encaixaria
+
+A estrutura básica do algoritmo genético:
+
+1) Primeiro é gerada uma população aleatório de N cromossomos com L-bits. As populações são candidatos para a solução do problema.
+2) É calculada a função fitness F(x) de cada cromossomo x na população.
+3) As etapas seguinte (a,b e c) são repetidas até serem criadas N gerações:
+a) Um par de cromossomos geradores da população atual são selecionados, com a probabilidade de seleção sendo uma função crescente fitness. O mesmo cromossomo pode ser selecionado mais de uma vez para ser gerador, processo chamado de "seleção com substituição".
+b) É feito um crossover no par em um ponto aleatório escolhido com probabilidade uniforme para formar dois descendentes. Se nenhum crossover ocorrer, gere dois descendentes identicos aos pais.  
+c) Execute a mutação nos dois descendentes com uma probabilidade de mutação em cada bit e coloque os cromossomos na nova população.
+4) Substitua a população antiga com a nova.
+5) Volte para etapa 2.
+
+WAFAmole utiliza operadores de mutação específicos para o passo c:
+Case Swapping
+Whitespace Substitution
+Comment Injection
+Comment Rewriting
+Integer Encoding
+Operator Swapping
+Logical Invariant
+
+Referências:
+
 
 \section{Algoritmos de Fuzzing}
 
