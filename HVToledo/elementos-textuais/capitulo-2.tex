@@ -1,6 +1,5 @@
 \chapter{REVISÃO DE LITERATURA}
 \label{chp:capitulo2}
-
 Em um campo com uma quantia tão rarefeita de artigos, publicações e materiais em larga parte espalhadas por blogs na internet, foi necessário realizar uma revisão de literatura para que as ferramentas de ponta, estratégias ainda sendo testadas e vulnerabilidades principais no mercado fossem corretamente identificadas. Isso se torna especialmente verdadeiro pela mudança no cenário de segurança dos anos 2000 para os anos 2010-2022, aonde boa parte de ameaças antigas podem ser de pouca relevância.
 
 Aqui serão amostrados alguns dos principais achados, as estratégias para organizar os mesmos e resumido o estado da arte no presente momento.
@@ -117,8 +116,6 @@ Infelizmente para o contexto do GraphXSS, muitos dos detalhes da implementação
 
 Assim, ao procurar uma maneira de contribuir para essa pesquisa, considerou-se que, por possuir uma arquitetura sofisticada o suficiente para ser complexa demais de replicar no tempo designado para este trabalho, ela seria estudada e não expandida. Espera-se que algum dia os autores disponibilizem um repositório com os códigos da experimentação realizada, ou talvez uma implementação mais concreta que seja mais factível para alunos e entusiastas contribuírem.
 
-
-
 \subsection{PADRES}
 
 O PADRES, sigla para PrivAcy, Data REgulation and Security, é um software desenvolvido inicialmente para auxiliar a infraestrutura do EPOS (\textit{(European Plate Observatory System)} e a comunidade do GNSS (\textbf{Global Navigation Satellite System}) em um ponto pouco explorado em Segurança da Informação no contexto de Internet - complacência com a GDPR (\textit{General Data Protection Regulation}), uma regulação então recém introduzida na legislatura Europeia com finalidade de proteger a privacidade e acesso aos dados alheios. Porém sua solução tornou-se generalizada o suficiente para auxiliar empresas de escopos, servindo para qualquer aplicação Web que seja aberta. A parte relevante para esse trabalho, no entanto, é uma funcionalidade de analisar aplicações Web por vulnerabilidades também embutida na mesma ferramenta, dado que privacidade de dados é comumente associado com segurança. Trata-se também de uma aplicação que surgiu como fruto de pesquisa acadêmica.
@@ -143,44 +140,40 @@ Com isso o PADRES no estado atual não pode ser recomendado como uma ferramenta 
 
 \subsection{WAF-A-MoLE}
 
-Desenvolvido como uma tese, o WAF-A-MoLE é uma ferramenta geradora de testes para WAFs \textit{Web Application Firewalls} baseados em Aprendizado de Máquina. A versão atual é particularmente dedicada a SQL-Injections, o tipo mais rampante de ataque em aplicações Web atualmente. Sendo um dos poucos softwares encontrados nos artigos com uma implementação concreta (a outra sendo o PADRES, que mostrou-se defeituosa), o WAF-A-MoLE certamente foi um dos mais convidativos a colaboração. Não só os autores providenciam uma documentação robusta para uma aplicação inicialmente desenvolvida no meio acadêmico, como também mostram nela caminhos a serem expandidos por contribuintes futuros.
+Desenvolvido como uma tese, o WAF-A-MoLE é uma ferramenta geradora de testes para WAFs \textit{Web Application Firewalls} baseados em Aprendizado de Máquina. A versão atual é particularmente dedicada a SQL-Injections. Sendo um dos poucos softwares encontrados nos artigos com uma implementação concreta (a outra sendo o PADRES, que mostrou-se defeituosa), o WAF-A-MoLE certamente foi um dos mais convidativos a colaboração. Não só os autores providenciam uma documentação robusta para uma aplicação inicialmente desenvolvida no meio acadêmico, como também mostram nela caminhos a serem expandidos por contribuintes futuros.
 
 \begin{figure}[ht]
     \centering
-    \caption{Arquitetura do WAF-A-MoLE - pi indica payload i e sigma i indica score de confiança.}
+    \caption{Arquitetura do WAF-A-MoLE - $p_i$ indica payload i e $\sigma_i$  indica score de confiança.}
+    % $num_{\mathrm{expression}}$ for n+1 subscript!
     \includegraphics[width=14cm]{figuras/wafamoleArchitecture.png} 
     \legend{Fonte: \href{https://arxiv.org/abs/2001.01952}{A. Valenza, L. Demetrio, G. Costa and G. Lagorio et al via arxiv} (2020, p. TO-DO)}
     \label{fig:internet} 
 \end{figure}
 
 
+Inteiramente codificado na linguagem Python 3, esse software faz uso de uma metodologia de testagem baseada em \textit{fuzzing} (inspirada pelo Fuzzing Book) para criar ataques que penetrem com sucesso um determinado WAF baseado em Aprendizado de Máquina a ser analisado. Mais precisamente, fazendo uso da pontuação de classificação do WAF como métrica, o processo de fuzzing é guiado de maneira que as entradas mais promissoras são priorizadas.
 
-Esse software faz uso de uma metodologia de testagem baseada em \textit{fuzzing} (inspirada pelo Fuzzing Book) para criar ataques que penetrem com sucesso um determinado WAF baseado em Aprendizado de Máquina a ser analisado. Mais precisamente, fazendo uso da pontuação de classificação do WAF como métrica, o processo de fuzzing é guiado de maneira que as entradas mais promissoras são priorizadas.
+Ele é implementado como uma biblioteca e como uma ferramenta de linha de comando, por meio de \textit{Click decorators} (uma função da biblioteca Click para minimizar o código por trás de aplicações de linha de comando). O usuário pode escolher qual modelo será utilizado, além de uma série de parâmetros como timeout, rodadas máximas, caminho para o arquivo de output e afins.
 
-Sua implementação é tanto uma biblioteca como uma ferramenta de linha de comando
+Tomando como base a figura de sua arquitetura acima, seu funcionamento é iniciado com um \textit{payload} inicial $p_0$ (fornecido pelo usuário ao executar o programa) ao qual o WAF a ser testado confere um score de confiança $\sigma_0 \epsilon [0, 1]$ que será inserido numa \textit{Pool} de payloads. Essa estrutura \verb+Pool+, uma \textit{priority queue}, armazenará payloads subsequentes por ordem decrescente de seus scores de confiança.
 
+Com isso, a cada iteração a cabeça da queue (fila) $p_n$ é selecionada pela Pool, passada adiante para a classe \verb+Fuzzer+, que realiza uma mutação em cima de $p_n$ transformando-o em $p_{\mathrm{n+1}}$ aplicando aleatoriamente um dos operadores de mutação padrões do programa (A lista completa de operadores de mutação pode ser conferida nos apêndices). $p_{\mathrm{n+1}}$ é submetido então ao WAF alvo para classificação/avaliação e seu score é gerado por uma classe \verb+Adapter+ após isso. A natureza extensível do WAF-A-MoLE permite que uma variedade de Web Application Firewalls sejam testados desde que estejam com adaptadores específicos para garantir compatibilidade. A classe \verb+Adapter+ retorna então tal score de $\sigma_{\mathrm{n+1}}$ de $p_{\mathrm{n+1}}$, sendo colocado de volta na fila \verb+Pool+ de payloads para sofrer novas mutações nas próximas iterações.
 
+\bigskip 
 
-
-Alíneas e subalíneas.
-\bigskip
-
+Com esse funcionamento, a condição de parada é dada da seguinte forma:
 \begin{alineas}
-\item linha 1:
-\begin{alineas}
-\item subalinea 1;
-\item subalinea 2;
+\item No momento em que um score de confiança $\sigma^*$ é menor do que um limite dado pelo usuário no início do programa (no parâmetro \verb+threshold+) - retornando-se o melhor par ($p^* \sigma^*$) encontrado;
+\item Caso o número de iterações máximas seja atingido e nenhum score de confiança $\sigma^*$ menor que \verb+threshold+ seja encontrado, o par ($p^* \sigma^*$) mais próximo do mesmo é retornado;
+\item O programa é interrompido via \verb+SIGKILL+, \verb+SIGTERM+ ou semelhante.
 \end{alineas}
-\item linha 2:
-\begin{subalineas}
-\item subalinea 1;
-\item subalinea 2;
-\end{subalineas}
-\item linha 3:
-\begin{incisos}
-\item subalinea 1;
-\item subalinea 2;
-\end{incisos}
-\item linha 4.
-\end{alineas}
+
+Para testagem de Web Application Firewalls de diferentes origens e arquiteturas, uma classe abstrata \verb+Model+ foi desenvolvida como uma interface, generalizando o comportamento de modelos usados. Dois métodos abstratos \verb+classify+ e \verb+extract_features+ são instanciados para cada modelo. Ao adaptar um WAF para ser testado, o desenvolvedor precisa buscar as funções equivalentes de seu classificador interno e compará-las com os modelos de exemplo do WAF-A-MoLE para saber quais características são usadas pelo mesmo no funcionamento de sua arquitetura.
+
+Essa necessidade de experimentação para adaptação não se mostrou muito clara, porém foi possível (como a contribuição principal deste trabalho, e com a ajuda dos autores originais) construir um \textit{wrapper} geral para modelos do scikit-learn com o WAF-A-MoLE++ - a extensão desse software melhor detalhada nos capítulos 4 e 5 deste documento.
+
+Em suma, percebe-se que o WAF-A-MoLE é uma excelente ferramenta base para reforçar Web Application Firewalls baseados em Aprendizado de Máquina. Configurando rotinas para gerar uma série de exemplos adversariais a partir do mesmo, especialistas de segurança podem refazer o treinamento de seus Firewalls complementando seus exemplos de base com os adversariais recém-gerados, chegando a níveis de robustez mais aceitáveis. Assim foi decidida a extensão do mesmo, nomeada de WAF-A-MoLE++.
+
+
 
