@@ -20,14 +20,30 @@ O cerne do projeto encontra-se nos seguintes módulos:
 
 Esses módulos, no entanto, não podem ser trivialmente estendidos sem alguns componentes auxiliares criados para o wafamole++, que são:
 \begin{alineas}
-\item \verb+datasets+ - TO-DO
+\item \verb+datasets+ - Aqui são contidos os datasets SQLiV3, SQLiV4, e SQLiV5, funções de tratamento para os mesmos e uma função de geração/adaptação do dataset original do WAF-A-MoLE para servir de treinamento para o MLBasedWAF, um Web Application Firewall que será descrito na seção seguinte. O SQLiV3 é o primeiro dataset utilizado para tal, disponibilizado pelo Kaggle e também está descrito adiante. Versões subsequentes (indicadas pelos números ascendentes) são incrementos realizados e testados nele com reforços de \textit{payloads} oriundas do wafamole++.
+
 \begin{alineas}
-\item \verb+mole+ - TO-DO
-\item \verb+sqli_cleaner+ - TO-DO
+\item \verb+mole+ - A função apelidada de \textit{mole} executa na linha de comando o WAF-A-MoLE para cada linha do dataset SQLiV3, de modo a gerar um leque mais amplo de ataques. Como se trata de um processo iterativo, um limite superior de 7000 novos payloads foi adotado - e o tempo de execução médio foi em torno de 8 horas para o processo todo. Para gerar novos ataques (dado que o WAF-A-MoLE produz saídas diferentes a cada execução), basta executá-lo com redireção de output padrão \textbf{>} \verb+./mole_query_generator.py > output.json+.
+
+\item \verb+sqli_cleaner+ - Essa função auxiliar foi codificada inicialmente com a finalidade de transformar o dataset SQLiV3 do formato .csv para .json que seria mais simples de trabalhar em Python, além de adaptá-lo para o padrão visto no MLBasedWAF, porém uma série de inconsistências suscitou um polimento e tratamento de certos casos para que a saída fosse corrigida. Seu código está disponível nessa seção.
+
+\item \verb+wafamole_dataset_generator+ - Fornecido apenas após um certo período de espera, o dataset do wafamole é disponibilizado no seu \href{https://github.com/zangobot/wafamole_dataset}{repositório} de maneira modular - com uma série de arquivos .json pequenos devido ao limite imposto pela plataforma Github. Além disso, ele precisou ser adaptado para o formato do MLBasedWAF assim como o SQLiV3 (sem grandes dificuldades nesse caso). Possui uma abrangência e riqueza maior no geral do que o antecessor. Essa função realiza a combinação e adaptação das partes disponibilizadas pelos autores.
+
 \end{alineas}
-\item \verb+MLBasedWafClassifier+ - TO-DO
-\item \verb+MLClassifierWafamole+ - TO-DO
+\item \verb+MLBasedWafClassifier+ - Localizada na pasta dos modelos customizados (models/svc), esse iPython Notebook é responsável por uma série de funções realizadas em cima dos datasets baseados no SQLiV3. É realizado a visualização dos dados contidos nos mesmos com alguns gráficos gerados, e os dados são agrupados de maneira a serem classificados para uso no wafamole++. Dois tipos de classificadores são suportados - \textit{Support Vector Machine} não linear, e \textit{Stochastic Gradient Descent}. 
+
+Para cada caso, é feito uma divisão em dados de treinamento e teste, para que seja averiguada a eficácia do modelo gerado ao fim da execução do código. Também é realizado uma rotina de \textit{GridSearchCV}, para exaustivamente testar parâmetros de maneira que sejam obtidos parâmetros mais otimizados para uso na classificação. Por fim é chamada a função fit responsável por tal classificação, e o classificador resultante é testado com seus resultados sendo colocados em métricas como a matriz de confusão e \textit{score}, e a biblioteca \verb+joblib+ exporta um arquivo \verb+.dump+ com o modelo final para uso no wafamole++. O final do notebook contém testes com queries geradas pelo wafamole++ que penetram o WAF avaliado no notebook.
+
+Para maior detalhamento e visualização das métricas no mesmo, o notebook está disponibilizado nos apêndices e no \href{https://github.com/nidnogg/tcc}{repositório} final.
+
+\item \verb+MLClassifierWafamole+ - Trata-se de uma versão semelhante ao notebook anterior, porém fazendo uso do dataset original do wafamole, um banco consideravelmente mais robusto e amplo no geral. O tamanho deste dataset exigiu algumas alterações para que os algoritmos rodassem apropriadamente, sendo um grande obstáculo no desenvolvimento do trabalho no geral. Destaca-se aqui o uso do backend paralelo \verb+ray+ como considerável ganho de performance. Mesmo assim, algumas execuções foram realizadas por um período maior do que 48 horas e abandonadas sem resultados na etapa de treinamento.
+
+No geral, este notebook possui um tempo de execução consideravelmente maior. Outra diferença chave são os classificadores usados - foram testados além dos dois anteriores o classificador Ada Boost, com resultados promissores. O \textit{Support Vector Machine} Não Linear, no entanto, não foi frutífero requerendo um tempo de execução que excedia 48 horas. Cabe salientar que a versão mais recente notebook foi disponibilizado não no repositório, mas sim no Google Colab sob o nome MLClassifierColabWafamole.ipynb, podendo também ser encontrada nos apêndices.
 \end{alineas}
+
+\label{sec:codigos}
+\includecode[C]{Reforço de dataset SQLiV3 do Kaggle} {alg:codigo2}{codigos/mole_query_generator.py}
+\bigskip
 
 \begin{figure}[H]
     \centering
@@ -87,8 +103,10 @@ Além disso, para corrigir uma variedade de erros de formatação, polir algumas
     \label{fig:internet} 
 \end{figure}
 
-\label{sec:codigos}
+\label{sec:codigos:sqli_cleaner}
 \includecode[C]{Para tratamento de dados brutos} {alg:codigo3}{codigos/sqli_cleaner.py}
+\bigskip
+
 
 \subsection{Support Vector Machine}
 Este foi o primeiro modelo implementado no wafamole++, antes do recebimento do dataset original da equipe original. 
