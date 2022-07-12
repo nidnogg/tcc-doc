@@ -85,7 +85,6 @@ Exemplificando algumas situações de SQL Injections:
 
 \end{alineas}
 
-A prevenção de vulnerabilidades deste tipo são dependentes das tecnologias em uso na aplicação web. Porém, alguns ponteiros básicos podem ser indicados - o uso de uma API segura, que evite o uso do interpretador SQL inteiramente ou use uma interface parametrizada; validação server-side de input positiva ou com “allowlist”; uso de queries LIMIT e outras queries SQL de controle no interpretador para evitar que informações sejam divulgadas em massa. Sumariamente, separar dados da lógica da aplicação web, e implementar configurações e/ou restrições que limitem a exposição dos dados nos casos de code injections bem sucedidas. 
 
 No contexto deste trabalho, no entanto, é estudado uma forma tanto comercial como open-source que têm tido crescimento no mercado: o uso de Web Application Firewalls, mais especificamente o de Web Application Firewalls baseados em técnicas de Machine Learning.
 
@@ -196,34 +195,38 @@ trocar os 2 blogs por livros ou artigos
 
 \section{Algoritmo Genético}
 
-TODO Explicar mutation rounds, funcionamento de pool e como fuzzer se encaixaria
+    RETIRAR ESSA SESSÃO E TROCAR POR FUZZING
+    
+O conceito de fuzzing tem-se estabelecido desde o fim dos anos 80, sendo uma das técnicas mais populares até hoje.
+Enquanto a idéia em si de fuzzing permanece a mesma, as maneiras de efetuá-lo tiveram um grande progresso de mudança.
+Fuzzing geralmente encontra bugs de corrupção de memória simples e a aleatoriedade e dispersão faz com que a eficiência do ataque seja baixa, além de cobrir poucas partes do código. Por outro lado, é simples de implementar, tem boa extensibilidade e pode ser feita sem o código-fonte. O fuzzing aumenta seu potencial quando o alvo está em execução em um ambiente real. Outro ponto positivo é o fato de poder aplicar a técnica em aplicações com pouco conhecimento prévio sobre.
+O fuzzing consiste na geração massiva de inputs normais e anômalos para uma aplicação específica, seguido da detecção de exceções no algoritmo devido o processamento das entradas geradas e monitoramento dos estados de execução da aplicação.
+Comparado com outras técnicas como análise estática, dinâmica e execução simbólica, o fuzzing apresenta facilidade em ser implementado, boa precisão (em ambientes reais) e boa escalabilidade.
 
-A estrutura básica do algoritmo genético:
+Um teste de fuzzing começa com a geração em larga escala de inputs para um programa específico, conhecidos como testcases. A qualidade dos testcases criados influencia diretamente na qualidade do teste fuzzing. Os inputs precisam atender os requisitos do programa testado para o padrão de entrada. Em contrapartida, os inputs precisam ser errôneos o suficiente para gerarem falhas ou erros no processamento do programa.
+De acordo com o alvo, os inputs podem ser arquivos com diferentes formados, dados de comunicação entre redes, binários executáveis específicos, entre outros. 
+Gerar testcases suficientemente errôneos é uma tarefa árdua, com duas variantes: generation-based e mutation-based. WAFAmole adota o mutation-based.
+Depois de gerados, os testcases alimentam o programa alvo, tendo variáveis de ambiente e outros parâmetros do software a ser testado devidamente configurados pelo programador. Geralmente um teste de fuzzing tem como condição final um timeout pré-definido ou uma falha de execução do programa.
+Fuzzers monitoram o estado de execução durante o processo, aguardando exceções ou falhas.  Formas comuns de metodologia de monitoramento de exceções incluem monitor sinais específicos do sistema, falhas e outras violações. Existem ferramentas para verificar comportamentos anormais dificeis de perceber intuitivamente, como o AddressSanitizer, DataFlowSanitizer, ThreadSanitizer e LeakSanitizer. Quando uma violação é captura, o fuzzer armazenada o testcase que a causou para análise futura e replicação.
+Por fim, na fase de análise, tem-se por objetivo determinar a localidade e a causa da violação no software. A análise geralmente é feita com o auxílio de debuggers como DGB, windbg ou outras ferramentas de análise binária, como a IDA Pro, OllyObg e outras. O exato estado de execução dos testcases, informações da thread, instruções e outras informações fazem parte do monitoramento.
 
-1) Primeiro é gerada uma população aleatório de N cromossomos com L-bits. As populações são candidatos para a solução do problema.
-2) É calculada a função fitness F(x) de cada cromossomo x na população.
-3) As etapas seguinte (a,b e c) são repetidas até serem criadas N gerações:
-a) Um par de cromossomos geradores da população atual são selecionados, com a probabilidade de seleção sendo uma função crescente fitness. O mesmo cromossomo pode ser selecionado mais de uma vez para ser gerador, processo chamado de "seleção com substituição".
-b) É feito um crossover no par em um ponto aleatório escolhido com probabilidade uniforme para formar dois descendentes. Se nenhum crossover ocorrer, gere dois descendentes identicos aos pais.  
-c) Execute a mutação nos dois descendentes com uma probabilidade de mutação em cada bit e coloque os cromossomos na nova população.
-4) Substitua a população antiga com a nova.
-5) Volte para etapa 2.
 
-WAFAmole utiliza operadores de mutação específicos para o passo c:
-Case Swapping
-Whitespace Substitution
-Comment Injection
-Comment Rewriting
-Integer Encoding
-Operator Swapping
-Logical Invariant
+\begin{figure}[ht]
+    \centering
+    \caption{Workflow Fuzzing}
+    \includegraphics[width=8cm,height=12cm,keepaspectratio]{figuras/fuzzing imagem.png} 
+    \legend{Fonte: \href{https://parsif.al}{Fluxograma} (2022, p. TO-DO)}
+    \label{fig:internet} 
+\end{figure}
 
-Referências:
+O fuzzer generation-based necessita saber como é o input que o programa é capaz de processar. No caso de um fuzzing para arquivos, geralmente é fornecido um arquivo de configuração com o modelo pré-definido de entrada. Os testcases são gerados de acordo com o arquivo de configuração. Fuzzers desse tipo tem facilidade em burlar validações do software testado, permitindo ao pentester entender com mais profundidade a aplicação estudada. Por outro lado, sem uma documentação amigável, analisar o formato do arquivo pode ser uma tarefa árdua.
+Em termos de praticidade, fuzzers mutation-based são mais fáceis de utilizar, com aplicabilidade genérica, sendo geralmente o tipo adotado por testes de intrusão no estado da arte. Diferente do generation-based, o mutation-based precisa de alguns inputs iniciais válidos. Os inputs vão sofrendo mutações e novos testcases vão sendo gerados. 
 
+Para testes grey box e black box, os fuzzers são mutation-based. Para testes white box, generation-based.
 
 \section{Algoritmos de Fuzzing}
 
-O cerne do algoritmo por trás do WAF-A-MoLE e o WAF-A-MoLE++ se encontra na técnica de \textit{fuzzing}. O termo fuzz foi cunhado pelo professor da Universidade de Wisconsin-Madison Barton Miller nos anos 80, após sofrer uma interferência considerável de uma tempestade no funcionamento de aplicações que rodavam em um ambiente unix remoto na época. 
+O cerne do algoritmo por trás do WAF-A-MoLE e o wafamole++ se encontra na técnica de \textit{fuzzing}. O termo fuzz foi cunhado pelo professor da Universidade de Wisconsin-Madison Barton Miller nos anos 80, após sofrer uma interferência considerável de uma tempestade no funcionamento de aplicações que rodavam em um ambiente unix remoto na época. 
 
 Pouco depois disso o mesmo passou aos seus alunos uma tarefa denominada o \textit{"Fuzz Generator"}, na qual era necessário implementar uma ferramenta que testasse a robustez de programas unix através de um bombardeio de informações aleatoriamente geradas.
 
@@ -252,6 +255,8 @@ Referências:
 https://www.fuzzingbook.org/html/Fuzzer.html
 https://www.fuzzingbook.org/html/MutationFuzzer.html
 https://fuzzinginfo.wordpress.com/history/
+Fuzzing: a survey, Jun Li, Bodong Zhao and Chao Zhang
+https://cybersecurity.springeropen.com/track/pdf/10.1186/s42400-018-0002-y.pdf
 
 \section{Recurrent Neural Networks}
 
