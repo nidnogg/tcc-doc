@@ -53,7 +53,33 @@ No geral, este notebook possui um tempo de execução consideravelmente maior. O
     \label{fig:internet} 
 \end{figure}
 
-\section{WAFs avaliados}
+\section{Operadores de Mutação}
+
+O papel dos Operadores de Mutação tanto no WAF-A-MoLE quanto no wafamole++ é fundamental, atuando como as ferramentas para guiar as mudanças realizadas no \textit{payload} atual a cada iteração do algoritmo. Sendo assim, considerando-se como o primeiro desenvolvimento feito na extensão do programa original, o wafamole++ conta com três novos operadores de mutação adicionados ao montante original. Todos estes encontram-se agrupados na classe \verb+sqlfuzzer.py+, localizada na pasta \textbf{payloadfuzzer} da aplicação.
+
+A presença destes incrementa a variedade de exemplos adversariais gerados, e em certos casos foi associado com uma rapidez maior na geração de queries finais. O primeiro destes é o \verb+shuffle_integers+, amostrado a seguir.
+
+\label{sec:codigos}
+\includecode[C]{Operador de mutação shuffle integers} {alg:codigo2}{codigos/operadores/shuffle_integers.py}
+
+\bigskip
+
+Sua implementação é a mais simples dentre os operadores novos - consistindo apenas na troca de números presentes no payload atual que lidera a fila principal por números inteiros diferentes entre 0 e 9. Selecionam-se números no payload (denominados de candidatos), a posição dos mesmos e seus conteúdos são armazenados e então uma substituição aleatória é escolhida e o payload modificado é retornado.  Interessantemente, modificando-se uma parte desse funcionamento para trocar a base numérica entre binário, octal, decimal e hexadecimal, obtém-se o próximo operador de mutação, com uma performance mais robusta. Trata-se do \verb+shuffle_bases+.
+
+\label{sec:codigos}
+\includecode[C]{Operador de mutação shuffle bases} {alg:codigo3}{codigos/operadores/shuffle_bases.py}
+
+\bigskip
+
+Nessa função a seleção e armazenamento de posições a serem modificadas é virtualmente idêntico - porém a substituição conta com uma lista de modificações em potencial dentre as quais uma é amostrada aleatoriamente na hora de ser realizada a mutação. Também são considerados os casos em que a mutação não ocasiona em variações no payload final. Finalmente, há o \verb+spaces_to_symbols+ - o operador com a performance mais interessante.
+
+\label{sec:codigos}
+\includecode[C]{Operador de mutação spaces to symbols} {alg:codigo3}{codigos/operadores/spaces_to_symbols.py}
+
+\bigskip
+
+
+\section{Modelos e WAFs avaliados}
 
 \subsection{WAF-Brain}
 
@@ -75,9 +101,10 @@ Na adaptação WAF-A-MoLE, esse poder de predição é aproveitado exclusivament
 
 Por mais que se trate de um algoritmo sofisticado por natureza, surpreendentemente o WAF-Brain fora implementado pelos seus autores originais de uma maneira simplória o suficiente para ser um dos WAFs mais vulneráveis às estratégias de fuzzing do WAF-A-MoLE. Vários operadores de mutação isolados conseguem resultados frutíferos em pouco tempo, como será visto na seção de testes adiante.
 
-\section{Operadores de Mutação}
+\subsection{SQLiGoT}
+Conforme uma advertência no repositório do WAF-A-MoLE pelos autores, esse Web Application Firewall exige um tempo de semanas para ser penetrado pela aplicação. Além disso, seu código encontra-se inacessível, proibindo a experimentação para o escopo desse trabalho, impossibilitando até mesmo que sejam feitas as etapas de treinamento. Por esse motivo, o SQLiGOT foi dispensado como alvo de estudo.
 
-\section{Modelos}
+\subsection{MLBasedWAF}
 Todos os modelos implementados tiveram como base o firewall ML-Based-WAF, disponível por vladan-stojnic no \href{https://github.com/vladan-stojnic/ML-based-WAF}{Github} que fora o WAF open source mais promissor e mais plausível de adaptar. Sua performance também era factível no contexto de recursos disponíveis para a conclusão deste projeto final.
 
 \begin{figure}[ht]
@@ -92,8 +119,7 @@ Embora seja um WAF orientado ao tráfego real ou simulado de uma rede de fato, a
 
 Para tal, foi necessário prever uma estratégia própria de treinamento para o classificador, além de um conjunto de dados especial para o mesmo. É cabível mencionar, no entanto, que isso introduziu uma série de dificuldades uma vez que sua documentação era consideravelmente modesta, e o banco novo a ser usado deveria seguir o padrão de formatação seguido pelo WAF.
 
-Dentre as opções de datasets disponíveis com SQL Injections, foi escolhido inicialmente a versão SQLiV3.json da coleção do Kaggle que será amostrada a seguir.
-Além disso, para corrigir uma variedade de erros de formatação, polir algumas queries incorretas (e de difícil proveito), e finalmente adaptar para o padrão .json utilizado pelo WAF, a seguinte função auxiliar foi codificada:
+Dentre as opções de datasets disponíveis com SQL Injections, foi escolhido inicialmente a versão SQLiV3.json da coleção do Kaggle, que fora anteriormente mencionada na seção de Arquitetura do wafamole++.
 
 \begin{figure}[ht]
     \centering
@@ -102,6 +128,9 @@ Além disso, para corrigir uma variedade de erros de formatação, polir algumas
     \legend{Fonte: \href{https://www.kaggle.com/datasets/syedsaqlainhussain/sql-injection-dataset}{Kaggle} (2021, p. TO-DO)}
     \label{fig:internet} 
 \end{figure}
+
+A etapa de correção de uma variedade de erros de formatação, polimento algumas queries incorretas (e de difícil proveito), e adaptação para o padrão .json utilizado pelo WAF, encontra-se codificada na função auxiliar \verb+sql_cleaner.py+.
+
 
 \label{sec:codigos:sqli_cleaner}
 \includecode[C]{Para tratamento de dados brutos} {alg:codigo3}{codigos/sqli_cleaner.py}
