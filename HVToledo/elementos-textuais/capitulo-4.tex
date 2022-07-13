@@ -138,9 +138,51 @@ A etapa de correção de uma variedade de erros de formatação, polimento algum
 
 
 \subsection{Support Vector Machine}
-Este foi o primeiro modelo implementado no wafamole++, antes do recebimento do dataset original da equipe original. 
+Este foi o primeiro modelo implementado no wafamole++, antes do recebimento do dataset original da equipe original. Dado isso, esse classificador foi implementado com êxito usando os datasets \verb+SQLiV3.json+, \verb+SQLiV4.json+ e \verb+SQLiV5.json+. Tais datasets correspondem, respectivamente, aos seguintes modelos:
+\begin{alineas}
+\item \verb+test_svc_classifier_no_mole.dump+
 
+(equivalente ao \verb+svc_trained.dump+);
+\item \verb+test_svc_classifier_moled.dump+;
+\item \verb+test_svc_classifier_extra_moled.dump+ 
+\end{alineas}
 
+A nomenclatura \textit{moled} foi escolhida para mensurar o quão reforçado o dataset usado no treinamento é - sendo tal reforço definido como a quantia de queries fuzzeadas pelo wafamole++ acrescentadas ao dataset inicial. E é evidente uma diferença na performance de cada modelo gerado - observou-se uma progressão de aumento (em média) de rodadas mutacionais (consumidas durante a execução) para os dois últimos modelos, especialmente no último.
+
+Infelizmente um dos pontos de dificuldades foi o treinamento de um classificador deste tipo para o dataset original do WAF-A-MoLE, recebido após os testes iniciais. Em suma, tempos de execução excederam 48 horas em alguns casos, impossibilitando a conclusão da função \verb+fit+ de treinamento, mesmo com o backend de paralelização \verb+ray+.  Com isso foram feitas pesquisas subsequentes que revelaram uma possível inadequação desse classificador ao tipo de dado fornecido, sugerindo que outros classificadores sejam usados em seu lugar.
+
+Além da testagem em cima do reforço via wafamole++, estruturalmente buscou-se diferenciar a implementação de Support Vector Machine da utilizada anteriormente no WAF-A-MoLE. Alguns parâmetros foram modificados, e fazendo-se uso de uma busca \textit{paramgrid} (para testar exaustivamente combinações de parâmetros) complementada de experimentação após sua execução, foi possível obter uma configuração com uma série de parâmetros diferentes.
+
+Nesse contexto destaca-se um que troca o algoritmo fundamental por trás do Support Vector Machine por um com abordagem não linear (no caso, \verb+kernel = 'rbf'+) em contraste direto com o algoritmo linear empregado no modelo Token-based padrão do WAF-A-MoLE. Por fim, é amostrado sua célula de código principal contida no Python Notebook.
+
+\label{sec:codigos:modelos}
+\includecode[C]{Pipeline classificador SVC Não-Linear}{alg:codigo3}{codigos/modelos/svc_model_sqliv3.py}
+\bigskip
+
+\subsection{Stochastic Gradient Descent}
+O segundo modelo a ser codificado pôde ser testado tanto para os datasets do kaggle como do WAF-A-MoLE original, sem grandes problemas de performance. No caso posterior, de fato houve uma exigência maior da máquina, requerindo um ambiente com mais memória que o desktop originalmente usado para executar os notebooks. Com isso, foi empregada a plataforma Google Colaboratory, da subdivisão de pesquisa da Google. 
+
+Essa mudança de ambiente ocasionou em uma série de vantagens, dentre as quais destacam-se: uma maior facilidade em executar um ambiente minimamente funcional, disponibilização de um link facilmente compartilhável, colaboração simultânea e principalmente mais memória RAM para executar as pipelines de treinamento. 
+
+Um fator indesejável é a impossibilidade de gerenciar com maior precisão a versão de Python e algumas dependências - ocasionando numa séria poluição de logs em virtude da deprecação de algumas técnicas empregadas em versões antigas dos pacotes \verb+numpy+, \verb+scikit-learn+ e \verb+tensorflow+, dificultando o desenvolvimento e diagnóstico de erros. 
+
+Acredita-se que a principal falha da plataforma, no entanto, seja a limitação de sua versão gratuita, no entanto, que desliga todas as células do Notebook em uso após um período fixo de 12 horas, a menos que o usuário esteja ativamente codificando na mesma. Isso dificultou grandemente o modelo discutido anteriormente, cujo fluxo de execução excedia facilmente esse intervalo para datasets suficientemente grandes.
+
+Não obstante, no caso do Stochastic Gradient Descent a performance foi satisfatória o suficiente para gerar um par de modelos a serem testados: um para o dataset \verb+SQLiV5.json+, entitulado de \verb+sgd_trained.dump+ e um para o dataset WAF-A-MoLE, \verb+test_sgd_classifier.py+. A performance dos mesmos será comparada mais detalhadamente no capítulo de testes adiante. 
+
+\label{sec:codigos:modelos}
+\includecode[C]{Pipeline classificador SGD sem backend de paralelização ray (Para SQLiV5.json)}{alg:codigo3}{codigos/modelos/sgd_model_sqliv3.py}
+\bigskip
+
+\subsection{Ada Boost Classifier}
+
+O último modelo, e um dos mais interessantes, é o Ada Boost Classifier, implementado apenas para o dataset do WAF-A-MoLE no final da implementação do trabalho. Sua performance é consideravelmente promissora, superando alguns dos modelos padrões do WAF-A-MoLE como alguns dos baseados em Token e o WAF-Brain. Para treiná-lo, foi necessário o uso do backend de paralelização \verb+ray+, tomando ainda um tempo considerável de vários minutos.
+
+O resultado desse modelo é entitulado de \verb+test_ada_classifier.dump+. Abaixo é amostrado como é feita essa adaptação.
+
+\label{sec:codigos:modelos}
+\includecode[C]{Pipeline classificador Ada Boost com backend de paralelização ray}{alg:codigo3}{codigos/modelos/ada_model.py}
+\bigskip
 
 
 
