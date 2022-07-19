@@ -184,5 +184,11 @@ O resultado desse modelo é entitulado de \verb+test_ada_classifier.dump+. Abaix
 \includecode[C]{Pipeline classificador Ada Boost com backend de paralelização ray}{alg:codigo3}{codigos/modelos/ada_model.py}
 \bigskip
 
+Por fim, para cada um desses novos modelos funcione, é necessária a criação de uma classe \textit{Wrapper} para servir de ponte entre a pipeline gerada pela biblioteca \verb+joblib+ e o wafamole++. A mesma inclui dois métodos: \verb+extract_features()+, atuando como uma função identidade; e \verb+classify()+, que realiza a classificação de fato sempre através da função \verb+predict_proba()+ que é requerida nos parâmetros de todos os modelos. Essa função retorna, conforme o comentário no código abaixo, a probabilidade do payload \verb+value+ de ser uma injeção SQL. Essa probabilidade é a que é comparada com a \verb+threshold+ limite dada pelo usuário no início da execução do programa, para uma eventual condição de parada.
+
+\label{sec:codigos:modelos}
+\includecode[C]{Classe SVCClassifierWrapper para modelos novos}{alg:codigo3}{codigos/modelos/svc_wrapper.py}
+\bigskip
+
 
 
