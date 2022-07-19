@@ -2,7 +2,7 @@
 \label{chp:capitulo5}
 
 \section{Abordagem de testes}
-O propósito inicial dos testes realizados é compreender amplamente o impacto das adições ao programa. Para tal, uma série de métricas foram empregadas para avaliação. A primeira característica avaliada foi a execução do programa, de uma maneira exaustiva, para todos os modelos relevantes (excluindo-se apenas o SQLiGOT, por motivos já mencionados. Através dela foi possível obter uma ideia do impacto que os novos modelos têm, e como o wafamole++ se adapta com \textit{wrappers} novos.
+O propósito inicial dos testes realizados é compreender amplamente o impacto das adições ao programa. Para tal, uma série de métricas foram empregadas para avaliação na execução do programa, de uma maneira exaustiva, para todos os modelos relevantes (excluindo-se apenas o SQLiGOT, por motivos já mencionados). Através dela foi possível obter uma ideia do impacto que os novos modelos têm, e como o wafamole++ se adapta com \textit{wrappers} novos.
 
 O parâmetro principal para tal avaliação foram \textbf{500} execuções por modelo no wafamole++. Tanto os modelos antigos como os modelos novos foram examinados. As medidas bases extraídas foram:
 \begin{alineas}
@@ -12,3 +12,85 @@ O parâmetro principal para tal avaliação foram \textbf{500} execuções por m
 \item \textbf{Execuções com iterações máximas alcançadas} - Quanto mais ocorrências dessa medida, mais robusto é o modelo uma vez que não é gerado um exemplo adversarial na execução.
 \end{alineas}
 
+\bigskip 
+
+Abaixo segue uma tabela com uma série de informações geradas de relevância, construídas a partir das métricas coletadas acima: 
+
+\begin{table}[H]
+\centering
+\caption{Visão Global de Execuções Realizadas}
+\begin{supertabular}{m{4.0cm}m{3.7cm}m{3.6cm}m{3.0cm}}
+\hline
+\multicolumn{1}{m{4.0cm}|}{\centering{Modelo}} &
+\multicolumn{1}{m{3.741cm}|}{\centering{Runtime médio}} &
+\multicolumn{1}{m{3.635cm}|}{\centering{Qtd. de Rounds restantes média (arredondado)}} &
+\centering\arraybslash{Execuções sem êxito}\\\hline
+\centering{\verb+test_ada+} &
+\centering{181.5269} &
+\centering{334} &
+\centering\arraybslash{198}\\
+\centering{\verb+test_svc_extra_moled+} &
+\centering{8.6750} &
+\centering{715} &
+\centering\arraybslash{26}\\
+\centering{\verb+test_svc_moled+} &
+\centering{7.6486} &
+\centering{993} &
+\centering\arraybslash{16}\\
+\centering{\verb+test_svc_no_mole+} &
+\centering{2.4484} &
+\centering{752} &
+\centering\arraybslash{0}\\
+\centering{\verb+sgd_trained+} &
+\centering{2.3822} &
+\centering{988} &
+\centering\arraybslash{0}\\
+\centering{\verb+test_sgd_wafamole+} &
+\centering{2.1332} &
+\centering{996} &
+\centering\arraybslash{0}\\
+\centering{\verb+token_random_forest+} &
+\centering{3.0299} &
+\centering{986} &
+\centering\arraybslash{1}\\
+\centering{\verb+token_naive_bayes+} &
+\centering{2.7982} &
+\centering{969} &
+\centering\arraybslash{1}\\
+\centering{\verb+token_linear_svm+} &
+\centering{2.3284} &
+\centering{997} &
+\centering\arraybslash{0}\\
+\centering{\verb+token_gauss_svm+} &
+\centering{2.2002} &
+\centering{999} &
+\centering\arraybslash{0}\\
+\centering{\verb+waf_brain+} &
+\centering{3.6010} &
+\centering{1000} &
+\centering\arraybslash{0}\\
+\hline
+\end{supertabular}
+    \legend{Fonte: Elaboração Própria }
+    \label{tab:tests}
+\end{table}
+\bigskip
+
+Os fatores que indicam uma performance melhor são relativamente contraintuitivos - um \textit{runtime} médio grande indica dificuldade em gerar um exemplo adversarial, que na verdade é um bom indicador para o Web Application Firewall sendo avaliado. Similarmente, poucos rounds restantes ao final da execução apontam para muitas iterações sendo consumidas e um WAF robusto, e um alto número de execuções sem êxito sugere casos em que o Web Application Firewall não se mostra suscetível a um ataque naquela execução. 
+
+Curiosamente, o modelo \verb+test_sgd+ gerado a partir do dataset original do WAF-A-MoLE não apresentou grandes melhorias em comparação com o modelo do dataset SQLiV3.json, \verb+sgd_trained+. Acredita-se que seja uma questão de adequação do classificador utilizado, uma vez que com a respectiva substuição do Stochastic Gradient Descent pelo Ada Boost e virtualmente a mesma implementação o mesmo se torna o WAF mais robusto do wafamole++.
+
+Dado isso, os modelos de maior interesse com base nos dados obtidos certamente são os entitulados de \verb+test_ada+, \verb+svc_extra_moled+, \verb+svc_moled+, \verb+svc_no_mole+. Neles, é possível ver uma melhora nítida em robustez quando comparado aos demais. O primeiro conjunto de \textit{Distribution Plots} amostrado a seguir detalha a evolução da robustez do Firewall alvo em função dos reforços incrementados ao dataset (indicados por \verb+no_mole+ como sem reforço, \verb+moled+ para um conjunto pequeno de reforço e \verb+extra_moled+ para um conjunto ainda maior de reforço), além de comparar com o modelo \verb+test_ada+ para perspectiva. 
+
+\begin{figure}[ht]
+    \centering
+    \caption{Distribution plot de tempos de execução (em segundos)}
+    \includegraphics[width=18cm]{figuras/graficos/runtimes_amount_set1.png} 
+    \legend{Fonte: Elaboração Própria}
+    \label{fig:mole-evolution} 
+\end{figure}
+
+% TO-DO Scatter plot único de Min Max runtimes por modelo
+
+
+% reminder {figure}[H] forces positioning!
