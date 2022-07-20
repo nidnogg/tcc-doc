@@ -1,16 +1,5 @@
-\chapter{CONSIDERAÇÕES FINAIS}
+\chapter{CONCLUSÃO}
 \label{chp:capitulo6}
-O valor acadêmico e profissional de aplicações como as descritas nesse trabalho foi extensivamente discutido, elucidando possíveis direções da área de Segurança da Informação. Foram analisadas diversas propostas e repositórios com ferramentas e soluções de \textit{hardening} no geral, com muitas sendo descartadas para contribuição ou como significativas. 
-
-Nesse contexto foi enfim encontrada uma potencialmente significativa contribuição para o progresso do campo, culminando no desenvolvimento do wafamole++. O mesmo traz não só modelos e operadores de mutação novos em comparação a sua edição original (WAF-A-MoLE), mas uma adaptação para um WAF open-source (\verb+MLBasedWAF+) baseado em Aprendizado de Máquina que possui uma performance comparável ao \verb+SQLiGOT+ (um modelo de ponta de alta complexidade e robustez). A diferença chave entre ambos, no entanto, é uma implementação consideravelmente mais simples para desenvolvedores e de código aberto ao público.
-
-Do projeto de testes com milhares de execuções realizadas, pode-se determinar que o reforço do dataset \verb+SQLiv3.json+ com exemplos adversariais do wafamole++ nos modelos \verb+test_svc_classifier_moled.dump+ e \verb+test_svc_classifier_extra_moled.dump+ possui um impacto direto na integridade do modelo, progressivamente tornando mais difícil de penetrar o resultado final conforme mais exemplos são adicionados.
-
-Conclui-se nesse âmbito que os modelos \verb+test_ada.dump+ e 
-
-\verb+test_svc_classifier_extra_moled.dump+ se mostram como prova real de que classificadores em Firewalls desse subcampo podem ser suficientemente reforçados com o wafamole++.
-
-Com o lançamento dessa aplicação, também são bem-vindas contribuições de desenvolvedores interessados, mantendo-se as mesmas diretrizes de expansão do WAF-A-MoLE original. Espera-se que para especialistas na área possam enriquecer com essa ferramentas seus Web Application Firewalls com exemplos geridos pelo mesmo.
 
 \section{Obstáculos Encontrados}
 
@@ -24,3 +13,16 @@ Fora essa restrição no plano da plataforma, o trabalho em torno de dados mostr
 Acredita-se a natureza extensível tanto do WAF-A-MoLE como do wafamole++ permite a ambos um potencial de melhoria razoavelmente amplo. Dado que os modelos novos são inteiramente amostrados da biblioteca \verb+scikit-learn+, cabe a reflexão pelos autores de como seriam resultados oriundos de modelos criados em bibliotecas como \verb+Keras+ (em uma implementação mais elaborada que a vista no WAF-Brain), \verb+PyTorch+, e afins. Não só isso, como há também uma infinidade de operadores de mutação a serem explorados, com os três escolhidos no wafamole++ sendo apenas uma breve amostragem de pesquisa dos autores.
 
 Como também é demonstrado nos iPython Notebooks anexados, a otimização de hiperparâmetros via \verb+GridSearch+ poderia ser mais explorada em um ambiente sem restrições de hardware e tempo de uso como o Google Colab, nos modelos com dados originais do WAF-A-MoLE que eram mais exigentes. 
+
+\section{Considerações Finais}
+O valor acadêmico e profissional de aplicações como as descritas nesse trabalho foi extensivamente discutido, elucidando possíveis direções da área de Segurança da Informação. Foram analisadas diversas propostas e repositórios com ferramentas e soluções de \textit{hardening} no geral, com muitas sendo descartadas para contribuição ou como significativas. 
+
+Nesse contexto foi enfim encontrada uma potencialmente significativa contribuição para o progresso do campo, culminando no desenvolvimento do wafamole++. O mesmo traz não só modelos e operadores de mutação novos em comparação a sua edição original (WAF-A-MoLE), mas uma adaptação para um WAF open-source (\verb+MLBasedWAF+) baseado em Aprendizado de Máquina que possui uma performance comparável ao \verb+SQLiGOT+ (um modelo de ponta de alta complexidade e robustez). A diferença chave entre ambos, no entanto, é uma implementação consideravelmente mais simples para desenvolvedores e de código aberto ao público.
+
+Do projeto de testes com milhares de execuções realizadas, pode-se determinar que o reforço do dataset \verb+SQLiv3.json+ com exemplos adversariais do wafamole++ nos modelos \verb+test_svc_classifier_moled.dump+ e \verb+test_svc_classifier_extra_moled.dump+ possui um impacto direto na integridade do modelo, progressivamente tornando mais difícil de penetrar o resultado final conforme mais exemplos são adicionados.
+
+Conclui-se nesse âmbito que os modelos \verb+test_ada.dump+ e 
+
+\verb+test_svc_classifier_extra_moled.dump+ se mostram como prova real de que classificadores em Firewalls desse subcampo podem ser suficientemente reforçados com o wafamole++.
+
+Com o lançamento dessa aplicação, também são bem-vindas contribuições de desenvolvedores interessados, mantendo-se as mesmas diretrizes de expansão do WAF-A-MoLE original. Espera-se que para especialistas na área possam enriquecer com essa ferramentas seus Web Application Firewalls com exemplos geridos pelo mesmo.

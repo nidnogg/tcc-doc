@@ -3,7 +3,7 @@
 
 Tendo em consideração o embasamento teórico estabelecido e a oportunidade de contribuir para um projeto \textit{open source} na área de interesse deste trabalho que tivesse uma boa abrangência e impacto, foi concebido o \textbf{wafamole++}, uma versão estendida do WAF-A-MoLE anteriormente descrito no capítulo de Revisão de Literatura. Foram seguidas diretrizes e recomendações de contribuição estabelecidas pelos autores, e alguns módulos adicionais contendo funcionalidades não disponibilizadas pelos mesmos referentes ao treinamento de novos classificadores, geração de novos modelos, e tratamento de datasets foram disponibilizados com este trabalho.
 
-A elaboração do mesmo permitiu um entendimento mais profundo da ferramenta original, recebendo apoio dos autores originais e atualmente conta com uma série de operadores de mutação novos e sobretudo modelos de classificadores novos implementados para um Web Application Firewall de código aberto encontrado na plataforma de colaboração Github.
+A elaboração do mesmo permitiu um entendimento mais profundo da ferramenta original, recebendo apoio dos autores originais e atualmente conta com uma série de operadores de mutação novos e sobretudo modelos de classificadores novos implementados para um Web Application Firewall de código aberto encontrado na plataforma de colaboração GitHub.
 
 Acredita-se que essa colaboração ocasionou em uma ferramenta mais abrangente, com uma menor barreira de entrada para futuros colaboradores e mais flexível para avaliação de Web Application Firewalls baseados em Aprendizado de Máquina no geral. Assim espera-se que mais contribuições possam ser geridas no futuro, estabelecendo-se como um projeto complementar ao WAF-A-MoLE original.
 
@@ -27,7 +27,7 @@ Esses módulos, no entanto, não podem ser trivialmente estendidos sem alguns co
 
 \item \verb+sqli_cleaner+ - Essa função auxiliar foi codificada inicialmente com a finalidade de transformar o dataset SQLiV3 do formato .csv para .json que seria mais simples de trabalhar em Python, além de adaptá-lo para o padrão visto no MLBasedWAF, porém uma série de inconsistências suscitou um polimento e tratamento de certos casos para que a saída fosse corrigida. Seu código está disponível nessa seção.
 
-\item \verb+wafamole_dataset_generator+ - Fornecido apenas após um certo período de espera, o dataset do wafamole é disponibilizado no seu \href{https://github.com/zangobot/wafamole_dataset}{repositório} de maneira modular - com uma série de arquivos .json pequenos devido ao limite imposto pela plataforma Github. Além disso, ele precisou ser adaptado para o formato do MLBasedWAF assim como o SQLiV3 (sem grandes dificuldades nesse caso). Possui uma abrangência e riqueza maior no geral do que o antecessor. Essa função realiza a combinação e adaptação das partes disponibilizadas pelos autores.
+\item \verb+wafamole_dataset_generator+ - Fornecido apenas após um certo período de espera, o dataset do wafamole é disponibilizado no seu \href{https://github.com/zangobot/wafamole_dataset}{repositório} de maneira modular - com uma série de arquivos .json pequenos devido ao limite imposto pela plataforma GitHub. Além disso, ele precisou ser adaptado para o formato do MLBasedWAF assim como o SQLiV3 (sem grandes dificuldades nesse caso). Possui uma abrangência e riqueza maior no geral do que o antecessor. Essa função realiza a combinação e adaptação das partes disponibilizadas pelos autores.
 
 \end{alineas}
 \item \verb+MLBasedWafClassifier+ - Localizada na pasta dos modelos customizados (models/svc), esse iPython Notebook é responsável por uma série de funções realizadas em cima dos datasets baseados no SQLiV3. É realizado a visualização dos dados contidos nos mesmos com alguns gráficos gerados, e os dados são agrupados de maneira a serem classificados para uso no wafamole++. Dois tipos de classificadores são suportados - \textit{Support Vector Machine} não linear, e \textit{Stochastic Gradient Descent}. 
@@ -83,7 +83,7 @@ Nessa função a seleção e armazenamento de posições a serem modificadas é 
 
 \subsection{WAF-Brain}
 
-\textbf{Autores}: Sergio D Fdez, cr0hn, Enrique Garcia. Disponível no Github \href{https://github.com/BBVA}{BBVA}
+\textbf{Autores}: Sergio D Fdez, cr0hn, Enrique Garcia. Disponível no GitHub \href{https://github.com/BBVA}{BBVA}
 
 O WAF-Brain foi um dos primeiros firewalls a serem testados pela equipe do WAF-A-MoLE, e subsequentemente é o primeiro modelo de exemplo disponibilizado para testes na documentação do mesmo. Dessa maneira, foi extensivamente testado com os novos operadores de mutação, sendo de grande ajuda para diagnosticar os incluídos no wafamole++.
 
@@ -91,7 +91,7 @@ O WAF-Brain foi um dos primeiros firewalls a serem testados pela equipe do WAF-A
     \centering
     \caption{Dependências e logomarca do WAF-Brain}
     \includegraphics[width=12.5cm]{figuras/WAFBrain.png} 
-    \legend{Fonte: \href{https://github.com/BBVA}{Github} (2019, p. TO-DO)}
+    \legend{Fonte: \href{https://github.com/BBVA}{GitHub} (2019, p. TO-DO)}
     \label{fig:internet} 
 \end{figure}
 
@@ -102,16 +102,16 @@ Na adaptação WAF-A-MoLE, esse poder de predição é aproveitado exclusivament
 Por mais que se trate de um algoritmo sofisticado por natureza, surpreendentemente o WAF-Brain fora implementado pelos seus autores originais de uma maneira simplória o suficiente para ser um dos WAFs mais vulneráveis às estratégias de fuzzing do WAF-A-MoLE. Vários operadores de mutação isolados conseguem resultados frutíferos em pouco tempo, como será visto na seção de testes adiante.
 
 \subsection{SQLiGoT}
-Conforme uma advertência no repositório do WAF-A-MoLE pelos autores, esse Web Application Firewall exige um tempo de semanas para ser penetrado pela aplicação. Além disso, seu código encontra-se inacessível, proibindo a experimentação para o escopo desse trabalho, impossibilitando até mesmo que sejam feitas as etapas de treinamento. Por esse motivo, o SQLiGOT foi dispensado como alvo de estudo.
+Conforme uma advertência no repositório do WAF-A-MoLE feita pelos autores, esse Web Application Firewall exige um tempo de semanas para ser penetrado pela aplicação. Além disso, seu código encontra-se inacessível, proibindo a experimentação para o escopo desse trabalho, impossibilitando até mesmo que sejam feitas as etapas de treinamento. Por esse motivo, o SQLiGOT foi dispensado como alvo de estudo.
 
 \subsection{MLBasedWAF}
-Todos os modelos implementados tiveram como base o firewall ML-Based-WAF, disponível por vladan-stojnic no \href{https://github.com/vladan-stojnic/ML-based-WAF}{Github} que fora o WAF open source mais promissor e mais plausível de adaptar. Sua performance também era factível no contexto de recursos disponíveis para a conclusão deste projeto final.
+Todos os modelos implementados tiveram como base o firewall ML-Based-WAF, disponível por vladan-stojnic no \href{https://github.com/vladan-stojnic/ML-based-WAF}{GitHub} que fora o WAF open source mais promissor e mais plausível de adaptar. Sua performance também era factível no contexto de recursos disponíveis para a conclusão deste projeto final.
 
 \begin{figure}[ht]
     \centering
     \caption{Repositório ML-Based-WAF}
     \includegraphics[width=16cm]{figuras/MLBasedWAF.png} 
-    \legend{Fonte: \href{https://github.com/vladan-stojnic/ML-based-WAF}{Github} (2020, p. TO-DO)}
+    \legend{Fonte: \href{https://github.com/vladan-stojnic/ML-based-WAF}{GitHub} (2020, p. TO-DO)}
     \label{fig:internet} 
 \end{figure}
 
