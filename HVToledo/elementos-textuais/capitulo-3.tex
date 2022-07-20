@@ -261,5 +261,114 @@ Comentar que modelo novo do wafamole++ é a versão não linear, em contraste co
 
 \subsection{Stochastic Gradient Descent}
 
-\subsection{Adaboost}
+\subsection{AdaBoost}
+
+AdaBoost é um algoritmo do tipo Boosting com capacidade auto-adaptativa que melhora a performance de classificadores fracos por estabelecer um conjunto de múltiplos classificadores. Como o AdaBoost adapta-se a taxa de erro do algoritmo básico em treinamento através de regulação dinâmica do peso de cada amostra, o interesse dos pesquisadores tem sido estimulado.
+
+O método de Boosting vem da análise teórica do modelo de aprendizado chamado PAC (Probably Approximately Correct). Os autores Kearns e Valiant propuseram os conceitos de aprendizado forte e fraco. No modelo de aprendizado do PAC, se um algoritmo de aprendizado polinomial para identificar um grupo de conceito e a acurácia do reconhecimento é muito alta, esse grupo de conceitos são considerados como aprendizado forte. Porém, se a taxa de corretude do algoritmo de aprendizado de identificação é um pouco superior a tentativa aleatória de adivinhar, então esse grupo é considerado aprendizado fraco. 
+
+Kearns e Valient perceberam uma relação de equivalência entre aprendizado fraco e forte, onde o algoritmo de aprendizado fraco pode ser promovido para aprendizado forte.
+Se existe uma equivalência entre fraco e forte, então enquanto aprende-se um conceito, pode-se elevar um algoritmo um pouco melhor que tentativas de adivinhação aleatórias para um algoritmo de aprendizado forte (desde que se saiba qual algoritmo forte em específico).
+
+Em 1990, Schapire publicou o primeiro método de Boosting. Freund fez melhorias e criou um método muito melhor conhecido como BBM (boost-by-majority).
+Boosting produz uma série de classificadores antes e depois do treinamento. O conjunto de treinamento utilizado em cada classificador é um subconjunto advindo do conjunto geral de treinamento e se cada amostra aparece no subconjunto ou não depende da performance dos classificadores anteriores. No caso das amostras julgadores como incorretas pelos classificadores já existentes, então ã probabilidade de surgirem no novo subconjunto de treinamento será muito maior, fazendo com que os classificadores seguintes tenham foco em lidar com as diferenças nas amostras, que é uma tarefa árdua para os classificadores já existentes.
+
+O método Boosting pode aumentar a capacidade de generalização de um dado algoritmo, mas o algoritmo precisa ter estabelecido o limite inferior da acurácia de aprendizagem de um classificador fraco, que na prática é uma tarefa difícil.
+
+AdaBoost que surgiu em 1995 atráves de Freund e Schapire fez uma grande melhoria no algoritmo de Boosting.
+Sendo o algoritmo mais representativo da família, ele mantém a distribuição de um conjunto de probabilidades para amostras de treinamento e ajusta a probabilidade de distribuição de cada amostra durante a iteração. Um algoritmo específico de aprendizado é usado para gerar o classificador-membro e calcular a taxa de erro nas amostras de treinamento. AdaBoost irá usar a taxa de erro para ajustar a probabilidade de distribuição das amostras de treino. O papel de mudar os pesos é para aumentar o impacto das classificações incorretas e reduzir o impacto das classificações corretas. Por fim, com o ajuste dos pesos nos classificadores únicos, é obtido um classificador forte.
+O pseudoalgoritmo tem a seguinte estrutura com um conjunto de amostras iniciais:
+
+\begin{equation}
+    L=\left\{\left(x_{1}, y_{1}\right),\left(x_{2}, y_{2}\right) \cdots\left(x_{N}, y_{N}\right)\right\}, y_{i} \in\{+1,0\}
+\end{equation}
+% \begin{figure}[ht]
+%     \centering
+%     \caption{Conjunto Inicial de Amostras}
+%     \includegraphics[width=14cm]{figuras/adaboost/amostras.png} 
+%     \legend{Fonte: \href{https://link.springer.com/chapter/10.1007/978-3-642-18129-0_1}{Some Analysis and Research of the AdaBoost Algorithm} (2022, p. TO-DO)}
+%     \label{fig:internet} 
+% \end{figure}
+
+
+A distribuição inicial dos pesos é dada por:
+
+\begin{equation}
+    w_{i}^{1}=\frac{1}{N}
+\end{equation}
+% \begin{figure}[ht]
+%     \centering
+%     \caption{Distribuição Inicial}
+%     \includegraphics[width=5cm]{figuras/adaboost/distribuicao_pesos_inicial.png} 
+%     \legend{Fonte: \href{https://link.springer.com/chapter/10.1007/978-3-642-18129-0_1}{Some Analysis and Research of the AdaBoost Algorithm} (2022, p. TO-DO)}
+%     \label{fig:internet} 
+% \end{figure}
+
+Onde +1 é uma amostra positiva e 0 é uma amostra negativa, sendo o total de amostras N.
+
+Considerando t = 1, ... , T, tem-se um loop com os pesos normalizados:
+
+% \begin{figure}[ht]
+%     \centering
+%     \caption{Peso Normalizado}
+%     \includegraphics[width=5cm]{figuras/adaboost/peso_normalizado.png} 
+%     \legend{Fonte: \href{https://link.springer.com/chapter/10.1007/978-3-642-18129-0_1}{Some Analysis and Research of the AdaBoost Algorithm} (2022, p. TO-DO)}
+%     \label{fig:internet} 
+% \end{figure}
+
+\begin{equation}
+    w_{i}^{t}=\frac{w_{i}^{t}}{\sum_{j=1}^{N} w_{j}^{t}}
+\end{equation}
+
+O classificador fraco que seleciona e classifica do conjunto de amostras aquele cuja taxa de erro é a menor e a distribuição do peso atual $h_{t}$. A taxa de erro do classificador fraco é dada pela expressão:
+
+% \begin{figure}[ht]
+%     \centering
+%     \caption{Taxa de Erro}
+%     \includegraphics[width=7cm]{figuras/adaboost/taxa de erro.png} 
+%     \legend{Fonte: \href{https://link.springer.com/chapter/10.1007/978-3-642-18129-0_1}{Some Analysis and Research of the AdaBoost Algorithm} (2022, p. TO-DO)}
+%     \label{fig:internet} 
+% \end{figure}
+
+\begin{equation}
+    \mathcal{E}_{t}=\sum_{i=1}^{N} w_{i}^{t}\left|h_{t}\left(x_{i}\right)-y_{i}\right|
+\end{equation}
+
+A atualização do peso da amostra é dada por:
+
+\begin{equation}
+    w_{i}^{t+1}=w_{i}^{t} \beta_{t}^{1-e_{i}}
+\end{equation}
+
+% \begin{figure}[ht]
+%     \centering
+%     \caption{Atualização dos Pesos}
+%     \includegraphics[width=7cm]{figuras/adaboost/atualização dos pesos.png} 
+%     \legend{Fonte: \href{https://link.springer.com/chapter/10.1007/978-3-642-18129-0_1}{Some Analysis and Research of the AdaBoost Algorithm} (2022, p. TO-DO)}
+%     \label{fig:internet} 
+% \end{figure}
+
+$e_{i}$ = 0 representa que xi foi classificado corretamente e $e_{i}$ = 1 significa que $x_{i}$ foi classificado incorretamente.
+
+Como saída final do algoritmo:
+
+\begin{equation}
+    \begin{aligned}
+    &H(x)= \begin{cases}1, & \sum_{t=1}^{T} \alpha_{t} h_{t}(x) \geq \frac{1}{2} \sum_{t=1}^{T} \alpha_{t} \\ 0, & \text { caso contrario }\end{cases}\\
+    &\alpha_{t}=\log \frac{1}{\beta_{t}} .
+    \end{aligned}
+\end{equation}
+% \begin{figure}[H]
+%     \centering
+%     \caption{Saída Final}
+%     \includegraphics[width=12cm]{figuras/adaboost/saída do algoritmo.png} 
+%     \legend{Fonte: \href{https://link.springer.com/chapter/10.1007/978-3-642-18129-0_1}{Some Analysis and Research of the AdaBoost Algorithm} (2022, p. TO-DO)}
+%     \label{fig:internet} 
+% \end{figure}
+
+
+Referência: 
+https://link.springer.com/chapter/10.1007/978-3-642-18129-0_1
+Some Analysis and Research of the AdaBoost Algorithm
+Autores: Peng Wu and Hui Zhao
 
