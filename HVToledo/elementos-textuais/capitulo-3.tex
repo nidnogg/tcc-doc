@@ -232,24 +232,47 @@ Sumariamente, pode-se perceber como esse campo de pesquisa traz consigo abordage
 
 Algoritmos que vêm por padrão no \textit{WAF-A-MoLE} em modelos de exemplo são \textit{Naive Bayes}, \textit{Random Forest} e \textit{Support Vector Machine} Gaussiana/Linear, ofertados pela biblioteca \textit{scikit-learn}. Além disso, há um WAF externo \textit{open-source} embutido que faz uso de Redes Neurais.
 
-Introduzir conceitos de ML básicos. Melhor ref pra essa intro é \href{link}{https://bibliotecadigital.fgv.br/dspace/handle/10438/30819}. Mencionar POR ALTO (basta nome e descrição bem breve de propósito, métodos e resultados dos algoritmos bases do \textit{WAF-A-MoLE} (não os novos do wafamole++)):
-\begin{alineas}
-\item Redes Neurais com Deep Learning - usar artigo Dantas de referência \href{link}{https://bibliotecadigital.fgv.br/dspace/handle/10438/30819}
-\item \textit{Naive Bayes}
-\item \textit{Random Forest}
-\item SVM Gaussiana e Linear
-\end{alineas}
-
-Mencionar que o resto como é explorado mais a fundo no \textit{wafamole++} será descrito nas subseções a seguir com mais detalhes ( Ver parâmetros usados no Cap 4 no wafamole++): 
-
 \subsection{Support Vector Machine}
+SVMs ou Support Vector Machines são modelos de aprendizado supervisionado (dentro do contexto de teoria de machine learning) associado a algoritmos de aprendizado que analisam dados para classificação e análise regressiva. É um dos métodos de predição mais robustos, baseado em \textit{frameworks} de aprendizado estatístico ou na teoria VC \cite{ben2001_vapnik_support}.
 
-Usar como ref artigo do Vladimir Vapnik original pra SVM (autor do classificador)
+Dado um conjunto de exemplos para treinamento, cada um é marcado em duas categorias, um algoritmo de treinamento SVM constrói um modelo que assina novos exemplos para uma categoria ou outra, sendo um classificador binário linear não-probabilístico. 
+O SVM mapeia exemplos de treinamento para pontos no espaço de maneira a maximizar a distância entre as duas categorias. Novos exemplos são então mapeados no mesmo espaço e a predição através de qual lado da diferença entra as categorias é mais provável ela cair. Em adição a performance do classificador linear, SVMs conseguem de maneira eficiente efetuar classificações não-lineares utilizando um mapeamento implícito de entradas em espaços multi-dimensionais.
+Quando os dados ainda não foram rotulados, o aprendizado supervisionado não é possível e é necessário uma abordagem não-supervisionada, que tenta encontra \textit{clusters} naturais para o grupo de dados e então mapear os novos dados nos grupos formados. O algoritmo \textit{SV clustering} aplica a estatística aos \textit{Support Vectors}, permitindo categorização de dados não-rotulados.
+Foi criado por Vladimir Vapnik com outros parceiros na AT\&T Bell Laboratories.
+Para exemplificar o poder do modelo de aprendizado, o artigo \cite{vapnik_svm_support} mostra a performance obtida em classificação de histogramas em níveis surpreendentemente altos, com taxas de erro por volta de 11\% (baixa) para a classificação de 14 categorias e com taxa de erro de 16\% para conjuntos de objetos mais genéricos. Esses resultados foram obtidos sem conhecimento prévio da tarefa, sabendo apenas que a entrada seria uma densidade discreta ou histograma colorido.
+\textit{Python} possui no pacote \textit{sklearn} um método SVC e variantes com eficácias distintas em cenários diferentes.
+O novo modelo proposto \textit{wafamole++} é a versão não-linear, diferente da proposta original de Vladimir.
 
-Comentar que modelo novo do \textit{wafamole++} é a versão não linear, em contraste com a linear original
+\begin{figure}[ht]
+    \centering
+    \caption{Plot com quatro variantes do SVC}
+    \includegraphics[width=14cm]{figuras/plot-svc.png} 
+    \legend{Fonte: \href{https://scikit-learn.org/stable/modules/svm.html}{\cite{scikit_svm_module}} (2022, p. TO-DO)}
+    \label{fig:internet} 
+\end{figure}
 
 \subsection{Stochastic Gradient Descent}
 
+Gradiente descendente estocástico é um método iterativo para otimização de uma função objetivo com propriedades "suaves" (diferenciais ou subdiferenciais) adequadas. \cite{ruder2016overview}
+
+Pode ser considerada uma aproximação estocástica da otimização por gradiente descendente, uma vez que substitui o gradiente atual (calculado do dataset inteiro) por uma estimativa do mesmo calculada for um subconjunto dos dados selecionado aleatoriamente.
+Em problemas de otimização com muitas dimensões, reduz o peso computacional, tendo resultados mais rápidos com o \textit{tradeoff} de perda na taxa de convergência.
+O SGD procura encontrar o mínimo global de uma função através de ajustes de configuração a cada tentativa. Ao invés de reduzir o erro ou achar o gradiente para o dataset inteiro, o método reduz o erro através de aproximações em direção ao gradiente para um subconjunto aleatório do dataset, que pode ser tão pequeno quanto o conjunto de dados de treinamento inicial.
+De forma heurística, se o modelo inicial erra muito, as alterações na configuração vão tornando o modelo mais preciso. Em contrapartida, é possível que questões antes acertadas, possam passar a serem erradas ou aumento da taxa de erro geral em favor de acertos específicos. Nem toda iteração necessariamente irá fazer o modelo melhorar.
+Positivamente, o SGD consegue sair do mínimo local em direção ao mínimo global através dos ajustes de configuração com baixo custo computacional em relação ao gradiente descendente clássico.
+\cite{overview_gradient_descent_stochastic}
+
+\begin{figure}[ht]
+    \centering
+    \caption{Função Objetivo}
+    \includegraphics[width=10cm,height=14cm,keepaspectratio]{figuras/funcao_objetivo.png} 
+    \legend{Fonte: \href{https://deepai.org/}{Função Objetivo} (2022, p. TO-DO)}
+    \label{fig:internet} 
+\end{figure}
+
+\includecode[C]{Função de um SGD elementar} {alg:codigo1}{codigos/sgd.py}
+
+\bigskip
 
 \subsection{AdaBoost}
 
@@ -263,7 +286,7 @@ Se existe uma equivalência entre fraco e forte, então enquanto aprende-se um c
 Em 1990, Schapire publicou o primeiro método de Boosting. Freund fez melhorias e criou um método muito melhor conhecido como BBM (boost-by-majority).
 \textit{Boosting} produz uma série de classificadores antes e depois do treinamento. O conjunto de treinamento utilizado em cada classificador é um subconjunto advindo do conjunto geral de treinamento e se cada amostra aparece no subconjunto ou não depende da performance dos classificadores anteriores. No caso das amostras julgadores como incorretas pelos classificadores já existentes, então ã probabilidade de surgirem no novo subconjunto de treinamento será muito maior, fazendo com que os classificadores seguintes tenham foco em lidar com as diferenças nas amostras, que é uma tarefa árdua para os classificadores já existentes.
 
-O método B\textit{oosting} pode aumentar a capacidade de generalização de um dado algoritmo, mas o algoritmo precisa ter estabelecido o limite inferior da acurácia de aprendizagem de um classificador fraco, que na prática é uma tarefa difícil.
+O método \textit{Boosting} pode aumentar a capacidade de generalização de um dado algoritmo, mas o algoritmo precisa ter estabelecido o limite inferior da acurácia de aprendizagem de um classificador fraco, que na prática é uma tarefa difícil.
 
 \textit{AdaBoost} que surgiu em 1995 atráves de Freund e Schapire fez uma grande melhoria no algoritmo de \textit{Boosting}.
 Sendo o algoritmo mais representativo da família, ele mantém a distribuição de um conjunto de probabilidades para amostras de treinamento e ajusta a probabilidade de distribuição de cada amostra durante a iteração. Um algoritmo específico de aprendizado é usado para gerar o classificador-membro e calcular a taxa de erro nas amostras de treinamento. \textit{AdaBoost} irá usar a taxa de erro para ajustar a probabilidade de distribuição das amostras de treino. O papel de mudar os pesos é para aumentar o impacto das classificações incorretas e reduzir o impacto das classificações corretas. Por fim, com o ajuste dos pesos nos classificadores únicos, é obtido um classificador forte.
