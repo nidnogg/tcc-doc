@@ -3,11 +3,10 @@
 
 \section{SQL Injection}
 
-No contexto de segurança das aplicações estudadas, Injeções de código são uma espécie de ataque ocorre quando um atacante testa a segurança de um site enviando dados inesperados para uma aplicação web, fazendo com que a mesma os processe de maneira inválida e se comporte de uma maneira diferente da qual foi originalmente programada. 
 
-O tipo mais comum e mais prevalecente de \textit{code injection} é o de SQL Injection, que manipula bancos de dados via SQL (Structured Query Language), a linguagem clássica de manuseio de bancos de dados, para receber acesso a informações sensíveis.
+O tipo mais comum e mais prevalecente de injeção de código é o de SQL Injection, que manipula bancos de dados via \verb+SQL+ (\textit{Structured Query Language}), a linguagem clássica de manuseio de bancos de dados, para receber acesso a informações sensíveis.
 
-Exemplificando algumas situações de SQL Injections:
+Exemplificando algumas situações de SQL Injections \cite{sql_port_swigger}:
 
 \begin{alineas}
     \item 
@@ -60,7 +59,7 @@ Exemplificando algumas situações de SQL Injections:
 
 \begin{alineas}
     \item
-    Também é possível recuperar dados de outras tabelas de um banco de dados, utilizando a keyword \verb+UNION+, que combina o resultado de múltiplas consultas \verb+SELECT+ em apenas um conjunto. Se um atacante executa a seguinte query contendo a entrada de usuário \verb+`Presentes`+, ainda no último exemplo de site:
+    Também é possível recuperar dados de outras tabelas de um banco de dados, utilizando a \textit{keyword} \verb+UNION+ \cite{mysql_union}, que combina o resultado de múltiplas consultas \verb+SELECT+ em apenas um conjunto. Se um atacante executa a seguinte query contendo a entrada de usuário \verb+`Presentes`+, ainda no último exemplo de site:
     
     \begin{verbatim}
         SELECT name, description
@@ -78,15 +77,13 @@ Exemplificando algumas situações de SQL Injections:
 \end{alineas}
 
 
-No contexto deste trabalho, no entanto, é estudado uma forma tanto comercial como open-source que têm tido crescimento no mercado: o uso de Web Application Firewalls, mais especificamente o de Web Application Firewalls baseados em técnicas de Aprendizado de Máquina.
-
-TO-DO: Colocar citações desse trecho de trabFinalMab.pdf 
+No contexto deste trabalho, no entanto, é estudado uma forma tanto comercial como \textit{open-source}  que têm tido crescimento no mercado: o uso de \textit{Web Application Firewalls}, mais especificamente os baseados em técnicas de Aprendizado de Máquina.
 
 \section{OWASP TOP 10}
 
 Há pelo menos dez anos os ataques cibernéticos vem aumentando, tendo grande impacto nas empresas.
 Aplicações web quando são desenvolvidas sem ter segurança da informação no seu cerne possibilita perda de ativos, inoperabilidade de serviços, exposição de dados sensíveis e comprometimento de sistemas. 
-A Open Web Application Security Project (também conhecida pela sigla OWASP) é uma fundação sem fins lucrativos cujo objetivo é aprimorar a segurança do software. A organização fornece projeto de código livre, vasta comunidade ativa, conferências, treinamentos e boas práticas. Uma das iniciativas é o \textbf{OWASP TOP 10}, que lista, detalha e informa acerca de defesas possíveis para as 10 vulnerabilidades de um dado ano:
+A \textit{Open Web Application Security Project} (também conhecida pela sigla OWASP) é uma fundação sem fins lucrativos cujo objetivo é aprimorar a segurança do software. A organização fornece projeto de código livre, vasta comunidade ativa, conferências, treinamentos e boas práticas. Uma das iniciativas é o \textit{OWASP TOP 10} \cite{bach_owasp2020understanding}, que lista, detalha e informa acerca de defesas possíveis para as 10 vulnerabilidades de um dado ano:
 
 \begin{alineas}
 
@@ -108,11 +105,11 @@ A Open Web Application Security Project (também conhecida pela sigla OWASP) é 
 
 \subsection{Injeção, ou code injection}
 Forma de ataque ampla onde uma entrada de dados recebe caracteres não tratados que são executados pelo sistema com objetivo de alterar o funcionamento padrão do software.
-Além dos exemplos bases de SQL Injection, existem variantes do SQL Injection como: \textit{error-based, union-based, blind} e \textit{out-of-band}. \textit{Error-based} são injeções que fornecem erros de SQL para o atacante, vazando informações críticas do banco de dados. \textit{Union-based} são ataques que utilizam uma query existente na lógica do sistema concatenada a outra através de um \verb+UNION+ de maneira a executar uma segunda lógica além da já estabelecida pelo sistema. Injeções às cegas (\textit{blind-based}) são aquelas que o sistema não dá nenhuma informação após a injeção, de forma que o atacante precisa ser engenhoso para obter informações e prosseguir com a ofensiva. \textit{Out-of-band} é uma injeção sem o fornecimento de uma saída para o atacante, porém é possível redirecionar a saída para um endpoint, geralmente servidor http.
+Além dos exemplos bases de SQL Injection, existem variantes do SQL Injection como: \textit{error-based, union-based, blind} e \textit{out-of-band} \cite{out_of_band_sql_invicti}. \textit{Error-based} são injeções que fornecem erros de SQL para o atacante, vazando informações críticas do banco de dados. \textit{Union-based} são ataques que utilizam uma query existente na lógica do sistema concatenada a outra através de um \verb+UNION+ de maneira a executar uma segunda lógica além da já estabelecida pelo sistema. Injeções às cegas (\textit{blind-based}) são aquelas que o sistema não dá nenhuma informação após a injeção, de forma que o atacante precisa ser engenhoso para obter informações e prosseguir com a ofensiva. \textit{Out-of-band} é uma injeção sem o fornecimento de uma saída para o atacante, porém é possível redirecionar a saída para um endpoint, geralmente servidor http.
 É fundamental para mitigar as injeções ter uma validação dos caracteres e declarações válidas ao receber uma entrada de dados na aplicação web.
 
 \subsection{Broken Authentication}
-Broken Authentication é um conjunto de métodos em que os atacantes podem ganhar as credenciais de usuário ou sequestrar sessões de usuário. Senhas fracas ou facilmente adivinháveis, senhas armazenadas indevidamente sem serem transformadas em hashes, IDs de sessão expostos em URLS, ataques de fixação de ID de sessão e transmissão não-criptografada http.
+Broken Authentication é um conjunto de métodos em que os atacantes podem ganhar as credenciais de usuário ou sequestrar sessões de usuário. Senhas fracas ou facilmente adivinháveis, senhas armazenadas indevidamente sem serem transformadas em hashes, IDs de sessão expostos em URLS, ataques de fixação de ID de sessão \cite{session_fixation_invicti} e transmissão não-criptografada http.
 Para mitigar problemas dessa natureza são indicadas medidas como armazenar senhas com hash, garantir que IDs de sessão não estão expostos nas URLS, configurar timeouts nas sessões, não permitir recriação de sessões expiradas, não transmitir senhas em canais sem criptografia, utilizar senhas com tamanho mínimo e determinada complexidade, ocultar nomes de usuário e senha em mensagens de erro devido a login mal sucedido e assegurar proteção contra brute force após cinco tentativas falhas.
 
 \subsection{Exposição de Dados Sensíveis}
@@ -120,7 +117,7 @@ Aplicações web que não protegem senhas, informações financeiras ou relativa
 
 \subsection{Entidades Externas de XML}
 Um tipo particular de injeção, também conhecido como injeção XXE, ocorre quando atacantes abusam dos parses XML utilizados em servidores web através do envio de documentos XML cuidadosamente forjados que caso sejam processados levam à negação de servição, execução remota de código arbitrário ou requisições forjadas do lado do servidor.
-Por exemplo, um atacante pode enviar um payload especialmente forjado para um servidor web, o servidor web envia para um parser XML, o parser XML por sua vez devolve o caminho do arquivo para o servidor, que devolve para o agente malicioso.
+Por exemplo, um atacante pode enviar um \textit{payload} especialmente forjado para um servidor web, o servidor web envia para um parser XML, o parser XML por sua vez devolve o caminho do arquivo para o servidor, que devolve para o agente malicioso.
 
 \begin{verbatim}
     <?xml version="1.0" ?>
@@ -132,88 +129,71 @@ Por exemplo, um atacante pode enviar um payload especialmente forjado para um se
     <passwd>&xxe;</passwd>
 \end{verbatim}
 
-Existem duas variantes de ataques XXE, sendo a primeira conhecida como in-band, onde o atacante forja um documento XML malicioso e o submete através da rede para ser processado e recebe uma resposta instantânea, enquanto a outra variante chamada out-of-band ocorre quando o atacante forja um documento XML malicioso, submete, todavia não obtém resposta imediata do servidor web. Ataques out-of-band também são chamados de "blind XXE injection".
-É possível mitigar injeções XXE desativando o Document Type Definitions (DTD). 
+Existem duas variantes de ataques XXE, sendo a primeira conhecida como \textit{in-band}, onde o atacante forja um documento XML malicioso e o submete através da rede para ser processado e recebe uma resposta instantânea, enquanto a outra variante chamada \textit{out-of-band} ocorre quando o atacante forja um documento XML malicioso, submete, todavia não obtém resposta imediata do servidor web. Ataques \textit{out-of-band} também são chamados de \textit{blind XXE injection}.
+É possível mitigar injeções XXE desativando o \textit{Document Type Definitions} (DTD). 
 
 \subsection{Broken Access Control}
-Diversos vetores de ataque podem ser considerados Broken access control. Entre eles: burlar verificações de controle de acesso, editar contas de outros usuários, elevação de privilégios, configurações erroneas de CORS (Cross-Origin Resource Sharing) que permitem acesso não autorizado a APIs (Application Programming Interface) restritas, manipulação de metadados através de tokens de controle de acesso JWT (JSON Web Tokens) e acesso não autorizado a páginas web com usuário desprivilegiado, podendo levar ao controle de funções do modelo de negócio ou obtenção de (todos) os dados.
-É recomendado ter listas de controle de acesso e negar funcionalidades através de back-end, de forma que o usuário não tem acesso ou controle do código.
+Diversos vetores de ataque podem ser considerados \textit{Broken access control}. Entre eles: burlar verificações de controle de acesso, editar contas de outros usuários, elevação de privilégios, configurações errôneas de CORS (\textit{Cross-Origin Resource Sharing}) que permitem acesso não autorizado a APIs (Application Programming Interface) restritas, manipulação de metadados através de tokens de controle de acesso JWT (\textit{JSON Web Tokens}) e acesso não autorizado a páginas web com usuário desprivilegiado, podendo levar ao controle de funções do modelo de negócio ou obtenção de (todos) os dados.
+É recomendado ter listas de controle de acesso e negar funcionalidades através de \textit{back-end}, de forma que o usuário não tem acesso ou controle do código.
 
-Configurações Incorretas de Segurança (Security misconfigurations)
-Configurações errôneas de segurança podem expor aplicações a security threads. Portas administrativas abertas desnecessariamente, firewalls mal gerenciados, aplicações legadas tentando comunicar com outras aplicações inexistentes são alguns exemplos de possíveis ingerencias nas configurações de segurança. São necessários padrões de qualidade, revistos, testados e verificados com frequencia para reduzir a superficie de ataque que esse tipo de vulnerabilidade permite.
+Configurações Incorretas de Segurança (\textit{Security misconfigurations})
+Configurações errôneas de segurança podem expor aplicações a \textit{security threads}. Portas administrativas abertas desnecessariamente, \textit{firewalls} mal gerenciados, aplicações legadas tentando comunicar com outras aplicações inexistentes são alguns exemplos de possíveis ingerências nas configurações de segurança. São necessários padrões de qualidade, revistos, testados e verificados com frequência para reduzir a superfície de ataque que esse tipo de vulnerabilidade permite.
 
 \subsection{Cross Site Scripting, ou XSS}
-Cross site scripting é uma técnica conhecida como XSS onde geralmente há uma injeção de scripts maliciosos na aplicações web, revelando dados sensíveis, serviços internos ou divulgação de cookies de usuários com privilégios.
-Existem três variantes de XSS: stored XSS, onde o atacante injeta um payload no webserver, de maneira que quando outro usuário faz a requisição para acessar a página, o payload irá ativar. Reflected XSS, quando o atacante injeta dados através de um método HTTP gerando uma resposta imediata na aplicação. Permite o malfeitor forjar uma URL específica que ao ser acessada pela vítima obtenha dados sensíveis, como os cookies. E por último a variante DOM Based XSS que consiste na inserção de código malicioso no DOM (Document Object Model), sem refletir no código-fonte HTML, sendo ativado apenas pelo console DOM.
+\textit{Cross Site Scripting} é uma técnica conhecida como XSS onde geralmente há uma injeção de \textit{scripts} maliciosos na aplicação web, revelando dados sensíveis, serviços internos ou divulgação de \textit{cookies} de usuários com privilégios.
+Existem três variantes de XSS: \textit{stored} XSS, onde o atacante injeta um \textit{payload} no servidor web, de maneira que quando outro usuário faz a requisição para acessar a página, o \textit{payload} é ativado. Outro caso é o de \textit{Reflected} XSS, quando o atacante injeta dados através de um método HTTP gerando uma resposta imediata na aplicação. Este permite o malfeitor forjar uma URL específica que ao ser acessada pela vítima vaza dados sensíveis, como \textit{cookies}. E por último a variante \textit{DOM Based} XSS que consiste na inserção de código malicioso no DOM (\textit{Document Object Model}), sem refletir no código-fonte HTML, sendo ativado apenas pelo console DOM.
 Dados obtidos de fontes não confiáveis devem ser devidamente validados e normalizados para evitar XSS.
 
 \subsection{Deserialização Insegura}
-Ataque que ocorre quando uma aplicação tenta transformar dados maliciosos, controlados pelo atacante, em estruturas de dados internas controladas pela aplicação. Payloads cuidadosamente forjados permitem tomar o controle de variáveis, funções e estados internos da aplicação. Geralmente esse tipo de ataque permite executar código remoto arbitrário e expor completamente o sistema da aplicação web.
-No código um array de itens são serializados em um fluxo de bytes onde são transportados e processados pelo back-end do website após a deserialização.
-O ataque de deserialização replica os objetos serializados, mas injetando código malicioso para ser processado pelo back-end.
-A mitigação para o ataque pode ser feito utilizando formatos seguros de data intercambiáveis como JSON ou YAML ao invés de formatos binários nativos, utilizando funções robustas de deserialização e bibliotecas, incluindo testes de integridade para o processamento de dados serializados e limitando o escopo e capacidades das operações serializadas.
+Ataque que ocorre quando uma aplicação tenta transformar dados maliciosos, controlados pelo atacante, em estruturas de dados internas controladas pela aplicação. \textit{Payloads} cuidadosamente forjados permitem tomar o controle de variáveis, funções e estados internos da aplicação. Geralmente esse tipo de ataque permite executar código remoto arbitrário e expor completamente o sistema da aplicação web.
+No código um \textit{array} de itens são serializados em um fluxo de bytes onde são transportados e processados pelo \textit{back-end} da aplicação web após a deserialização.
+O ataque de deserialização replica os objetos serializados, mas injetando código malicioso para ser processado pelo \textit{back-end}.
+A mitigação para o ataque pode ser feito utilizando formatos seguros de dados intercambiáveis como JSON ou YAML ao invés de formatos binários nativos, utilizando funções robustas de deserialização e bibliotecas, incluindo testes de integridade para o processamento de dados serializados e limitando o escopo e capacidades das operações serializadas.
 
 \subsection{Utilizar Componentes com Vulnerabilidades Conhecidas}
-Geralmente, atacantes não buscam descobrir vulnerabilidades inéditas, mas utilizar os exploits já conhecidos.
+Geralmente, atacantes não buscam descobrir vulnerabilidades inéditas, mas utilizar os \textit{exploits} já conhecidos.
 Utilizar softwares ou hardwares específicos com vulnerabilidades documentadas, que foram descontinuados ou que atingiram o fim da vida útil aumenta a propensão de sofrer ataques já consolidados por usuários mal intencionados.
 Rastrear dependências, documentar de maneira adequada, remover dependências inúteis, eliminar código obsoleto e ter uma política de atualização de dependências, procedimentos e manutenção de software são medidas efetivas para mitigar esse tipo de ataque.
 
 \subsection{Monitoramento e Logging Insuficientes}
-Ausência de mecanismos de logging atrelados às melhores práticas para auxiliar no monitoramento e detecção de incidentes de segurança permitem atacantes conduzirem atividades sem serem detectados, fazendo com que a tarefa da detecção de incidentes e resposta seja muito mais difícil. Logs não são úteis apenas para rastrear as atividades do atacante ou detectar erros ou atividades anômalas. Logs também servem para auditorias e outros processos regulatórios.
+Ausência de mecanismos de \textit{logging} atrelados às melhores práticas para auxiliar no monitoramento e detecção de incidentes de segurança permitem atacantes conduzirem atividades sem serem detectados, fazendo com que a tarefa da detecção de incidentes e resposta seja muito mais difícil. \textit{Logs} não são úteis apenas para rastrear as atividades do atacante ou detectar erros ou atividades anômalas. \textit{Logs} também servem para auditorias e outros processos regulatórios.
 
 Injeção (em especial SQL) é uma das vulnerabilidades mais comuns, de baixa complexidade para o atacante e historicamente impactante, o que motivou o trabalho em aprofundar em um problema subestimado por desenvolvedores, que tem impactos profundos na confiabilidade, integridade e disponibilidade de um serviço web.
 
-Referências:
-
-Understanding The Top 10 OWASP Vulnerabilities, Matthew Bach-Nutman
-
-https://arxiv.org/ftp/arxiv/papers/2012/2012.09960.pdf
-
-https://www.indusface.com/blog/10-common-web-application-security-mistakes/
-
-https://www.invicti.com/learn/out-of-band-sql-injection-oob-sqli/
-
-https://owasp.org/www-project-top-ten/
-
-shorturl.at/ewHNS
-
-https://www.acunetix.com/blog/web-security-zone/what-is-session-fixation/
-
 \section{Algoritmos de Fuzzing}
 
-O cerne do algoritmo por trás do WAF-A-MoLE e o wafamole++ se encontra na técnica de \textit{fuzzing}. O termo fuzz foi cunhado pelo professor da Universidade de Wisconsin-Madison Barton Miller nos anos 80, após sofrer uma interferência considerável de uma tempestade no funcionamento de aplicações que rodavam em um ambiente unix remoto na época. 
+O cerne do algoritmo por trás do \textit{WAF-A-MoLE} e o \textit{wafamole++} se encontra na técnica de \textit{fuzzing}. O termo \textit{fuzz} foi cunhado pelo professor da Universidade de Wisconsin-Madison Barton Miller nos anos 80, após sofrer uma interferência considerável de uma tempestade no funcionamento de aplicações que rodavam em um ambiente \textit{unix} remoto na época \cite{fuzzing_info}. 
 
-Pouco depois disso o mesmo passou aos seus alunos uma tarefa denominada o \textit{"Fuzz Generator"}, na qual era necessário implementar uma ferramenta que testasse a robustez de programas unix através de um bombardeio de informações aleatoriamente geradas.
+Pouco depois disso o mesmo passou aos seus alunos uma tarefa denominada o \textit{"Fuzz Generator"}, na qual era necessário implementar uma ferramenta que testasse a robustez de programas \textit{unix} através de um bombardeio de informações aleatoriamente geradas.
 
-Atualmente é uma técnica amplamente aceita na testagem/sondagem da segurança de diversas aplicações, com um leque de ofertas de fuzzing comerciais no mercado. E naturalmente é empregável em Web Application Firewalls, permitindo extrair informações valiosas que rendam aprimoramentos para os mesmos. Enquanto a idéia em si de fuzzing permanece a mesma, as maneiras de efetuá-lo tiveram um grande progresso de mudança.
+Atualmente é uma técnica amplamente aceita na testagem/sondagem da segurança de diversas aplicações, com um leque de ofertas de \textit{fuzzing} comerciais no mercado. E naturalmente é empregável em \textit{Web Application Firewalls}, permitindo extrair informações valiosas que rendam aprimoramentos para os mesmos. Enquanto a idéia em si de \textit{fuzzing} permanece a mesma, as maneiras de efetuá-lo tiveram um grande progresso de mudança.
 
 
-Uma função elementar de fuzzing pode ser vista abaixo:
+Uma função elementar de \textit{fuzzing} pode ser vista abaixo:
 
-\includecode[C]{Função de um fuzzer elementar} {alg:codigo1}{codigos/fuzzer.py}
-
-\bigskip
-Tais funções de fuzzing podem ser aprimoradas, customizadas para testar os mais diversos programas. Uma das maneiras de polir os resultados oriundos de fuzzing elementar, que podem ser rejeitados facilmente por muitos programas inicialmente, é um processo chamado fuzzing mutacional, ou \textit{mutational fuzzing}, projetado para melhorar as chances de obter entradas consideradas válidas.
-
-Nessa estratégia, a execução se inicia com uma entrada válida, e ela subsequentemente sofre uma mutação pequena, como no caso de uma string a mudança de um caractere, adição/remoção de um número, ou até mesmo uma troca de um bit (todos naturalmente aleatórios, pelo princípio do funcionamento de fuzzing).
-
-\includecode[C]{Classe de fuzzer mutacional} {alg:codigo1}{codigos/mutational_fuzzer.py}
+\includecode[C]{Função de um \textit{fuzzer}  elementar} {alg:codigo1}{codigos/fuzzer.py}
 
 \bigskip
-O programa acima realiza, dentre três operadores de mutação, uma mutação aleatória ao chamar a função \verb+mutate()+. Na prática, são realizadas uma série de mutações para que se produzam entradas viáveis. Com um simples loop para chamar a função \verb+mutate()+ isso é possibilitado.
+Tais funções de \textit{fuzzing} podem ser aprimoradas, customizadas para testar os mais diversos programas. Uma das maneiras de polir os resultados oriundos de \textit{fuzzing} elementar, que podem ser rejeitados facilmente por muitos programas inicialmente, é um processo chamado \textit{fuzzing} mutacional, ou \textit{mutational fuzzing}, projetado para melhorar as chances de obter entradas consideradas válidas.
 
-Essas técnicas geralmente encontram bugs de corrupção de memória simples e a aleatoriedade, dispersão fazem com que a eficiência do ataque seja baixa, além de cobrir poucas partes do código. Por outro lado, é simples de implementar, tem boa extensibilidade e pode ser feita sem o código-fonte. O fuzzing aumenta seu potencial quando o alvo está em execução em um ambiente real. Outro ponto positivo é o fato de poder aplicar a técnica em aplicações com pouco conhecimento prévio sobre.
+Nessa estratégia, a execução se inicia com uma entrada válida, e ela subsequentemente sofre uma mutação pequena, como no caso de uma string a mudança de um caractere, adição/remoção de um número, ou até mesmo uma troca de um bit (todos naturalmente aleatórios, pelo princípio do funcionamento de \textit{fuzzing}).
 
-Em suma fuzzing consiste na geração massiva de inputs normais e anômalos para uma aplicação específica, seguido da detecção de exceções no algoritmo devido o processamento das entradas geradas e monitoramento dos estados de execução da aplicação. Quando comparado com outras técnicas como análise estática, dinâmica e execução simbólica, o fuzzing apresenta facilidade em ser implementado, boa precisão (em ambientes reais) e boa escalabilidade.
+\includecode[C]{Classe de \textit{fuzzer} mutacional} {alg:codigo1}{codigos/mutational_fuzzer.py}
 
-Expandindo um pouco o conceito, um teste de fuzzing tipicamente consiste na geração em larga escala de entradas para um programa específico, entradas conhecidas também como \textit{testcases}. A qualidade de tais \textit{testcases} criados influencia diretamente na qualidade do teste fuzzing. Os inputs (ou entradas) precisam atender os requisitos do programa testado para o padrão de entrada. Em contrapartida, os inputs precisam ser errôneos o suficiente para gerarem falhas ou erros no processamento do programa. De acordo com o alvo, os inputs podem ser arquivos com diferentes formados, dados de comunicação entre redes, binários executáveis específicos, entre outros. No caso do wafamole++ trabalha-se, conforme descrito anteriormente, com injeções SQL.
+\bigskip
+O programa acima realiza, dentre três operadores de mutação, uma mutação aleatória ao chamar a função \verb+mutate()+. Na prática, são realizadas uma série de mutações para que se produzam entradas viáveis. Com um simples \textit{loop} para chamar a função \verb+mutate()+ isso é possibilitado.
 
-Gerar testcases suficientemente errôneos é uma tarefa árdua, com duas variantes: \textit{generation-based} e \textit{mutation-based}, das quais a última é a adotada pelo WAF-A-MoLE e wafamole++
-Depois de gerados, os testcases alimentam o programa alvo, tendo variáveis de ambiente e outros parâmetros do software a ser testado devidamente configurados pelo programador. Geralmente um teste de fuzzing tem como condição final um tempo limite (ou \textit{timeout}) pré-definido ou uma falha de execução do programa.
+Essas técnicas geralmente encontram \textit{bugs} de corrupção de memória simples e a aleatoriedade, dispersão fazem com que a eficiência do ataque seja baixa, além de cobrir poucas partes do código. Por outro lado, é simples de implementar, tem boa extensibilidade e pode ser feita sem o código-fonte. O \textit{fuzzing} aumenta seu potencial quando o alvo está em execução em um ambiente real. Outro ponto positivo é o fato de poder aplicar a técnica em aplicações com pouco conhecimento prévio sobre.
 
-Fuzzers monitoram o estado de execução durante o processo, aguardando exceções ou falhas.  Formas comuns de metodologia de monitoramento de exceções incluem monitor sinais específicos do sistema, falhas e outras violações. Existem ferramentas para verificar comportamentos anormais difíceis de perceber intuitivamente, como o \verb+AddressSanitizer+, \verb+DataFlowSanitizer+, \verb+ThreadSanitizer+ e \verb+LeakSanitizer+. Quando uma violação é capturada, o fuzzer armazena o testcase que a causou para análise futura e replicação.
+Em suma \textit{fuzzing} consiste na geração massiva de entradas normais e anômalas para uma aplicação específica, seguido da detecção de exceções no algoritmo devido o processamento das entradas geradas e monitoramento dos estados de execução da aplicação. Quando comparado com outras técnicas como análise estática, dinâmica e execução simbólica, o \textit{fuzzing} apresenta facilidade em ser implementado, boa precisão (em ambientes reais) e boa escalabilidade.
 
-Por fim, na fase de análise, tem-se por objetivo determinar a localidade e a causa da violação no software. A análise geralmente é feita com o auxílio de debuggers como \verb+DGB+, \verb+windbg+ ou outras ferramentas de análise binária, como a \verb+IDA Pro+, \verb+OllyObg+ e outras. O exato estado de execução dos testcases, informações da thread, instruções e outras informações fazem parte do monitoramento. Para o caso do trabalho em questão, considerando-se o ambiente em Python, o debugger padrão \verb+pdb+ mostrou-se suficiente para diagnosticar a maioria dos bugs encontrados.
+Expandindo um pouco o conceito, um teste de \textit{fuzzing} tipicamente consiste na geração em larga escala de entradas para um programa específico, entradas conhecidas também como \textit{testcases}. A qualidade de tais \textit{testcases} criados influencia diretamente na qualidade do teste fuzzing. As entradas precisam atender os requisitos do programa testado para o padrão de entrada. Em contrapartida, as entradas precisam ser errôneas o suficiente para gerarem falhas ou erros no processamento do programa. De acordo com o alvo, as entradas podem ser arquivos com diferentes formatos, dados de comunicação entre redes, binários executáveis específicos, entre outros. No caso do \textit{wafamole++} trabalha-se, conforme descrito anteriormente, com injeções SQL.
+
+Gerar \textit{testcases} suficientemente errôneos é uma tarefa árdua, com duas variantes: \textit{generation-based} e \textit{mutation-based}, das quais a última é a adotada pelo \textit{WAF-A-MoLE} e \textit{wafamole++}. Depois de gerados, os \textit{testcases} alimentam o programa alvo, tendo variáveis de ambiente e outros parâmetros do software a ser testado devidamente configurados pelo programador. Geralmente um teste de \textit{fuzzing} tem como condição final um tempo limite (ou \textit{timeout}) pré-definido ou uma falha de execução do programa.
+
+\textit{Fuzzers} monitoram o estado de execução durante o processo, aguardando exceções ou falhas.  Formas comuns de metodologia de monitoramento de exceções incluem monitor sinais específicos do sistema, falhas e outras violações. Existem ferramentas para verificar comportamentos anormais difíceis de perceber intuitivamente, como o \verb+AddressSanitizer+, \verb+DataFlowSanitizer+, \verb+ThreadSanitizer+ e \verb+LeakSanitizer+. Quando uma violação é capturada, o \textit{fuzzer} armazena o \textit{testcase} que a causou para análise futura e replicação \cite{li2018fuzzing}.
+
+Por fim, na fase de análise, tem-se por objetivo determinar a localidade e a causa da violação no software. A análise geralmente é feita com o auxílio de \textit{debuggers} como \verb+DGB+, \verb+windbg+ ou outras ferramentas de análise binária, como a \verb+IDA Pro+, \verb+OllyObg+ e outras. O exato estado de execução dos \textit{testcases}, informações da \textit{thread}, instruções e outras informações fazem parte do monitoramento. Para o caso do trabalho em questão, considerando-se o ambiente em \textit{Python}, o \textit{debugger} padrão \verb+pdb+ mostrou-se suficiente para diagnosticar a maioria dos \textit{bugs} encontrados.
 
 \begin{figure}[ht]
     \centering
@@ -223,112 +203,91 @@ Por fim, na fase de análise, tem-se por objetivo determinar a localidade e a ca
     \label{fig:internet} 
 \end{figure}
 
-O fuzzer \textit{generation-based} necessita saber como é a entrada que o programa é capaz de processar. No caso de um fuzzing para arquivos, geralmente é fornecido um arquivo de configuração com o modelo pré-definido de entrada. Os testcases são gerados de acordo com o arquivo de configuração. Fuzzers desse tipo tem facilidade em burlar validações do software testado, permitindo ao pentester entender com mais profundidade a aplicação estudada. Por outro lado, sem uma documentação amigável, analisar o formato do arquivo pode ser uma tarefa árdua.
-Em termos de praticidade, fuzzers mutation-based são mais fáceis de utilizar, com aplicabilidade genérica, sendo geralmente o tipo adotado por testes de intrusão no estado da arte. Diferente do generation-based, o mutation-based precisa de alguns inputs iniciais válidos. Os inputs vão sofrendo mutações e novos testcases vão sendo gerados. O wafamole++ requer apenas uma entrada inicial válido - uma query que é fornecida ao final de cada chamada ao comando \verb+wafamole evade+.
+O \textit{fuzzer} \textit{generation-based} necessita saber como é a entrada que o programa é capaz de processar. No caso de um \textit{fuzzing} para arquivos, geralmente é fornecido um arquivo de configuração com o modelo pré-definido de entrada. Os \textit{testcases} são gerados de acordo com o arquivo de configuração. Fuzzers desse tipo tem facilidade em burlar validações do software testado, permitindo ao pentester entender com mais profundidade a aplicação estudada. Por outro lado, sem uma documentação amigável, analisar o formato do arquivo pode ser uma tarefa árdua.
+Em termos de praticidade, fuzzers mutation-based são mais fáceis de utilizar, com aplicabilidade genérica, sendo geralmente o tipo adotado por testes de intrusão no estado da arte. Diferente do generation-based, o mutation-based precisa de algumas entradas iniciais válidas. As entradas vão sofrendo mutações e novos \textit{testcases} vão sendo gerados. O \textit{wafamole++} requer apenas uma entrada inicial válido - uma query que é fornecida ao final de cada chamada ao comando \verb+wafamole evade+.
 
-Para testes \textit{grey box} e \textit{black box}, os fuzzers são \textit{mutation-based}. Para testes \textit{white box}, \textit{generation-based}.
+Para testes \textit{grey box} e \textit{black box}, os \textit{fuzzers} são \textit{mutation-based}. Para testes \textit{white box}, \textit{generation-based}.
 
-O contexto relevante para o WAF-A-MoLE é produzir, iterativamente, múltiplas injeções SQL a serem testadas a cada "rodada" de mutação. Uma injeção SQL é usada como base inicial, e a mesma sofre mutações por um fuzzer dedicado até ser considerada válida pelo Web Application Firewall testado, embora seja no fundo ainda uma injeção maliciosa. Dessa maneira, o wafamole++ pode ser resumidamente descrito como um fuzzer mutacional, operando em cima de WAFs com entradas de injeções SQL "fuzzeadas".
-
-Referências:
-
-https://www.fuzzingbook.org/html/Fuzzer.html
-
-https://www.fuzzingbook.org/html/MutationFuzzer.html
-
-https://fuzzinginfo.wordpress.com/history/
-
-Fuzzing: a survey, Jun Li, Bodong Zhao and Chao Zhang
-
-https://cybersecurity.springeropen.com/track/pdf/10.1186/s42400-018-0002-y.pdf
+O contexto relevante para o \textit{WAF-A-MoLE} é produzir, iterativamente, múltiplas injeções SQL a serem testadas a cada "rodada" de mutação. Uma injeção SQL é usada como base inicial, e a mesma sofre mutações por um \textit{fuzzer} dedicado até ser considerada válida pelo Web Application Firewall testado, embora seja no fundo ainda uma injeção maliciosa. Dessa maneira, o \textit{wafamole++} pode ser resumidamente descrito como um \textit{fuzzer} mutacional, operando em cima de WAFs com entradas de injeções SQL "fuzzeadas".
 
 \section{Aprendizado de Máquina}
-Introduzir conceitos de ML básicos. Melhor ref pra essa intro é \href{link}{https://bibliotecadigital.fgv.br/dspace/handle/10438/30819}. Mencionar POR ALTO (basta nome e descrição bem breve de propósito, métodos e resultados dos algoritmos bases do WAF-A-MoLE (não os novos do wafamole++)):
+
+Tendo seus primórdios em torno das décadas de 60 e 70, com dispositivos como o \textit{Cybertron} intitulados de "máquinas de aprendizado", esse subcampo de Inteligência Artificial teve uma tremenda ressurgência com recentes avanços em capacidade de processamento em tempos atuais. Com isso, dentre as áreas de interesse de computação enriquecidas por técnicas, naturalmente foram investigadas novas empreitadas em Segurança da Informação
+
+A ideia por trás de Aprendizado de Máquina \cite{dantas_transformers_2021} é a instrução de computadores por meio de exemplos - diferente da automação usual que envolve o programador elaborando algoritmos envolvendo manipulação de dados de entrada e saída desejados. Nesse contexto, um típico objetivo é rotular dados novos em categorias definidas nos dados iniciais. Para tal, temos dois principais procedimentos:
+\begin{alineas}
+\item \textbf{Aprendizado supervisionado} - em casos nos quais dados de entrada e saída de um algoritmo desse tipo são conhecidos, e o algoritmo resultando é aprimorado com base nisto
+\item \textit{Aprendizado não-supervisionado} - casos nos quais os dados de saída não são conhecidos, sendo possível identificar padrões no próprio conjunto de entrada da aplicação.
+\end{alineas}
+
+Alguns termos de relevância dentro de tais procedimentos podem ser elencados:
+\begin{alineas}
+\item \textbf{Classificação} - É a ação qualitativa de rotular um dado avaliado com uma categoria, feito com um algoritmo de um classificador. Aplicando a um exemplo direto de Segurança da Informação, um classificador que rotula um pacote como "malicioso" realiza essa ação.
+\item \textbf{Treinamento} - Também conhecido como \verb+fitting+, essa ação envolve o fornecimento de exemplos para um determinado classificador, para que esse programa possa realizar a eventual classificação de dados vindouros.
+\item \textbf{Dados de Validação} - Durante o treinamento, são separados dados para a orientação do mesmo. O procedimento usual é separar uma parcela dos dados original como tal. É importante que sejam distintos de dados de teste, para que o algoritmo resultante possa ter seu desempenho contra dados eventualmente completamente novos testado.
+\item \textbf{Dados de Teste} - São dados usados para a avaliação de um classificador realizada logo após seu treinamento, para que seja possível averiguar a eficácia e corretude do mesmo.
+\end{alineas}
+
+Sumariamente, pode-se perceber como esse campo de pesquisa traz consigo abordagens de automatização relevantes para uma gama de aplicações. Para o contexto deste trabalho, é imprescindível o conhecimento de Aprendizado de Máquina, uma vez que as principais aplicações avaliadas no mesmo englobam diversos algoritmos oriundos desse subcampo de Inteligência Artificial.
+
+Algoritmos que vêm por padrão no \textit{WAF-A-MoLE} em modelos de exemplo são \textit{Naive Bayes}, \textit{Random Forest} e \textit{Support Vector Machine} Gaussiana/Linear, ofertados pela biblioteca \textit{scikit-learn}. Além disso, há um WAF externo \textit{open-source} embutido que faz uso de Redes Neurais.
+
+Introduzir conceitos de ML básicos. Melhor ref pra essa intro é \href{link}{https://bibliotecadigital.fgv.br/dspace/handle/10438/30819}. Mencionar POR ALTO (basta nome e descrição bem breve de propósito, métodos e resultados dos algoritmos bases do \textit{WAF-A-MoLE} (não os novos do wafamole++)):
 \begin{alineas}
 \item Redes Neurais com Deep Learning - usar artigo Dantas de referência \href{link}{https://bibliotecadigital.fgv.br/dspace/handle/10438/30819}
-\item Naive Bayes
-\item Random Forest
+\item \textit{Naive Bayes}
+\item \textit{Random Forest}
 \item SVM Gaussiana e Linear
 \end{alineas}
 
-Mencionar que o resto como é explorado mais a fundo no wafamole++ será descrito nas subseções a seguir com mais detalhes ( Ver parâmetros usados no Cap 4 no wafamole++): 
+Mencionar que o resto como é explorado mais a fundo no \textit{wafamole++} será descrito nas subseções a seguir com mais detalhes ( Ver parâmetros usados no Cap 4 no wafamole++): 
 
 \subsection{Support Vector Machine}
 
 Usar como ref artigo do Vladimir Vapnik original pra SVM (autor do classificador)
 
-Comentar que modelo novo do wafamole++ é a versão não linear, em contraste com a linear original
+Comentar que modelo novo do \textit{wafamole++} é a versão não linear, em contraste com a linear original
 
 \subsection{Stochastic Gradient Descent}
 
+
 \subsection{AdaBoost}
 
-AdaBoost é um algoritmo do tipo Boosting com capacidade auto-adaptativa que melhora a performance de classificadores fracos por estabelecer um conjunto de múltiplos classificadores. Como o AdaBoost adapta-se a taxa de erro do algoritmo básico em treinamento através de regulação dinâmica do peso de cada amostra, o interesse dos pesquisadores tem sido estimulado.
+\textit{AdaBoost} é um algoritmo do tipo \textit{Boosting} \cite{wu2011some} com capacidade auto-adaptativa que melhora a performance de classificadores fracos por estabelecer um conjunto de múltiplos classificadores. Como o \textit{AdaBoost} adapta-se a taxa de erro do algoritmo básico em treinamento através de regulação dinâmica do peso de cada amostra, o interesse dos pesquisadores tem sido estimulado.
 
-O método de Boosting vem da análise teórica do modelo de aprendizado chamado PAC (Probably Approximately Correct). Os autores Kearns e Valiant propuseram os conceitos de aprendizado forte e fraco. No modelo de aprendizado do PAC, se um algoritmo de aprendizado polinomial para identificar um grupo de conceito e a acurácia do reconhecimento é muito alta, esse grupo de conceitos são considerados como aprendizado forte. Porém, se a taxa de corretude do algoritmo de aprendizado de identificação é um pouco superior a tentativa aleatória de adivinhar, então esse grupo é considerado aprendizado fraco. 
+O método de \textit{Boosting} vem da análise teórica do modelo de aprendizado chamado PAC (\textit{Probably Approximately Correct}). Os autores Kearns e Valiant propuseram os conceitos de aprendizado forte e fraco. No modelo de aprendizado do PAC, se um algoritmo de aprendizado polinomial para identificar um grupo de conceito e a acurácia do reconhecimento é muito alta, esse grupo de conceitos são considerados como aprendizado forte. Porém, se a taxa de corretude do algoritmo de aprendizado de identificação é um pouco superior a tentativa aleatória de adivinhar, então esse grupo é considerado aprendizado fraco. 
 
 Kearns e Valient perceberam uma relação de equivalência entre aprendizado fraco e forte, onde o algoritmo de aprendizado fraco pode ser promovido para aprendizado forte.
 Se existe uma equivalência entre fraco e forte, então enquanto aprende-se um conceito, pode-se elevar um algoritmo um pouco melhor que tentativas de adivinhação aleatórias para um algoritmo de aprendizado forte (desde que se saiba qual algoritmo forte em específico).
 
 Em 1990, Schapire publicou o primeiro método de Boosting. Freund fez melhorias e criou um método muito melhor conhecido como BBM (boost-by-majority).
-Boosting produz uma série de classificadores antes e depois do treinamento. O conjunto de treinamento utilizado em cada classificador é um subconjunto advindo do conjunto geral de treinamento e se cada amostra aparece no subconjunto ou não depende da performance dos classificadores anteriores. No caso das amostras julgadores como incorretas pelos classificadores já existentes, então ã probabilidade de surgirem no novo subconjunto de treinamento será muito maior, fazendo com que os classificadores seguintes tenham foco em lidar com as diferenças nas amostras, que é uma tarefa árdua para os classificadores já existentes.
+\textit{Boosting} produz uma série de classificadores antes e depois do treinamento. O conjunto de treinamento utilizado em cada classificador é um subconjunto advindo do conjunto geral de treinamento e se cada amostra aparece no subconjunto ou não depende da performance dos classificadores anteriores. No caso das amostras julgadores como incorretas pelos classificadores já existentes, então ã probabilidade de surgirem no novo subconjunto de treinamento será muito maior, fazendo com que os classificadores seguintes tenham foco em lidar com as diferenças nas amostras, que é uma tarefa árdua para os classificadores já existentes.
 
-O método Boosting pode aumentar a capacidade de generalização de um dado algoritmo, mas o algoritmo precisa ter estabelecido o limite inferior da acurácia de aprendizagem de um classificador fraco, que na prática é uma tarefa difícil.
+O método B\textit{oosting} pode aumentar a capacidade de generalização de um dado algoritmo, mas o algoritmo precisa ter estabelecido o limite inferior da acurácia de aprendizagem de um classificador fraco, que na prática é uma tarefa difícil.
 
-AdaBoost que surgiu em 1995 atráves de Freund e Schapire fez uma grande melhoria no algoritmo de Boosting.
-Sendo o algoritmo mais representativo da família, ele mantém a distribuição de um conjunto de probabilidades para amostras de treinamento e ajusta a probabilidade de distribuição de cada amostra durante a iteração. Um algoritmo específico de aprendizado é usado para gerar o classificador-membro e calcular a taxa de erro nas amostras de treinamento. AdaBoost irá usar a taxa de erro para ajustar a probabilidade de distribuição das amostras de treino. O papel de mudar os pesos é para aumentar o impacto das classificações incorretas e reduzir o impacto das classificações corretas. Por fim, com o ajuste dos pesos nos classificadores únicos, é obtido um classificador forte.
+\textit{AdaBoost} que surgiu em 1995 atráves de Freund e Schapire fez uma grande melhoria no algoritmo de \textit{Boosting}.
+Sendo o algoritmo mais representativo da família, ele mantém a distribuição de um conjunto de probabilidades para amostras de treinamento e ajusta a probabilidade de distribuição de cada amostra durante a iteração. Um algoritmo específico de aprendizado é usado para gerar o classificador-membro e calcular a taxa de erro nas amostras de treinamento. \textit{AdaBoost} irá usar a taxa de erro para ajustar a probabilidade de distribuição das amostras de treino. O papel de mudar os pesos é para aumentar o impacto das classificações incorretas e reduzir o impacto das classificações corretas. Por fim, com o ajuste dos pesos nos classificadores únicos, é obtido um classificador forte.
 O pseudoalgoritmo tem a seguinte estrutura com um conjunto de amostras iniciais:
 
 \begin{equation}
     L=\left\{\left(x_{1}, y_{1}\right),\left(x_{2}, y_{2}\right) \cdots\left(x_{N}, y_{N}\right)\right\}, y_{i} \in\{+1,0\}
 \end{equation}
-% \begin{figure}[ht]
-%     \centering
-%     \caption{Conjunto Inicial de Amostras}
-%     \includegraphics[width=14cm]{figuras/adaboost/amostras.png} 
-%     \legend{Fonte: \href{https://link.springer.com/chapter/10.1007/978-3-642-18129-0_1}{Some Analysis and Research of the AdaBoost Algorithm} (2022, p. TO-DO)}
-%     \label{fig:internet} 
-% \end{figure}
-
 
 A distribuição inicial dos pesos é dada por:
 
 \begin{equation}
     w_{i}^{1}=\frac{1}{N}
 \end{equation}
-% \begin{figure}[ht]
-%     \centering
-%     \caption{Distribuição Inicial}
-%     \includegraphics[width=5cm]{figuras/adaboost/distribuicao_pesos_inicial.png} 
-%     \legend{Fonte: \href{https://link.springer.com/chapter/10.1007/978-3-642-18129-0_1}{Some Analysis and Research of the AdaBoost Algorithm} (2022, p. TO-DO)}
-%     \label{fig:internet} 
-% \end{figure}
 
 Onde +1 é uma amostra positiva e 0 é uma amostra negativa, sendo o total de amostras N.
 
-Considerando t = 1, ... , T, tem-se um loop com os pesos normalizados:
-
-% \begin{figure}[ht]
-%     \centering
-%     \caption{Peso Normalizado}
-%     \includegraphics[width=5cm]{figuras/adaboost/peso_normalizado.png} 
-%     \legend{Fonte: \href{https://link.springer.com/chapter/10.1007/978-3-642-18129-0_1}{Some Analysis and Research of the AdaBoost Algorithm} (2022, p. TO-DO)}
-%     \label{fig:internet} 
-% \end{figure}
+Considerando t = 1, ... , T, tem-se um \textit{loop} com os pesos normalizados:
 
 \begin{equation}
     w_{i}^{t}=\frac{w_{i}^{t}}{\sum_{j=1}^{N} w_{j}^{t}}
 \end{equation}
 
 O classificador fraco que seleciona e classifica do conjunto de amostras aquele cuja taxa de erro é a menor e a distribuição do peso atual $h_{t}$. A taxa de erro do classificador fraco é dada pela expressão:
-
-% \begin{figure}[ht]
-%     \centering
-%     \caption{Taxa de Erro}
-%     \includegraphics[width=7cm]{figuras/adaboost/taxa de erro.png} 
-%     \legend{Fonte: \href{https://link.springer.com/chapter/10.1007/978-3-642-18129-0_1}{Some Analysis and Research of the AdaBoost Algorithm} (2022, p. TO-DO)}
-%     \label{fig:internet} 
-% \end{figure}
 
 \begin{equation}
     \mathcal{E}_{t}=\sum_{i=1}^{N} w_{i}^{t}\left|h_{t}\left(x_{i}\right)-y_{i}\right|
@@ -340,14 +299,6 @@ A atualização do peso da amostra é dada por:
     w_{i}^{t+1}=w_{i}^{t} \beta_{t}^{1-e_{i}}
 \end{equation}
 
-% \begin{figure}[ht]
-%     \centering
-%     \caption{Atualização dos Pesos}
-%     \includegraphics[width=7cm]{figuras/adaboost/atualização dos pesos.png} 
-%     \legend{Fonte: \href{https://link.springer.com/chapter/10.1007/978-3-642-18129-0_1}{Some Analysis and Research of the AdaBoost Algorithm} (2022, p. TO-DO)}
-%     \label{fig:internet} 
-% \end{figure}
-
 $e_{i}$ = 0 representa que xi foi classificado corretamente e $e_{i}$ = 1 significa que $x_{i}$ foi classificado incorretamente.
 
 Como saída final do algoritmo:
@@ -358,17 +309,4 @@ Como saída final do algoritmo:
     &\alpha_{t}=\log \frac{1}{\beta_{t}} .
     \end{aligned}
 \end{equation}
-% \begin{figure}[H]
-%     \centering
-%     \caption{Saída Final}
-%     \includegraphics[width=12cm]{figuras/adaboost/saída do algoritmo.png} 
-%     \legend{Fonte: \href{https://link.springer.com/chapter/10.1007/978-3-642-18129-0_1}{Some Analysis and Research of the AdaBoost Algorithm} (2022, p. TO-DO)}
-%     \label{fig:internet} 
-% \end{figure}
-
-
-Referência: 
-https://link.springer.com/chapter/10.1007/978-3-642-18129-0_1
-Some Analysis and Research of the AdaBoost Algorithm
-Autores: Peng Wu and Hui Zhao
 

@@ -2,12 +2,12 @@
 \label{chp:capitulo5}
 
 \section{Métodos}
-O propósito inicial dos testes realizados é compreender amplamente o impacto das adições ao programa. Para tal, uma série de métricas foram empregadas para avaliação na execução do programa, de uma maneira exaustiva, para todos os modelos relevantes (excluindo-se apenas o SQLiGOT, por motivos já mencionados). Através dela foi possível obter uma ideia do impacto que os novos modelos têm, e como o wafamole++ se adapta com \textit{wrappers} novos.
+O propósito inicial dos testes realizados é compreender amplamente o impacto das adições ao programa. Para tal, uma série de métricas foram empregadas para avaliação na execução do programa, de uma maneira exaustiva, para todos os modelos relevantes (excluindo-se apenas o SQLiGOT, por motivos já mencionados). Através dela foi possível obter uma ideia do impacto que os novos modelos têm, e como o \textit{wafamole++} se adapta com \textit{wrappers} novos.
 
 O parâmetro principal para tal avaliação foram \textbf{500} execuções por modelo no wafamole++. Tanto os modelos antigos como os modelos novos foram examinados. As medidas bases extraídas foram:
 \begin{alineas}
 \item \textbf{Número de rodadas restantes} - A partir dessas obtém-se o número de rodadas ou iterações consumidas;
-\item \textbf{Menor probabilidade de payload encontrada} - É possível medir com essas a precisão de um determinado modelo;
+\item \textbf{Menor probabilidade de \textit{payload} encontrada} - É possível medir com essas a precisão de um determinado modelo;
 \item \textbf{Tempo de execução em segundos} - Tanto para o tempo médio de execução como para diagnosticar a robustez. Um tempo maior indica uma maior eficiência em virtude da reforço do dataset;
 \item \textbf{Execuções com iterações máximas alcançadas} - Quanto mais ocorrências dessa medida, mais robusto é o modelo uma vez que não é gerado um exemplo adversarial na execução.
 \end{alineas}
@@ -80,7 +80,7 @@ Abaixo segue uma tabela com uma série de informações geradas de relevância, 
 
 Os fatores que indicam uma performance melhor são relativamente contraintuitivos - um \textit{runtime} médio grande indica dificuldade em gerar um exemplo adversarial, que na verdade é um bom indicador para o Web Application Firewall sendo avaliado. Similarmente, poucos rounds restantes ao final da execução apontam para muitas iterações sendo consumidas e um WAF robusto, e um alto número de execuções sem êxito sugere casos em que o Web Application Firewall não se mostra suscetível a um ataque naquela execução. 
 
-Curiosamente, o modelo \verb+test_sgd+ gerado a partir do dataset original do WAF-A-MoLE não apresentou grandes melhorias em comparação com o modelo do dataset \verb+SQLiV3.json+, \verb+sgd_trained+. Acredita-se que seja uma questão de adequação do classificador utilizado, uma vez que com a respectiva substuição do \textit{Stochastic Gradient Descent} pelo \textit{Ada Boost} e virtualmente a mesma implementação o mesmo se torna o WAF mais robusto do wafamole++.
+Curiosamente, o modelo \verb+test_sgd+ gerado a partir do dataset original do \textit{WAF-A-MoLE} não apresentou grandes melhorias em comparação com o modelo do dataset \verb+SQLiV3.json+, \verb+sgd_trained+. Acredita-se que seja uma questão de adequação do classificador utilizado, uma vez que com a respectiva substuição do \textit{Stochastic Gradient Descent} pelo \textit{Ada Boost} e virtualmente a mesma implementação o mesmo se torna o WAF mais robusto do wafamole++.
 
 Dado isso, os modelos de maior interesse com base nos dados obtidos certamente são os entitulados de \verb+test_ada+, \verb+svc_extra_moled+, \verb+svc_moled+, \verb+svc_no_mole+. Neles, é possível ver uma melhora nítida em robustez quando comparado aos demais. O primeiro conjunto de \textit{Distribution Plots} amostrado a seguir detalha a evolução da robustez do Firewall alvo em função dos reforços incrementados ao dataset (indicados por \verb+no_mole+ como sem reforço, \verb+moled+ para um conjunto pequeno de reforço e \verb+extra_moled+ para um conjunto ainda maior de reforço), além de comparar com o modelo \verb+test_ada+ para perspectiva. 
 
@@ -92,7 +92,7 @@ Dado isso, os modelos de maior interesse com base nos dados obtidos certamente s
     \label{fig:mole-evolution} 
 \end{figure}
 
-Atentando-se aos valores no eixo das abscissas, é possível identificar que os tempos de execução ficam consideravelmente maiores conforme os reforços são aplicados ao modelo \verb+test_svc+. Somado a isso, uma diferença radical pode ser avaliada no modelo \verb+test_ada+, com a maioria dos tempos de execução levando uma quantia consideravelmente maior do que todos os modelos avaliados. Isso aponta para uma performance próxima do \verb+SQLiGOT+, um modelo virtualmente inacessível por exigir muito do WAF-A-MoLE e de código fechado.
+Atentando-se aos valores no eixo das abscissas, é possível identificar que os tempos de execução ficam consideravelmente maiores conforme os reforços são aplicados ao modelo \verb+test_svc+. Somado a isso, uma diferença radical pode ser avaliada no modelo \verb+test_ada+, com a maioria dos tempos de execução levando uma quantia consideravelmente maior do que todos os modelos avaliados. Isso aponta para uma performance próxima do \verb+SQLiGOT+, um modelo virtualmente inacessível por exigir muito do \textit{WAF-A-MoLE} e de código fechado.
 
 Para melhor ilustrar a amplitude de tempos de execução, a distribuição dos mesmos foi mapeada em um gráfico \textit{Box plot}, agrupada por cada modelo. O único caso não contemplado é um \textit{outlier} no modelo \verb+token_random_forest+, que fora omitido para não comprometer a visualização do gráfico. Foi também feita uma separação entre o \verb+test_ada+ e os demais modelos, uma vez que seu intervalo é distinto o suficiente para distorcer as proporções.
 
@@ -112,6 +112,6 @@ Para melhor ilustrar a amplitude de tempos de execução, a distribuição dos m
     \label{fig:min-max-ada} 
 \end{figure}
 
-Sumariamente, esses resultados permitem compreender que o classificador \textit{Stochastic Gradient Descent} possivelmente não é o mais indicado para esse tipo de modelagem, com um desempenho semelhante independente do banco usado para treiná-lo. Não obstante, fica estabelecida a capacidade de aprimoramento que os modelos gerados pelo wafamole++ e WAF-A-MoLE oferecem a determinados dataset de treinamento. Espera-se que a abordagem deste trabalho sendo transparente permita resultados ainda mais enriquecedores de modelos novos em um breve futuro.
+Sumariamente, esses resultados permitem compreender que o classificador \textit{Stochastic Gradient Descent} possivelmente não é o mais indicado para esse tipo de modelagem, com um desempenho semelhante independente do banco usado para treiná-lo. Não obstante, fica estabelecida a capacidade de aprimoramento que os modelos gerados pelo \textit{wafamole++} e \textit{WAF-A-MoLE} oferecem a determinados dataset de treinamento. Espera-se que a abordagem deste trabalho sendo transparente permita resultados ainda mais enriquecedores de modelos novos em um breve futuro.
 
 % reminder {figure}[H] forces positioning!
