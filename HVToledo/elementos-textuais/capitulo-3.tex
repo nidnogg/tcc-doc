@@ -1,335 +1,177 @@
-\chapter{EMBASAMENTO TEÓRICO}
+\chapter{REVISÃO DE LITERATURA}
 \label{chp:capitulo3}
+Em um campo com uma quantia tão rarefeita de artigos, publicações e materiais em larga parte espalhadas por blogs na internet, foi necessário realizar uma revisão de literatura para que as ferramentas de ponta, estratégias ainda sendo testadas e vulnerabilidades principais no mercado fossem corretamente identificadas. Isso se torna especialmente verdadeiro pela mudança no cenário de segurança dos anos 2000 para os anos 2010-2022, aonde boa parte de ameaças antigas podem ser de pouca relevância.
 
-\section{SQL Injection}
+Aqui serão amostrados alguns dos principais achados, as estratégias para organizar os mesmos e resumido o estado da arte no presente momento.
 
+\section{Levantamento de Artigos}
 
-O tipo mais comum e mais prevalecente de injeção de código é o de SQL Injection, que manipula bancos de dados via \verb+SQL+ (\textit{Structured Query Language}), a linguagem clássica de manuseio de bancos de dados, para receber acesso a informações sensíveis.
+Para a coleta e organização de artigos em si, as principais utilidades empregadas foram o Parsifal, o Scopus e o CAFe (disponibilizado pela Universidade Federal do Rio de Janeiro). 
 
-Exemplificando algumas situações de SQL Injections \cite{sql_port_swigger}:
-
-\begin{alineas}
-    \item 
-    Consideremos uma aplicação que possui uma funcionalidade básica de login, com usuário e senha. Quando o usuário fornece as entradas \verb+‘usuário'+ e \verb+'123’+ como credenciais, a seguinte query SQL é realizada pelo sistema na checagem:
-    
-    \begin{verbatim}
-        SELECT * FROM users 
-        WHERE username = ‘usuario’ AND password = ‘123’
-    \end{verbatim}
-    
-    Como a query retorna os detalhes do usuário, o login é bem sucedido. Caso contrário  é rejeitado. Nesse caso, se o atacante usa a sequência de comentário SQL \verb+--+, ele é capaz de remover a checagem de senha da cláusula \verb+WHERE+. Exemplificando, se ele submete o usuário \verb+administrator’--+ e uma senha em branco, a seguinte query é processada:
-    
-    \begin{verbatim}
-        SELECT * FROM users 
-        WHERE username = 'administrator'--' AND password = '' 
-    \end{verbatim}
-    
-    Isso efetivamente retorna o usuário cujo \verb+username+ é \verb+administrator+ e realiza o login do atacante como tal, expondo funções sensíveis da aplicação web inteira.
-
-\end{alineas}
-
-\begin{alineas}
-    \item
-    Em uma aplicação de e-commerce que organiza produtos em categorias diferentes, podemos ter um caso onde o usuário clica em uma categoria \verb+‘Presentes’+, requisitando o seguinte URL do navegador web:
-    
-    \textbf{https://insecure-website.com/products?category=Presentes}
-    
-    Isso faz com que a aplicação realize uma query SQL para resgatar detalhes de tais produtos do banco de dados:
-    
-    \begin{verbatim}
-        SELECT * FROM products
-        WHERE category = ‘Presentes' AND released = 1 
-    \end{verbatim}
-    
-    Tal query retorna todos os detalhes (identificado por \verb+*+) da tabela de produtos, onde a categoria é \verb+‘Presentes’+ e a restrição \verb+released+ é 1. Essa restrição, quando observada por um atacante astuto, se revela como algo usado para esconder produtos não lançados. Esse atacante pode então construir um ataque digitando a seguinte URL, dado que o site não previne contra ataques SQL:
-        
-    \textbf{https://insecure-website.com/products?category=Presentes’--}
-    
-    Que provoca a seguinte query SQL:
-    
-    \begin{verbatim}
-        SELECT * FROM products 
-        WHERE category = 'Presentes'--' AND released = 1 
-    \end{verbatim}
-    
-     Uma vez que a sequência \verb+--+ anteriormente vista denota um comentário SQL, a parte depois de 
-    \verb+‘Presentes’+ é interpretada como tal e não é executada, revelando todos os produtos escondidos.
-
-\end{alineas}
-
-\begin{alineas}
-    \item
-    Também é possível recuperar dados de outras tabelas de um banco de dados, utilizando a \textit{keyword} \verb+UNION+ \cite{mysql_union}, que combina o resultado de múltiplas consultas \verb+SELECT+ em apenas um conjunto. Se um atacante executa a seguinte query contendo a entrada de usuário \verb+`Presentes`+, ainda no último exemplo de site:
-    
-    \begin{verbatim}
-        SELECT name, description
-        FROM products WHERE category = ‘Presentes'
-    \end{verbatim}
-    
-    Então ele pode também submeter uma entrada nociva com \verb+UNION+:
-    
-    \begin{verbatim}
-        ' UNION SELECT username, password FROM users--
-    \end{verbatim}
-        
-    Tal entrada faz com que todos os usuários e senhas venham juntos das descrições dos supostos presentes, fundamentalmente comprometendo a segurança da aplicação
-
-\end{alineas}
-
-
-No contexto deste trabalho, no entanto, é estudado uma forma tanto comercial como \textit{open-source}  que têm tido crescimento no mercado: o uso de \textit{Web Application Firewalls}, mais especificamente os baseados em técnicas de Aprendizado de Máquina.
-
-\section{OWASP TOP 10}
-
-Há pelo menos dez anos os ataques cibernéticos vem aumentando, tendo grande impacto nas empresas.
-Aplicações web quando são desenvolvidas sem ter segurança da informação no seu cerne possibilita perda de ativos, inoperabilidade de serviços, exposição de dados sensíveis e comprometimento de sistemas. 
-A \textit{Open Web Application Security Project} (também conhecida pela sigla OWASP) é uma fundação sem fins lucrativos cujo objetivo é aprimorar a segurança do software. A organização fornece projeto de código livre, vasta comunidade ativa, conferências, treinamentos e boas práticas. Uma das iniciativas é o \textit{OWASP TOP 10} \cite{bach_owasp2020understanding}, que lista, detalha e informa acerca de defesas possíveis para as 10 vulnerabilidades de um dado ano:
-
-\begin{alineas}
-
-\item \textbf{Injeção};
-\item \textbf{Broken Authentication};
-\item \textbf{Exposição de Dados Sensíveis};
-\item \textbf{Entidades Externas de XML};
-\item \textbf{Broken Access Control};
-\item \textbf{Configurações Incorretas de Segurança};
-\item \textbf{Cross Site Scripting XSS};
-\item \textbf{Deserialização Insegura};
-\item \textbf{Utilizar Componentes com Vulnerabilidades Conhecidas};
-\item \textbf{Monitoramento e Logging Insuficientes}.
-
-
-\end{alineas}
-
-\bigskip
-
-\subsection{Injeção, ou code injection}
-Forma de ataque ampla onde uma entrada de dados recebe caracteres não tratados que são executados pelo sistema com objetivo de alterar o funcionamento padrão do software.
-Além dos exemplos bases de SQL Injection, existem variantes do SQL Injection como: \textit{error-based, union-based, blind} e \textit{out-of-band} \cite{out_of_band_sql_invicti}. \textit{Error-based} são injeções que fornecem erros de SQL para o atacante, vazando informações críticas do banco de dados. \textit{Union-based} são ataques que utilizam uma query existente na lógica do sistema concatenada a outra através de um \verb+UNION+ de maneira a executar uma segunda lógica além da já estabelecida pelo sistema. Injeções às cegas (\textit{blind-based}) são aquelas que o sistema não dá nenhuma informação após a injeção, de forma que o atacante precisa ser engenhoso para obter informações e prosseguir com a ofensiva. \textit{Out-of-band} é uma injeção sem o fornecimento de uma saída para o atacante, porém é possível redirecionar a saída para um endpoint, geralmente servidor http.
-É fundamental para mitigar as injeções ter uma validação dos caracteres e declarações válidas ao receber uma entrada de dados na aplicação web.
-
-\subsection{Broken Authentication}
-Broken Authentication é um conjunto de métodos em que os atacantes podem ganhar as credenciais de usuário ou sequestrar sessões de usuário. Senhas fracas ou facilmente adivinháveis, senhas armazenadas indevidamente sem serem transformadas em hashes, IDs de sessão expostos em URLS, ataques de fixação de ID de sessão \cite{session_fixation_invicti} e transmissão não-criptografada http.
-Para mitigar problemas dessa natureza são indicadas medidas como armazenar senhas com hash, garantir que IDs de sessão não estão expostos nas URLS, configurar timeouts nas sessões, não permitir recriação de sessões expiradas, não transmitir senhas em canais sem criptografia, utilizar senhas com tamanho mínimo e determinada complexidade, ocultar nomes de usuário e senha em mensagens de erro devido a login mal sucedido e assegurar proteção contra brute force após cinco tentativas falhas.
-
-\subsection{Exposição de Dados Sensíveis}
-Aplicações web que não protegem senhas, informações financeiras ou relativas servindo potencialmente para criminosos obterem acesso não autorizado a contas de usuário, efetuar ações fraudulentas como compras online com informações roubadas ou extorquir vítimas com dados sensíveis. Dados sensíveis expostos podem causar perdas financeiras, ferir a reputação de corporações que tiveram seus dados vazados ou ativos expostos, levando as empresas a pagarem despesas para investigação sobre o incidente de segurança. Para proteger-se desse tipo de ataque são necessários softwares de acordo com a legislação do país e da industria, uma vez que ignorar a possibilidade de exposição de dados sensíveis leva a desastres financeiros de grandes proporções. 
-
-\subsection{Entidades Externas de XML}
-Um tipo particular de injeção, também conhecido como injeção XXE, ocorre quando atacantes abusam dos parses XML utilizados em servidores web através do envio de documentos XML cuidadosamente forjados que caso sejam processados levam à negação de servição, execução remota de código arbitrário ou requisições forjadas do lado do servidor.
-Por exemplo, um atacante pode enviar um \textit{payload} especialmente forjado para um servidor web, o servidor web envia para um parser XML, o parser XML por sua vez devolve o caminho do arquivo para o servidor, que devolve para o agente malicioso.
-
-\begin{verbatim}
-    <?xml version="1.0" ?>
-    <!DOCTYPE passws [
-    <!ELEMENT passwd ANY>
-    <!ENTITY passwd SYSTEM "file:///etc/passwd">
-    ]>
-
-    <passwd>&xxe;</passwd>
-\end{verbatim}
-
-Existem duas variantes de ataques XXE, sendo a primeira conhecida como \textit{in-band}, onde o atacante forja um documento XML malicioso e o submete através da rede para ser processado e recebe uma resposta instantânea, enquanto a outra variante chamada \textit{out-of-band} ocorre quando o atacante forja um documento XML malicioso, submete, todavia não obtém resposta imediata do servidor web. Ataques \textit{out-of-band} também são chamados de \textit{blind XXE injection}.
-É possível mitigar injeções XXE desativando o \textit{Document Type Definitions} (DTD). 
-
-\subsection{Broken Access Control}
-Diversos vetores de ataque podem ser considerados \textit{Broken access control}. Entre eles: burlar verificações de controle de acesso, editar contas de outros usuários, elevação de privilégios, configurações errôneas de CORS (\textit{Cross-Origin Resource Sharing}) que permitem acesso não autorizado a APIs (Application Programming Interface) restritas, manipulação de metadados através de tokens de controle de acesso JWT (\textit{JSON Web Tokens}) e acesso não autorizado a páginas web com usuário desprivilegiado, podendo levar ao controle de funções do modelo de negócio ou obtenção de (todos) os dados.
-É recomendado ter listas de controle de acesso e negar funcionalidades através de \textit{back-end}, de forma que o usuário não tem acesso ou controle do código.
-
-Configurações Incorretas de Segurança (\textit{Security misconfigurations})
-Configurações errôneas de segurança podem expor aplicações a \textit{security threads}. Portas administrativas abertas desnecessariamente, \textit{firewalls} mal gerenciados, aplicações legadas tentando comunicar com outras aplicações inexistentes são alguns exemplos de possíveis ingerências nas configurações de segurança. São necessários padrões de qualidade, revistos, testados e verificados com frequência para reduzir a superfície de ataque que esse tipo de vulnerabilidade permite.
-
-\subsection{Cross Site Scripting, ou XSS}
-\textit{Cross Site Scripting} é uma técnica conhecida como XSS onde geralmente há uma injeção de \textit{scripts} maliciosos na aplicação web, revelando dados sensíveis, serviços internos ou divulgação de \textit{cookies} de usuários com privilégios.
-Existem três variantes de XSS: \textit{stored} XSS, onde o atacante injeta um \textit{payload} no servidor web, de maneira que quando outro usuário faz a requisição para acessar a página, o \textit{payload} é ativado. Outro caso é o de \textit{Reflected} XSS, quando o atacante injeta dados através de um método HTTP gerando uma resposta imediata na aplicação. Este permite o malfeitor forjar uma URL específica que ao ser acessada pela vítima vaza dados sensíveis, como \textit{cookies}. E por último a variante \textit{DOM Based} XSS que consiste na inserção de código malicioso no DOM (\textit{Document Object Model}), sem refletir no código-fonte HTML, sendo ativado apenas pelo console DOM.
-Dados obtidos de fontes não confiáveis devem ser devidamente validados e normalizados para evitar XSS.
-
-\subsection{Deserialização Insegura}
-Ataque que ocorre quando uma aplicação tenta transformar dados maliciosos, controlados pelo atacante, em estruturas de dados internas controladas pela aplicação. \textit{Payloads} cuidadosamente forjados permitem tomar o controle de variáveis, funções e estados internos da aplicação. Geralmente esse tipo de ataque permite executar código remoto arbitrário e expor completamente o sistema da aplicação web.
-No código um \textit{array} de itens são serializados em um fluxo de bytes onde são transportados e processados pelo \textit{back-end} da aplicação web após a deserialização.
-O ataque de deserialização replica os objetos serializados, mas injetando código malicioso para ser processado pelo \textit{back-end}.
-A mitigação para o ataque pode ser feito utilizando formatos seguros de dados intercambiáveis como JSON ou YAML ao invés de formatos binários nativos, utilizando funções robustas de deserialização e bibliotecas, incluindo testes de integridade para o processamento de dados serializados e limitando o escopo e capacidades das operações serializadas.
-
-\subsection{Utilizar Componentes com Vulnerabilidades Conhecidas}
-Geralmente, atacantes não buscam descobrir vulnerabilidades inéditas, mas utilizar os \textit{exploits} já conhecidos.
-Utilizar softwares ou hardwares específicos com vulnerabilidades documentadas, que foram descontinuados ou que atingiram o fim da vida útil aumenta a propensão de sofrer ataques já consolidados por usuários mal intencionados.
-Rastrear dependências, documentar de maneira adequada, remover dependências inúteis, eliminar código obsoleto e ter uma política de atualização de dependências, procedimentos e manutenção de software são medidas efetivas para mitigar esse tipo de ataque.
-
-\subsection{Monitoramento e Logging Insuficientes}
-Ausência de mecanismos de \textit{logging} atrelados às melhores práticas para auxiliar no monitoramento e detecção de incidentes de segurança permitem atacantes conduzirem atividades sem serem detectados, fazendo com que a tarefa da detecção de incidentes e resposta seja muito mais difícil. \textit{Logs} não são úteis apenas para rastrear as atividades do atacante ou detectar erros ou atividades anômalas. \textit{Logs} também servem para auditorias e outros processos regulatórios.
-
-Injeção (em especial SQL) é uma das vulnerabilidades mais comuns, de baixa complexidade para o atacante e historicamente impactante, o que motivou o trabalho em aprofundar em um problema subestimado por desenvolvedores, que tem impactos profundos na confiabilidade, integridade e disponibilidade de um serviço web.
-
-\section{Algoritmos de Fuzzing}
-
-O cerne do algoritmo por trás do \textit{WAF-A-MoLE} e o \textit{wafamole++} se encontra na técnica de \textit{fuzzing}. O termo \textit{fuzz} foi cunhado pelo professor da Universidade de Wisconsin-Madison Barton Miller nos anos 80, após sofrer uma interferência considerável de uma tempestade no funcionamento de aplicações que rodavam em um ambiente \textit{unix} remoto na época \cite{fuzzing_info}. 
-
-Pouco depois disso o mesmo passou aos seus alunos uma tarefa denominada o \textit{"Fuzz Generator"}, na qual era necessário implementar uma ferramenta que testasse a robustez de programas \textit{unix} através de um bombardeio de informações aleatoriamente geradas.
-
-Atualmente é uma técnica amplamente aceita na testagem/sondagem da segurança de diversas aplicações, com um leque de ofertas de \textit{fuzzing} comerciais no mercado. E naturalmente é empregável em \textit{Web Application Firewalls}, permitindo extrair informações valiosas que rendam aprimoramentos para os mesmos. Enquanto a idéia em si de \textit{fuzzing} permanece a mesma, as maneiras de efetuá-lo tiveram um grande progresso de mudança.
-
-
-Uma função elementar de \textit{fuzzing} pode ser vista abaixo:
-
-\includecode[C]{Função de um \textit{fuzzer}  elementar} {alg:codigo1}{codigos/fuzzer.py}
-
-\bigskip
-Tais funções de \textit{fuzzing} podem ser aprimoradas, customizadas para testar os mais diversos programas. Uma das maneiras de polir os resultados oriundos de \textit{fuzzing} elementar, que podem ser rejeitados facilmente por muitos programas inicialmente, é um processo chamado \textit{fuzzing} mutacional, ou \textit{mutational fuzzing}, projetado para melhorar as chances de obter entradas consideradas válidas.
-
-Nessa estratégia, a execução se inicia com uma entrada válida, e ela subsequentemente sofre uma mutação pequena, como no caso de uma string a mudança de um caractere, adição/remoção de um número, ou até mesmo uma troca de um bit (todos naturalmente aleatórios, pelo princípio do funcionamento de \textit{fuzzing}).
-
-\includecode[C]{Classe de \textit{fuzzer} mutacional} {alg:codigo1}{codigos/mutational_fuzzer.py}
-
-\bigskip
-O programa acima realiza, dentre três operadores de mutação, uma mutação aleatória ao chamar a função \verb+mutate()+. Na prática, são realizadas uma série de mutações para que se produzam entradas viáveis. Com um simples \textit{loop} para chamar a função \verb+mutate()+ isso é possibilitado.
-
-Essas técnicas geralmente encontram \textit{bugs} de corrupção de memória simples e a aleatoriedade, dispersão fazem com que a eficiência do ataque seja baixa, além de cobrir poucas partes do código. Por outro lado, é simples de implementar, tem boa extensibilidade e pode ser feita sem o código-fonte. O \textit{fuzzing} aumenta seu potencial quando o alvo está em execução em um ambiente real. Outro ponto positivo é o fato de poder aplicar a técnica em aplicações com pouco conhecimento prévio sobre.
-
-Em suma \textit{fuzzing} consiste na geração massiva de entradas normais e anômalas para uma aplicação específica, seguido da detecção de exceções no algoritmo devido o processamento das entradas geradas e monitoramento dos estados de execução da aplicação. Quando comparado com outras técnicas como análise estática, dinâmica e execução simbólica, o \textit{fuzzing} apresenta facilidade em ser implementado, boa precisão (em ambientes reais) e boa escalabilidade.
-
-Expandindo um pouco o conceito, um teste de \textit{fuzzing} tipicamente consiste na geração em larga escala de entradas para um programa específico, entradas conhecidas também como \textit{testcases}. A qualidade de tais \textit{testcases} criados influencia diretamente na qualidade do teste fuzzing. As entradas precisam atender os requisitos do programa testado para o padrão de entrada. Em contrapartida, as entradas precisam ser errôneas o suficiente para gerarem falhas ou erros no processamento do programa. De acordo com o alvo, as entradas podem ser arquivos com diferentes formatos, dados de comunicação entre redes, binários executáveis específicos, entre outros. No caso do \textit{wafamole++} trabalha-se, conforme descrito anteriormente, com injeções SQL.
-
-Gerar \textit{testcases} suficientemente errôneos é uma tarefa árdua, com duas variantes: \textit{generation-based} e \textit{mutation-based}, das quais a última é a adotada pelo \textit{WAF-A-MoLE} e \textit{wafamole++}. Depois de gerados, os \textit{testcases} alimentam o programa alvo, tendo variáveis de ambiente e outros parâmetros do software a ser testado devidamente configurados pelo programador. Geralmente um teste de \textit{fuzzing} tem como condição final um tempo limite (ou \textit{timeout}) pré-definido ou uma falha de execução do programa.
-
-\textit{Fuzzers} monitoram o estado de execução durante o processo, aguardando exceções ou falhas.  Formas comuns de metodologia de monitoramento de exceções incluem monitor sinais específicos do sistema, falhas e outras violações. Existem ferramentas para verificar comportamentos anormais difíceis de perceber intuitivamente, como o \verb+AddressSanitizer+, \verb+DataFlowSanitizer+, \verb+ThreadSanitizer+ e \verb+LeakSanitizer+. Quando uma violação é capturada, o \textit{fuzzer} armazena o \textit{testcase} que a causou para análise futura e replicação \cite{li2018fuzzing}.
-
-Por fim, na fase de análise, tem-se por objetivo determinar a localidade e a causa da violação no software. A análise geralmente é feita com o auxílio de \textit{debuggers} como \verb+DGB+, \verb+windbg+ ou outras ferramentas de análise binária, como a \verb+IDA Pro+, \verb+OllyObg+ e outras. O exato estado de execução dos \textit{testcases}, informações da \textit{thread}, instruções e outras informações fazem parte do monitoramento. Para o caso do trabalho em questão, considerando-se o ambiente em \textit{Python}, o \textit{debugger} padrão \verb+pdb+ mostrou-se suficiente para diagnosticar a maioria dos \textit{bugs} encontrados.
+\subsection{Parsifal}
 
 \begin{figure}[ht]
     \centering
-    \caption{Workflow Fuzzing}
-    \includegraphics[width=8cm,height=12cm,keepaspectratio]{figuras/fuzzing imagem.png} 
-    \legend{Fonte: \href{https://parsif.al}{Fluxograma} (2022, p. TO-DO)}
+    \caption{Dashboard Parsifal}
+    \includegraphics[width=14cm]{figuras/parsifal.png} 
+    \legend{Fonte: \href{https://parsif.al}{parsif.al} (2022, p. TO-DO)}
     \label{fig:internet} 
 \end{figure}
-
-O \textit{fuzzer} \textit{generation-based} necessita saber como é a entrada que o programa é capaz de processar. No caso de um \textit{fuzzing} para arquivos, geralmente é fornecido um arquivo de configuração com o modelo pré-definido de entrada. Os \textit{testcases} são gerados de acordo com o arquivo de configuração. Fuzzers desse tipo tem facilidade em burlar validações do software testado, permitindo ao pentester entender com mais profundidade a aplicação estudada. Por outro lado, sem uma documentação amigável, analisar o formato do arquivo pode ser uma tarefa árdua.
-Em termos de praticidade, fuzzers mutation-based são mais fáceis de utilizar, com aplicabilidade genérica, sendo geralmente o tipo adotado por testes de intrusão no estado da arte. Diferente do generation-based, o mutation-based precisa de algumas entradas iniciais válidas. As entradas vão sofrendo mutações e novos \textit{testcases} vão sendo gerados. O \textit{wafamole++} requer apenas uma entrada inicial válido - uma query que é fornecida ao final de cada chamada ao comando \verb+wafamole evade+.
-
-Para testes \textit{grey box} e \textit{black box}, os \textit{fuzzers} são \textit{mutation-based}. Para testes \textit{white box}, \textit{generation-based}.
-
-O contexto relevante para o \textit{WAF-A-MoLE} é produzir, iterativamente, múltiplas injeções SQL a serem testadas a cada "rodada" de mutação. Uma injeção SQL é usada como base inicial, e a mesma sofre mutações por um \textit{fuzzer} dedicado até ser considerada válida pelo Web Application Firewall testado, embora seja no fundo ainda uma injeção maliciosa. Dessa maneira, o \textit{wafamole++} pode ser resumidamente descrito como um \textit{fuzzer} mutacional, operando em cima de WAFs com entradas de injeções SQL "fuzzeadas".
-
-\section{Aprendizado de Máquina}
-
-Tendo seus primórdios em torno das décadas de 60 e 70, com dispositivos como o \textit{Cybertron} intitulados de "máquinas de aprendizado", esse subcampo de Inteligência Artificial teve uma tremenda ressurgência com recentes avanços em capacidade de processamento em tempos atuais. Com isso, dentre as áreas de interesse de computação enriquecidas por técnicas, naturalmente foram investigadas novas empreitadas em Segurança da Informação
-
-A ideia por trás de Aprendizado de Máquina \cite{dantas_transformers_2021} é a instrução de computadores por meio de exemplos - diferente da automação usual que envolve o programador elaborando algoritmos envolvendo manipulação de dados de entrada e saída desejados. Nesse contexto, um típico objetivo é rotular dados novos em categorias definidas nos dados iniciais. Para tal, temos dois principais procedimentos:
-\begin{alineas}
-\item \textbf{Aprendizado supervisionado} - em casos nos quais dados de entrada e saída de um algoritmo desse tipo são conhecidos, e o algoritmo resultando é aprimorado com base nisto
-\item \textit{Aprendizado não-supervisionado} - casos nos quais os dados de saída não são conhecidos, sendo possível identificar padrões no próprio conjunto de entrada da aplicação.
-\end{alineas}
-
-Alguns termos de relevância dentro de tais procedimentos podem ser elencados:
-\begin{alineas}
-\item \textbf{Classificação} - É a ação qualitativa de rotular um dado avaliado com uma categoria, feito com um algoritmo de um classificador. Aplicando a um exemplo direto de Segurança da Informação, um classificador que rotula um pacote como "malicioso" realiza essa ação.
-\item \textbf{Treinamento} - Também conhecido como \verb+fitting+, essa ação envolve o fornecimento de exemplos para um determinado classificador, para que esse programa possa realizar a eventual classificação de dados vindouros.
-\item \textbf{Dados de Validação} - Durante o treinamento, são separados dados para a orientação do mesmo. O procedimento usual é separar uma parcela dos dados original como tal. É importante que sejam distintos de dados de teste, para que o algoritmo resultante possa ter seu desempenho contra dados eventualmente completamente novos testado.
-\item \textbf{Dados de Teste} - São dados usados para a avaliação de um classificador realizada logo após seu treinamento, para que seja possível averiguar a eficácia e corretude do mesmo.
-\end{alineas}
-
-Sumariamente, pode-se perceber como esse campo de pesquisa traz consigo abordagens de automatização relevantes para uma gama de aplicações. Para o contexto deste trabalho, é imprescindível o conhecimento de Aprendizado de Máquina, uma vez que as principais aplicações avaliadas no mesmo englobam diversos algoritmos oriundos desse subcampo de Inteligência Artificial.
-
-Algoritmos que vêm por padrão no \textit{WAF-A-MoLE} em modelos de exemplo são \textit{Naive Bayes}, \textit{Random Forest} e \textit{Support Vector Machine} Gaussiana/Linear, ofertados pela biblioteca \textit{scikit-learn}. Além disso, há um WAF externo \textit{open-source} embutido que faz uso de Redes Neurais.
-
-\subsection{Support Vector Machine}
-SVMs ou Support Vector Machines são modelos de aprendizado supervisionado (dentro do contexto de teoria de machine learning) associado a algoritmos de aprendizado que analisam dados para classificação e análise regressiva. É um dos métodos de predição mais robustos, baseado em \textit{frameworks} de aprendizado estatístico ou na teoria VC \cite{ben2001_vapnik_support}.
-
-Dado um conjunto de exemplos para treinamento, cada um é marcado em duas categorias, um algoritmo de treinamento SVM constrói um modelo que assina novos exemplos para uma categoria ou outra, sendo um classificador binário linear não-probabilístico. 
-O SVM mapeia exemplos de treinamento para pontos no espaço de maneira a maximizar a distância entre as duas categorias. Novos exemplos são então mapeados no mesmo espaço e a predição através de qual lado da diferença entra as categorias é mais provável ela cair. Em adição a performance do classificador linear, SVMs conseguem de maneira eficiente efetuar classificações não-lineares utilizando um mapeamento implícito de entradas em espaços multi-dimensionais.
-Quando os dados ainda não foram rotulados, o aprendizado supervisionado não é possível e é necessário uma abordagem não-supervisionada, que tenta encontra \textit{clusters} naturais para o grupo de dados e então mapear os novos dados nos grupos formados. O algoritmo \textit{SV clustering} aplica a estatística aos \textit{Support Vectors}, permitindo categorização de dados não-rotulados.
-Foi criado por Vladimir Vapnik com outros parceiros na AT\&T Bell Laboratories.
-Para exemplificar o poder do modelo de aprendizado, o artigo \cite{vapnik_svm_support} mostra a performance obtida em classificação de histogramas em níveis surpreendentemente altos, com taxas de erro por volta de 11\% (baixa) para a classificação de 14 categorias e com taxa de erro de 16\% para conjuntos de objetos mais genéricos. Esses resultados foram obtidos sem conhecimento prévio da tarefa, sabendo apenas que a entrada seria uma densidade discreta ou histograma colorido.
-\textit{Python} possui no pacote \textit{sklearn} um método SVC e variantes com eficácias distintas em cenários diferentes.
-O novo modelo proposto \textit{wafamole++} é a versão não-linear, diferente da proposta original de Vladimir.
-
-\begin{figure}[ht]
-    \centering
-    \caption{Plot com quatro variantes do SVC}
-    \includegraphics[width=14cm]{figuras/plot-svc.png} 
-    \legend{Fonte: \href{https://scikit-learn.org/stable/modules/svm.html}{\cite{scikit_svm_module}} (2022, p. TO-DO)}
-    \label{fig:internet} 
-\end{figure}
-
-\subsection{Stochastic Gradient Descent}
-
-Gradiente descendente estocástico é um método iterativo para otimização de uma função objetivo com propriedades "suaves" (diferenciais ou subdiferenciais) adequadas. \cite{ruder2016overview}
-
-Pode ser considerada uma aproximação estocástica da otimização por gradiente descendente, uma vez que substitui o gradiente atual (calculado do dataset inteiro) por uma estimativa do mesmo calculada for um subconjunto dos dados selecionado aleatoriamente.
-Em problemas de otimização com muitas dimensões, reduz o peso computacional, tendo resultados mais rápidos com o \textit{tradeoff} de perda na taxa de convergência.
-O SGD procura encontrar o mínimo global de uma função através de ajustes de configuração a cada tentativa. Ao invés de reduzir o erro ou achar o gradiente para o dataset inteiro, o método reduz o erro através de aproximações em direção ao gradiente para um subconjunto aleatório do dataset, que pode ser tão pequeno quanto o conjunto de dados de treinamento inicial.
-De forma heurística, se o modelo inicial erra muito, as alterações na configuração vão tornando o modelo mais preciso. Em contrapartida, é possível que questões antes acertadas, possam passar a serem erradas ou aumento da taxa de erro geral em favor de acertos específicos. Nem toda iteração necessariamente irá fazer o modelo melhorar.
-Positivamente, o SGD consegue sair do mínimo local em direção ao mínimo global através dos ajustes de configuração com baixo custo computacional em relação ao gradiente descendente clássico.
-\cite{overview_gradient_descent_stochastic}
-
-\begin{figure}[ht]
-    \centering
-    \caption{Função Objetivo}
-    \includegraphics[width=10cm,height=14cm,keepaspectratio]{figuras/funcao_objetivo.png} 
-    \legend{Fonte: \href{https://deepai.org/}{Função Objetivo} (2022, p. TO-DO)}
-    \label{fig:internet} 
-\end{figure}
-
-\includecode[C]{Função de um SGD elementar} {alg:codigo1}{codigos/sgd.py}
 
 \bigskip
 
-\subsection{AdaBoost}
+Na figura a seguir pode-se verificar no topo quatro abas principais do Parsifal \cite{parsifal_docs} - \textbf{Review, Planning, Conducting, }e \textbf{Reporting}. A primeira é simples e não muito essencial, descrevendo apenas os colaboradores registrados na plataforma na determinada pesquisa. A segunda, no entanto, é composta de três etapas interdependentes:
 
-\textit{AdaBoost} é um algoritmo do tipo \textit{Boosting} \cite{wu2011some} com capacidade auto-adaptativa que melhora a performance de classificadores fracos por estabelecer um conjunto de múltiplos classificadores. Como o \textit{AdaBoost} adapta-se a taxa de erro do algoritmo básico em treinamento através de regulação dinâmica do peso de cada amostra, o interesse dos pesquisadores tem sido estimulado.
+\begin{alineas}
 
-O método de \textit{Boosting} vem da análise teórica do modelo de aprendizado chamado PAC (\textit{Probably Approximately Correct}). Os autores Kearns e Valiant propuseram os conceitos de aprendizado forte e fraco. No modelo de aprendizado do PAC, se um algoritmo de aprendizado polinomial para identificar um grupo de conceito e a acurácia do reconhecimento é muito alta, esse grupo de conceitos são considerados como aprendizado forte. Porém, se a taxa de corretude do algoritmo de aprendizado de identificação é um pouco superior a tentativa aleatória de adivinhar, então esse grupo é considerado aprendizado fraco. 
+\item \textbf{Protocol} - estabelece os objetivos, e parâmetros da pesquisa. Tais parâmetros chaves incluem PICOC (population, intervention, comparison, outcomes and context - fatores que permitem sondar o objetivo), Research Questions, Keywords + Sinônimos, Search String, Buscas e Critério de Seleção.
 
-Kearns e Valient perceberam uma relação de equivalência entre aprendizado fraco e forte, onde o algoritmo de aprendizado fraco pode ser promovido para aprendizado forte.
-Se existe uma equivalência entre fraco e forte, então enquanto aprende-se um conceito, pode-se elevar um algoritmo um pouco melhor que tentativas de adivinhação aleatórias para um algoritmo de aprendizado forte (desde que se saiba qual algoritmo forte em específico).
+\item \textbf{Quality Asessment Checklist} - o pesquisador estabelece uma série de perguntas sobre os artigos, e a resposta para essas (Sim, Parcialmente, Não no caso dessa pesquisa) recebe um peso que permite classificar um artigo como aceito ou rejeitado na seleção final. 
 
-Em 1990, Schapire publicou o primeiro método de Boosting. Freund fez melhorias e criou um método muito melhor conhecido como BBM (boost-by-majority).
-\textit{Boosting} produz uma série de classificadores antes e depois do treinamento. O conjunto de treinamento utilizado em cada classificador é um subconjunto advindo do conjunto geral de treinamento e se cada amostra aparece no subconjunto ou não depende da performance dos classificadores anteriores. No caso das amostras julgadores como incorretas pelos classificadores já existentes, então ã probabilidade de surgirem no novo subconjunto de treinamento será muito maior, fazendo com que os classificadores seguintes tenham foco em lidar com as diferenças nas amostras, que é uma tarefa árdua para os classificadores já existentes.
+As perguntas escolhidas priorizavam bons resultados descritos nos artigos, artigos na língua inglesa, problemas abertos, contexto de aplicações web e papers com download/visualização disponíveis (uma dificuldade que será discutida mais a frente).
 
-O método \textit{Boosting} pode aumentar a capacidade de generalização de um dado algoritmo, mas o algoritmo precisa ter estabelecido o limite inferior da acurácia de aprendizagem de um classificador fraco, que na prática é uma tarefa difícil.
+\item \textbf{Data Extraction Form} - Permite nomear agrupar dados de destaque de artigos aceitos.
 
-\textit{AdaBoost} que surgiu em 1995 atráves de Freund e Schapire fez uma grande melhoria no algoritmo de \textit{Boosting}.
-Sendo o algoritmo mais representativo da família, ele mantém a distribuição de um conjunto de probabilidades para amostras de treinamento e ajusta a probabilidade de distribuição de cada amostra durante a iteração. Um algoritmo específico de aprendizado é usado para gerar o classificador-membro e calcular a taxa de erro nas amostras de treinamento. \textit{AdaBoost} irá usar a taxa de erro para ajustar a probabilidade de distribuição das amostras de treino. O papel de mudar os pesos é para aumentar o impacto das classificações incorretas e reduzir o impacto das classificações corretas. Por fim, com o ajuste dos pesos nos classificadores únicos, é obtido um classificador forte.
-O pseudoalgoritmo tem a seguinte estrutura com um conjunto de amostras iniciais:
+\end{alineas}
 
-\begin{equation}
-    L=\left\{\left(x_{1}, y_{1}\right),\left(x_{2}, y_{2}\right) \cdots\left(x_{N}, y_{N}\right)\right\}, y_{i} \in\{+1,0\}
-\end{equation}
+A etapa seguinte, a de \textbf{Conducting}, é um tanto mais complexa composta de mais subetapas. São elas:
+\begin{alineas}
+\item \textbf{Search} - verifica-se a Search String definida na etapa anterior de Planning. No final optou-se por ("Web Apps" OR "Web Application") AND ("Hardening") AND ("Prevention" OR "Avoidance") AND ("Secure Coding") AND ("Vulnerability").
 
-A distribuição inicial dos pesos é dada por:
+\item \textbf{Import Studies} - nessa subetapa há a opção de importar para a plataforma metadados das publicações encontradas (studies), no formato \textit{BibTeX}. Ao total foram em torno de 74 artigos selecionados para avaliação, todos oriundos do Scopus que será descrito a seguir.
 
-\begin{equation}
-    w_{i}^{1}=\frac{1}{N}
-\end{equation}
+\item \textbf{Study Selection} - uma das partes mais importantes - é realizada a seleção dos artigos, além da eliminação dos artigos duplicados na busca. É a seção amostrada na captura de tela acima. Uma série de metadados é mostrada e é possível filtrar por fonte, artigos aceitos, rejeitados, duplicados e ainda não classificados.
 
-Onde +1 é uma amostra positiva e 0 é uma amostra negativa, sendo o total de amostras N.
+\item \textbf{Quality Assessment} - as perguntas criadas na subetapa Quality Assessment Checklist da etapa anterior de Planning são respondidas aqui, o que determina o aceite ou não de determinados artigos baseados em suas "pontuações" por perguntas respondidas.
 
-Considerando t = 1, ... , T, tem-se um \textit{loop} com os pesos normalizados:
+\item \textbf{Data Extraction} - é feita a anotação de acordo com os grupos denominados na etapa anterior pelo pesquisador. Porém não foi muito utilizada no escopo deste trabalho.
 
-\begin{equation}
-    w_{i}^{t}=\frac{w_{i}^{t}}{\sum_{j=1}^{N} w_{j}^{t}}
-\end{equation}
+\item \textbf{Data Analysis} - como o nome descreve, o Parsifal disponibiliza nessa subetapa uma série de gráficos a respeito dos dados trabalhados. São eles: artigos por fonte, artigos aceitos por fonte, e artigos por ano dentre os aceitos. Os resultados dessa seção estão contidos nos apêndices.
 
-O classificador fraco que seleciona e classifica do conjunto de amostras aquele cuja taxa de erro é a menor e a distribuição do peso atual $h_{t}$. A taxa de erro do classificador fraco é dada pela expressão:
+\end{alineas}
 
-\begin{equation}
-    \mathcal{E}_{t}=\sum_{i=1}^{N} w_{i}^{t}\left|h_{t}\left(x_{i}\right)-y_{i}\right|
-\end{equation}
+Por fim, há a etapa final \textbf{Reporting}, que é permite ao pesquisador exportar um relatório final com os principais resultados do Parsifal - selecionando os dados desejados. Esse relatório encontra-se nos apêndices.
 
-A atualização do peso da amostra é dada por:
+\subsection{Scopus e CAFe}
+O Scopus é o banco de dados disponibilizado pela Elsevier de citações e \textit{abstracts}. Com a exceção de alguns artigos encontrados gratuitamente em plataformas como o Google Scholar ou Research Gate, a maioria dos artigos coletados para os fins desse trabalho foram fornecidos através dessa plataforma.
 
-\begin{equation}
-    w_{i}^{t+1}=w_{i}^{t} \beta_{t}^{1-e_{i}}
-\end{equation}
+Quanto a essa plataforma, graças aos seus ricos metadados e facilidade de integração com o Parsifal, foi possível coletar cerca de 74 artigos para análise. Além disso, é garantido um acesso robusto através da identificação que a Universidade Federal providencia com a Comunidade Acadêmica Federada (também conhecida coma CAFe), um serviço de gestão de identidade que facilita acesso web à várias instituições de ensino e pesquisa brasileiras. 
 
-$e_{i}$ = 0 representa que xi foi classificado corretamente e $e_{i}$ = 1 significa que $x_{i}$ foi classificado incorretamente.
+\begin{figure}[ht]
+    \centering
+    \caption{Pesquisa por área de interesse no Scopus}
+    \includegraphics[width=14cm]{figuras/scopus.png} 
+    \legend{Fonte: \href{https://www.scopus.com}{Scopus} (2022, p. TO-DO)}
+    \label{fig:internet} 
+\end{figure}
 
-Como saída final do algoritmo:
+\bigskip
 
-\begin{equation}
-    \begin{aligned}
-    &H(x)= \begin{cases}1, & \sum_{t=1}^{T} \alpha_{t} h_{t}(x) \geq \frac{1}{2} \sum_{t=1}^{T} \alpha_{t} \\ 0, & \text { caso contrario }\end{cases}\\
-    &\alpha_{t}=\log \frac{1}{\beta_{t}} .
-    \end{aligned}
-\end{equation}
+Infelizmente uma das dificuldades encontradas foi uma considerável instabilidade por parte do sistema de login do CAFe, acarretando em diversos atrasos. É comum não funcionar por longos períodos de tempo. Fora isso, uma série de artigos mesmo após providenciados pelo Scopus requeriam autenticação fora da Universidade, impossibilitando até mesmo sua visualização. Alguns raros casos foram encontrados em plataformas como as anteriormente mencionadas (Google Scholar e afins).
+
+\section{Avaliação de Propostas de Hardening}
+Ao fim da coleta de artigos, além do embasamento teórico e melhor enquadramento do escopo a ser estudando, buscou-se uma série de ferramentas e/ou casos reais de modelos e sistemas sugeridos na área de hardening, para que um desses pudesse ser expandido de modo a criar um impacto maior no trabalho.
+
+\subsection{nscanner}
+Essa solução, publicada apenas na forma de um artigo \cite{surian_nscanner_2020}, provém de um estudo dirigido sobre uma série de outras ferramentas existentes hoje no mundo de \textit{Penetration Testing} (e de utilidade/notoriedade no mercado) como Metasploit, Wapiti e Acunetix. Trata-se de uma aplicação dinâmica, flexível e automatizada para detectar os ataques mais comuns e problemáticos em segurança de Informação, que são SQL Injection e Cross Site Scripting. É capaz também de detectar malware via machine learning para prevenir resultados que seriam falsos positivos.
+
+Há uma fase de testagem de vulnerabilidade em aplicação Web, e uma de escaneamento de arquivos. Todas as informações trabalhadas são armazenadas localmente, tornando desnecessário o uso de uma solução de Banco de Dados. 
+
+Para a primeira fase, as seguintes etapas são observadas pelo autor:
+\begin{alineas}
+\item Tendo sido estabelecida uma conexão com a internet, um usuário da ferramenta escolhe o tipo de vulnerabilidade que será testada. Após isso, ele fornece um endereço web ou de IP que armazena a aplicação que receberá os testes.
+\item Uma requisição com os dados fornecidos pelo usuário é feita ao web crawler do Nscanner, um script responsável por acessar a aplicação em si e realizar a verificação por vulnerabilidades. Ele busca o site da aplicação pelo domínio, usado para identificar o servidor armazenando tal site.
+\item Após isso, uma conexão com o servidor encontrado é requisitada pelo crawler, estabelecendo então uma ponte entre web crawler e servidor. Assim as páginas e componentes da aplicação em análise são navegadas e todas as partes com formulários são identificadas.
+\item Nessa etapa (a mais importante da pipeline), os bugs são identificados pelo Nscanner. A ferramenta injeta \textit{payloads} (isto é, entradas) de acordo com a seleção de vulnerabilidade do usuário no início do fluxo, em todas as partes críticas (formulários) visualizadas na análise anteriormente feita a fim de verificar se alguma delas omite erros fundamentais deixando passar uma vulnerabilidade. Espera-se que consuma um tempo por ser um processo iterativo. Finalmente é gerado um relatório que o usuário final pode optar por baixar para fins de histórico ou apenas visualizar no momento.
+\end{alineas}
+
+Enfim tem-se a segunda parte da proposta, de escaneamento de arquivos:
+\begin{alineas}
+\item É feito um upload de um arquivo/amostra que o usuário considera malicioso ao Nscanner.
+\item O principal componente da detecção de malware do Nscanner é acionado ao verificar que o upload foi bem sucedido, iniciando uma análise dinâmica. Por exemplo, um classificador de Machine Learning baseado no algoritmo de \textit{Random Forest}, treinado para detectar arquivos malware com uma série árvore de decisões geradas em seu treinamento. Verificando com sucesso algum caso em que a precisão seja suficiente para definir como malicioso, o arquivo é designado como tal e um relatório é gerado semelhantemente a etapa anterior para o usuário.
+\end{alineas}
+
+Embora seja uma ideia de projeto conveniente, percebem-se algumas falhas nessa implementação. Em particular, na etapa mais importante do fluxo de detecção de vulnerabilidades em aplicação web - há dois pontos críticos que o autor não cuidou de verificar: não há uma proposta suficientemente concreta para fornecer \textit{payloads} que testem a aplicação corretamente. Há uma série de aplicações no mercado que visam implementar isso, porém é um processo complexo. Fora isso, a diferença entre SQL injections e Cross Site Scripting (XSS) não garante necessariamente que os mesmos pontos críticos terão as mesmas vulnerabilidades. É frequente observar vulnerabilidades XSS em partes até impossíveis de se realizar injeções SQL.
+
+Com isso em consideração, somando o fato de que é uma ideia sem implementação qualquer fornecida pelo autor essa pesquisa foi considerada de baixo impacto para expansão e apenas avaliada.
+
+\subsection{GraphXSS}
+A proposta do GraphXSS \cite{liu_graphxss_2022} sugere uma implementação de uma \textit{Graph Convolutional Network ou GCN} para realizar a detecção de ataques de \textit{Cross-Site Scripting} em aplicações web. A \textit{pipeline} básica envolve um pré-processamento dos dados, a composição dos mesmos em uma estrutura de grafos, e a utilização de algoritmos que realizem \textit{Deep Learning} em cima dessa estrutura para enfim realizar a detecção de maliciosidade em uma determinada entrada (payload). A solução é ilustrada no seguinte diagrama: 
+
+\begin{figure}[ht]
+    \centering
+    \caption{Arquitetura do Sistema GraphXSS proposto}
+    \includegraphics[width=14cm]{figuras/graphXSS.png} 
+    \legend{Fonte: \href{https://www.sciencedirect.com/science/article/pii/S016740482100420X}{Z. Liu, Y.Fang, C. Huang et al via Scopus} (2022, p. TO-DO)}
+    \label{fig:internet} 
+\end{figure}
+
+O pré-processamento tem por finalidade reduzir a parametrização excessiva (no caso, considerada pelos atores até desnecessária) que possa interferir com os resultados finais de detecção do sistema. Ao passo que essa etapa é realizada, também se obtém uma redução no custo computacional de subsequentes treinamentos  efetuados nas etapas de classificação (justamente o momento mais exigente do sistema) melhorando também a eficiência do algoritmo. Aqui são utilizados algoritmos comuns de encodificação/decodificação como primeira etapa, compreendidos por: URL decoding, HTML entity encoding, Unicode decoding e Base64 decoding. Os resultados destes quatro algoritmos são generalizados (via discretização, generalização e/ou padronização de dado)s e segmentados no Tokenizador de expressões regulares do módulo NLTK (Nature Language Toolkit).
+
+Este pré-processamento dá entrada no módulo de composição para grafo, responsável por conectar palavras e dados de uma maneira regular para formar um grafo dotado de \textit{data points} (no caso, um tipo de nó) e arestas. formado para uso no módulo de Deep Learning (baseado em algoritmos de GCNs) que otimiza os parâmetros de tal grafo. Finalmente obtém-se uma distribuição de probabilidade de cada vértice que levará à classificação do \textit{data point} fornecido ao sistema. 
+
+Infelizmente para o contexto do GraphXSS, muitos dos detalhes da implementação além dos diagramas da arquitetura geral não foram encontrados na pesquisa - sugerindo dúvidas se o modelo foi implementado ou não. Apenas foram disponibilizados saídas da etapa de classificação final (implicando que o pré-processamento, generalização, dependências de bibliotecas de código foram todos realizados, porém não integrados a uma solução central).
+
+Assim, ao procurar uma maneira de contribuir para essa pesquisa, considerou-se que, por possuir uma arquitetura sofisticada o suficiente para ser complexa demais de replicar no tempo designado para este trabalho, ela seria estudada e não expandida. Espera-se que algum dia os autores disponibilizem um repositório com os códigos da experimentação realizada, ou talvez uma implementação mais concreta que seja mais factível para alunos e entusiastas contribuírem.
+
+\subsection{PADRES}
+
+O PADRES \cite{pereira_padres_2022}, sigla para PrivAcy, Data REgulation and Security, é um software desenvolvido inicialmente para auxiliar a infraestrutura do EPOS (\textit{European Plate Observatory System}) e a comunidade do GNSS (\textbf{Global Navigation Satellite System}) em um ponto pouco explorado em Segurança da Informação no contexto de Internet - complacência com a GDPR (\textit{General Data Protection Regulation}), uma regulação então recém introduzida na legislatura Europeia com finalidade de proteger a privacidade e acesso aos dados alheios. Porém sua solução tornou-se generalizada o suficiente para auxiliar empresas de escopos, servindo para qualquer aplicação Web que seja aberta. A parte relevante para esse trabalho, no entanto, é uma funcionalidade de analisar aplicações Web por vulnerabilidades também embutida na mesma ferramenta, dado que privacidade de dados é comumente associado com segurança. Trata-se também de uma aplicação que surgiu como fruto de pesquisa acadêmica.
+
+O fluxo básico dessa aplicação envolve o usuário fornecer um endereço de uma aplicação Web a ser analisada, seguido de uma série de perguntas sobre GDPR que são respondidas manualmente pelo administrador da mesma. Com isso, a aplicação é analisada pelo PADRES, e um relatório sobre suas vulnerabilidades e pendências com a regulação GDPR (baseadas nas respostas fornecidas no questionário manual) é disponibilizado para baixar. 
+
+\begin{figure}[ht]
+    \centering
+    \caption{Screenshot do PADRES em funcionamento}
+    \includegraphics[width=14cm]{figuras/padres.png} 
+    \legend{Fonte: \href{https://www.sciencedirect.com/science/article/pii/S2352711021001515}{Fábio Pereira, Paul Crocker, Valderi R.Q. Leithardt et al via Scopus} (2022, p. TO-DO)}
+    \label{fig:internet} 
+\end{figure}
+
+Em termos de arquitetura, o PADRES é dotado de um modelo de Cliente e Servidor. Há um \textit{front-end} desenvolvido no framework Angular (para JavaScript), e o \textit{back-end} implementa uma arquitetura REST por meio do framework Flask, em \textit{Python}. Um banco de dados preenchido de questões GDPR a serem respondidas é conectado ao \textit{back-end}, e uma estrutura para armazenar metadados do relatório final em formato \textit{.BLOB} é providenciada. Esse banco é modelado de maneira que as perguntas são extensíveis, tornando o software um bom candidato para expansão. Algumas ferramentas de código aberto de \textit{Penetration Testing} são utilizadas no módulo de detecção de vulnerabilidades Web, são elas: Wapiti, ZAP e NMAP. Elas são executadas pelo usuário via a interface gráfica, com suas saídas sendo acopladas à saída do questionário GDPR.
+
+Todo esse arcabouço técnico é encapsulado pelo Docker, a principal ferramenta de conteinerização de software hoje no mercado, escrita em Golang. Através desse artifício, qualquer sistema operacional utilizando Docker consegue instalar o ambiente de desenvolvimento sem problemas, executar a aplicação e desenvolvê-la. 
+
+Esse e o fato de a extensibilidade da aplicação ser algo muito enfatizado pelos autores fez do PADRES um bom candidato à contribuição, tendo sido o alvo inicial de pesquisa e desenvolvimento desse trabalho. Todavia, uma série de dificuldades imprevistas foram encontradas. Não só o repositório com a aplicação fornecida carecia gravemente de documentação, a aplicação no estado atual não funcionou como previsto em uma variedade de ambientes testados. Apenas um esqueleto do \textit{front-end} é corretamente disponibilizado, porém a parte da interface gráfica responsável por selecionar uma aplicação Web de fato encontrava-se impossível de ser selecionada. Algumas estratégias para contornar isso foram tentadas, porém sem sucesso. Não foi encontrada também uma forma de verificar o correto funcionamento do \textit{back-end}.
+
+Com isso o PADRES no estado atual não pode ser recomendado como uma ferramenta viável para o ramo, mesmo que sua ideia resgate interesses de privacidade de alta relevância até mesmo fora da Europa, e reforça a importância de documentação e testagem robusta de aplicações que sejam criadas com o intuito de reforçar software no geral.
+
+\subsection{WAF-A-MoLE}
+
+Desenvolvido como uma tese, o \textit{WAF-A-MoLE} \cite{valenza_waf--mole_2020} é uma ferramenta geradora de testes para WAFs \textit{Web Application Firewalls} baseados em Aprendizado de Máquina. A versão atual é particularmente dedicada a SQL-Injections. Sendo um dos poucos softwares encontrados nos artigos com uma implementação concreta (a outra sendo o PADRES, que mostrou-se defeituosa), o \textit{WAF-A-MoLE} certamente foi um dos mais convidativos a colaboração. Não só os autores providenciam uma documentação robusta para uma aplicação inicialmente desenvolvida no meio acadêmico, como também mostram nela caminhos a serem expandidos por contribuintes futuros.
+
+\begin{figure}[ht]
+    \centering
+    \caption{Arquitetura do \textit{WAF-A-MoLE} - $p_i$ indica \textit{payload} i e $\sigma_i$  indica score de confiança.}
+    % $num_{\mathrm{expression}}$ for n+1 subscript!
+    \includegraphics[width=14cm]{figuras/wafamoleArchitecture.png} 
+    \legend{Fonte: \href{https://arxiv.org/abs/2001.01952}{A. Valenza, L. Demetrio, G. Costa and G. Lagorio et al via arxiv} (2020, p. TO-DO)}
+    \label{fig:internet} 
+\end{figure}
+
+
+Inteiramente codificado na linguagem de programação \textit{Python 3}, esse software faz uso de uma metodologia de testagem baseada em \textit{fuzzing} (inspirada pelo \textit{Fuzzing Book}) \cite{fuzzing_book} para criar ataques que penetrem com sucesso um determinado WAF baseado em Aprendizado de Máquina a ser analisado. Mais precisamente, fazendo uso da pontuação de classificação do WAF como métrica, o processo de fuzzing é guiado de maneira que as entradas mais promissoras são priorizadas.
+
+Ele é implementado como uma biblioteca e como uma ferramenta de linha de comando, por meio de \textit{Click decorators} (uma função da biblioteca \textit{Click} para minimizar o código por trás de aplicações de linha de comando). O usuário pode escolher qual modelo será utilizado, além de uma série de parâmetros como \verb+timeout+, rodadas máximas, caminho para o arquivo de saída e afins.
+
+Tomando como base a figura de sua arquitetura acima, seu funcionamento é iniciado com um \textit{payload} inicial $p_0$ (fornecido pelo usuário ao executar o programa) ao qual o WAF a ser testado confere um score de confiança $\sigma_0 \epsilon [0, 1]$ que será inserido numa \textit{Pool} de payloads. Essa estrutura \verb+Pool+, uma \textit{priority queue}, armazenará \textit{payloads} subsequentes por ordem decrescente de seus scores de confiança.
+
+Com isso, a cada iteração a cabeça da \textit{queue} (fila) $p_n$ é selecionada pela \verb+Pool+, passada adiante para a classe \verb+Fuzzer+, que realiza uma mutação em cima de $p_n$ transformando-o em $p_{\mathrm{n+1}}$ aplicando aleatoriamente um dos operadores de mutação padrões do programa (A lista completa de operadores de mutação pode ser conferida nos apêndices). $p_{\mathrm{n+1}}$ é submetido então ao WAF alvo para classificação/avaliação e seu score é gerado por uma classe \verb+Adapter+ após isso. A natureza extensível do \textit{WAF-A-MoLE} permite que uma variedade de \textit{Web Application Firewalls} sejam testados desde que estejam com adaptadores específicos para garantir compatibilidade. A classe \verb+Adapter+ retorna então tal score de $\sigma_{\mathrm{n+1}}$ de $p_{\mathrm{n+1}}$, sendo colocado de volta na fila \verb+Pool+ de \textit{payloads} para sofrer novas mutações nas próximas iterações.
+
+\bigskip 
+
+Com esse funcionamento, a condição de parada é dada da seguinte forma:
+\begin{alineas}
+\item No momento em que um score de confiança $\sigma^*$ é menor do que um limite dado pelo usuário no início do programa (no parâmetro \verb+threshold+) - retornando-se o melhor par ($p^* \sigma^*$) encontrado;
+\item Caso o número de iterações máximas seja atingido e nenhum score de confiança $\sigma^*$ menor que \verb+threshold+ seja encontrado, o par ($p^* \sigma^*$) mais próximo do mesmo é retornado;
+\item O programa é interrompido via \verb+SIGKILL+, \verb+SIGTERM+ ou semelhante.
+\end{alineas}
+
+Para testagem de \textit{Web Application Firewalls} de diferentes origens e arquiteturas, uma classe abstrata \verb+Model+ foi desenvolvida como uma interface, generalizando o comportamento de modelos usados. Dois métodos abstratos \verb+classify+ e \verb+extract_features+ são instanciados para cada modelo. Ao adaptar um WAF para ser testado, o desenvolvedor precisa buscar as funções equivalentes de seu classificador interno e compará-las com os modelos de exemplo do \textit{WAF-A-MoLE} para saber quais características são usadas pelo mesmo no funcionamento de sua arquitetura.
+
+Essa necessidade de experimentação para adaptação não se mostrou muito clara, porém foi possível (como a contribuição principal deste trabalho, e com a ajuda dos autores originais) construir um \textit{wrapper} geral para modelos do scikit-learn com o WAF-A-MoLE++ - a extensão desse software melhor detalhada nos capítulos 4 e 5 deste documento.
+
+Em suma, percebe-se que o \textit{WAF-A-MoLE} é uma excelente ferramenta base para reforçar \textit{Web Application Firewalls} baseados em Aprendizado de Máquina. Configurando rotinas para gerar uma série de exemplos adversariais a partir do mesmo, especialistas de segurança podem refazer o treinamento de seus Firewalls complementando seus exemplos de base com os adversariais recém-gerados, chegando a níveis de robustez mais aceitáveis. Assim foi decidida a extensão do mesmo, nomeada de WAF-A-MoLE++.
+
+
 
