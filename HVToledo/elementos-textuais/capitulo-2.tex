@@ -79,86 +79,19 @@ Exemplificando algumas situações de SQL Injections \cite{sql_port_swigger}:
 
 No contexto deste trabalho, no entanto, é estudado uma forma tanto comercial como \textit{open-source}  que têm tido crescimento no mercado: o uso de \textit{Web Application Firewalls}, mais especificamente os baseados em técnicas de Aprendizado de Máquina.
 
-\section{OWASP TOP 10}
-
-Há pelo menos dez anos os ataques cibernéticos vem aumentando, tendo grande impacto nas empresas.
-Aplicações web quando são desenvolvidas sem ter segurança da informação no seu cerne possibilita perda de ativos, inoperabilidade de serviços, exposição de dados sensíveis e comprometimento de sistemas. 
-A \textit{Open Web Application Security Project} (também conhecida pela sigla OWASP) é uma fundação sem fins lucrativos cujo objetivo é aprimorar a segurança do software. A organização fornece projeto de código livre, vasta comunidade ativa, conferências, treinamentos e boas práticas. Uma das iniciativas é o \textit{OWASP TOP 10} \cite{bach_owasp2020understanding}, que lista, detalha e informa acerca de defesas possíveis para as 10 vulnerabilidades de um dado ano:
-
-\begin{alineas}
-
-\item \textbf{Injeção};
-\item \textbf{Broken Authentication};
-\item \textbf{Exposição de Dados Sensíveis};
-\item \textbf{Entidades Externas de XML};
-\item \textbf{Broken Access Control};
-\item \textbf{Configurações Incorretas de Segurança};
-\item \textbf{Cross Site Scripting XSS};
-\item \textbf{Deserialização Insegura};
-\item \textbf{Utilizar Componentes com Vulnerabilidades Conhecidas};
-\item \textbf{Monitoramento e Logging Insuficientes}.
-
-
-\end{alineas}
-
-\bigskip
-
-\subsection{Injeção, ou code injection}
 Forma de ataque ampla onde uma entrada de dados recebe caracteres não tratados que são executados pelo sistema com objetivo de alterar o funcionamento padrão do software.
-Além dos exemplos bases de SQL Injection, existem variantes do SQL Injection como: \textit{error-based, union-based, blind} e \textit{out-of-band} \cite{out_of_band_sql_invicti}. \textit{Error-based} são injeções que fornecem erros de SQL para o atacante, vazando informações críticas do banco de dados. \textit{Union-based} são ataques que utilizam uma query existente na lógica do sistema concatenada a outra através de um \verb+UNION+ de maneira a executar uma segunda lógica além da já estabelecida pelo sistema. Injeções às cegas (\textit{blind-based}) são aquelas que o sistema não dá nenhuma informação após a injeção, de forma que o atacante precisa ser engenhoso para obter informações e prosseguir com a ofensiva. \textit{Out-of-band} é uma injeção sem o fornecimento de uma saída para o atacante, porém é possível redirecionar a saída para um endpoint, geralmente servidor http.
+Além dos exemplos bases de injeção SQL, existem variantes \cite{bach_owasp2020understanding} do SQL Injection como: \textit{error-based, union-based, blind} e \textit{out-of-band} \cite{out_of_band_sql_invicti}. \textit{Error-based} são injeções que fornecem erros de SQL para o atacante, vazando informações críticas do banco de dados. \textit{Union-based} são ataques que utilizam uma query existente na lógica do sistema concatenada a outra através de um \verb+UNION+ de maneira a executar uma segunda lógica além da já estabelecida pelo sistema. Injeções às cegas (\textit{blind-based}) são aquelas que o sistema não dá nenhuma informação após a injeção, de forma que o atacante precisa ser engenhoso para obter informações e prosseguir com a ofensiva. \textit{Out-of-band} é uma injeção sem o fornecimento de uma saída para o atacante, porém é possível redirecionar a saída para um endpoint, geralmente servidor http.
 É fundamental para mitigar as injeções ter uma validação dos caracteres e declarações válidas ao receber uma entrada de dados na aplicação web.
 
-\subsection{Broken Authentication}
-Broken Authentication é um conjunto de métodos em que os atacantes podem ganhar as credenciais de usuário ou sequestrar sessões de usuário. Senhas fracas ou facilmente adivinháveis, senhas armazenadas indevidamente sem serem transformadas em hashes, IDs de sessão expostos em URLS, ataques de fixação de ID de sessão \cite{session_fixation_invicti} e transmissão não-criptografada http.
-Para mitigar problemas dessa natureza são indicadas medidas como armazenar senhas com hash, garantir que IDs de sessão não estão expostos nas URLS, configurar timeouts nas sessões, não permitir recriação de sessões expiradas, não transmitir senhas em canais sem criptografia, utilizar senhas com tamanho mínimo e determinada complexidade, ocultar nomes de usuário e senha em mensagens de erro devido a login mal sucedido e assegurar proteção contra brute force após cinco tentativas falhas.
+Injeção (em especial SQL) é uma das vulnerabilidades mais comuns, de baixa complexidade para o atacante e historicamente impactante, o que motivou o trabalho em aprofundar em um problema subestimado por desenvolvedores, que tem impactos profundos na confiabilidade, integridade e disponibilidade de um serviço web.
 
-\subsection{Exposição de Dados Sensíveis}
-Aplicações web que não protegem senhas, informações financeiras ou relativas servindo potencialmente para criminosos obterem acesso não autorizado a contas de usuário, efetuar ações fraudulentas como compras online com informações roubadas ou extorquir vítimas com dados sensíveis. Dados sensíveis expostos podem causar perdas financeiras, ferir a reputação de corporações que tiveram seus dados vazados ou ativos expostos, levando as empresas a pagarem despesas para investigação sobre o incidente de segurança. Para proteger-se desse tipo de ataque são necessários softwares de acordo com a legislação do país e da industria, uma vez que ignorar a possibilidade de exposição de dados sensíveis leva a desastres financeiros de grandes proporções. 
-
-\subsection{Entidades Externas de XML}
-Um tipo particular de injeção, também conhecido como injeção XXE, ocorre quando atacantes abusam dos parses XML utilizados em servidores web através do envio de documentos XML cuidadosamente forjados que caso sejam processados levam à negação de servição, execução remota de código arbitrário ou requisições forjadas do lado do servidor.
-Por exemplo, um atacante pode enviar um \textit{payload} especialmente forjado para um servidor web, o servidor web envia para um parser XML, o parser XML por sua vez devolve o caminho do arquivo para o servidor, que devolve para o agente malicioso.
-
-\begin{verbatim}
-    <?xml version="1.0" ?>
-    <!DOCTYPE passws [
-    <!ELEMENT passwd ANY>
-    <!ENTITY passwd SYSTEM "file:///etc/passwd">
-    ]>
-
-    <passwd>&xxe;</passwd>
-\end{verbatim}
-
-Existem duas variantes de ataques XXE, sendo a primeira conhecida como \textit{in-band}, onde o atacante forja um documento XML malicioso e o submete através da rede para ser processado e recebe uma resposta instantânea, enquanto a outra variante chamada \textit{out-of-band} ocorre quando o atacante forja um documento XML malicioso, submete, todavia não obtém resposta imediata do servidor web. Ataques \textit{out-of-band} também são chamados de \textit{blind XXE injection}.
-É possível mitigar injeções XXE desativando o \textit{Document Type Definitions} (DTD). 
-
-\subsection{Broken Access Control}
-Diversos vetores de ataque podem ser considerados \textit{Broken access control}. Entre eles: burlar verificações de controle de acesso, editar contas de outros usuários, elevação de privilégios, configurações errôneas de CORS (\textit{Cross-Origin Resource Sharing}) que permitem acesso não autorizado a APIs (Application Programming Interface) restritas, manipulação de metadados através de tokens de controle de acesso JWT (\textit{JSON Web Tokens}) e acesso não autorizado a páginas web com usuário desprivilegiado, podendo levar ao controle de funções do modelo de negócio ou obtenção de (todos) os dados.
-É recomendado ter listas de controle de acesso e negar funcionalidades através de \textit{back-end}, de forma que o usuário não tem acesso ou controle do código.
-
-Configurações Incorretas de Segurança (\textit{Security misconfigurations})
-Configurações errôneas de segurança podem expor aplicações a \textit{security threads}. Portas administrativas abertas desnecessariamente, \textit{firewalls} mal gerenciados, aplicações legadas tentando comunicar com outras aplicações inexistentes são alguns exemplos de possíveis ingerências nas configurações de segurança. São necessários padrões de qualidade, revistos, testados e verificados com frequência para reduzir a superfície de ataque que esse tipo de vulnerabilidade permite.
-
-\subsection{Cross Site Scripting, ou XSS}
+\section{Cross Site Scripting, ou XSS}
 \textit{Cross Site Scripting} é uma técnica conhecida como XSS onde geralmente há uma injeção de \textit{scripts} maliciosos na aplicação web, revelando dados sensíveis, serviços internos ou divulgação de \textit{cookies} de usuários com privilégios.
 Existem três variantes de XSS: \textit{stored} XSS, onde o atacante injeta um \textit{payload} no servidor web, de maneira que quando outro usuário faz a requisição para acessar a página, o \textit{payload} é ativado. Outro caso é o de \textit{Reflected} XSS, quando o atacante injeta dados através de um método HTTP gerando uma resposta imediata na aplicação. Este permite o malfeitor forjar uma URL específica que ao ser acessada pela vítima vaza dados sensíveis, como \textit{cookies}. E por último a variante \textit{DOM Based} XSS que consiste na inserção de código malicioso no DOM (\textit{Document Object Model}), sem refletir no código-fonte HTML, sendo ativado apenas pelo console DOM.
 Dados obtidos de fontes não confiáveis devem ser devidamente validados e normalizados para evitar XSS.
 
-\subsection{Deserialização Insegura}
-Ataque que ocorre quando uma aplicação tenta transformar dados maliciosos, controlados pelo atacante, em estruturas de dados internas controladas pela aplicação. \textit{Payloads} cuidadosamente forjados permitem tomar o controle de variáveis, funções e estados internos da aplicação. Geralmente esse tipo de ataque permite executar código remoto arbitrário e expor completamente o sistema da aplicação web.
-No código um \textit{array} de itens são serializados em um fluxo de bytes onde são transportados e processados pelo \textit{back-end} da aplicação web após a deserialização.
-O ataque de deserialização replica os objetos serializados, mas injetando código malicioso para ser processado pelo \textit{back-end}.
-A mitigação para o ataque pode ser feito utilizando formatos seguros de dados intercambiáveis como JSON \cite{json_org} ou YAML \cite{yaml_org} ao invés de formatos binários nativos, utilizando funções robustas de deserialização e bibliotecas, incluindo testes de integridade para o processamento de dados serializados e limitando o escopo e capacidades das operações serializadas.
+Um dos \textit{Web Application Firewalls} mais utilizados na solução proposta também oferecia avaliação para ataques XSS, sendo importante compreender qual tipo de vulnerabilidade é analisada em determinadas seções do código.
 
-\subsection{Utilizar Componentes com Vulnerabilidades Conhecidas}
-Geralmente, atacantes não buscam descobrir vulnerabilidades inéditas, mas utilizar os \textit{exploits} já conhecidos.
-Utilizar softwares ou hardwares específicos com vulnerabilidades documentadas, que foram descontinuados ou que atingiram o fim da vida útil aumenta a propensão de sofrer ataques já consolidados por usuários mal intencionados.
-Rastrear dependências, documentar de maneira adequada, remover dependências inúteis, eliminar código obsoleto e ter uma política de atualização de dependências, procedimentos e manutenção de software são medidas efetivas para mitigar esse tipo de ataque.
-
-\subsection{Monitoramento e Logging Insuficientes}
-Ausência de mecanismos de \textit{logging} atrelados às melhores práticas para auxiliar no monitoramento e detecção de incidentes de segurança permitem atacantes conduzirem atividades sem serem detectados, fazendo com que a tarefa da detecção de incidentes e resposta seja muito mais difícil. \textit{Logs} não são úteis apenas para rastrear as atividades do atacante ou detectar erros ou atividades anômalas. \textit{Logs} também servem para auditorias e outros processos regulatórios.
-
-Injeção (em especial SQL) é uma das vulnerabilidades mais comuns, de baixa complexidade para o atacante e historicamente impactante, o que motivou o trabalho em aprofundar em um problema subestimado por desenvolvedores, que tem impactos profundos na confiabilidade, integridade e disponibilidade de um serviço web.
 
 \section{Algoritmos de Fuzzing}
 

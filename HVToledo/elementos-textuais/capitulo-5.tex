@@ -2,6 +2,20 @@
 \label{chp:capitulo5}
 
 \section{Métodos}
+
+Para quesito de reprodutibilidade dos testes, o ambiente utilizado para efetuá-los foi uma máquina Windows 10, com as seguintes condições:
+
+\begin{alineas}
+    \item Kernel Debian executando \textit{Windows Subsystem for Linux} (WSL), edição 2;
+    \item Todos arquivos armazenados no sistema de arquivos do WSL, e não no Windows. Sem essa condição, a performance sofre consideravelmente;
+    \item 8GB de memória RAM, com 6GB alocados para a execução WSL;
+    \item Processaodor Intel i7 4770k 3.8ghz;
+    \item GPU Nvidia GeForce 1060, edição 3GB VRAM;
+    \item Disco SSD Sata, com pelo menos 12GBs de espaço livre em armazenamento
+\end{alineas}
+
+Embora o programa estivesse funcional em máquinas virtuais Debian via \textit{VirtualBox}, escolheu-se WSL 2 pela performance mais próxima de um sistema original Linux.
+
 O propósito inicial dos testes realizados é compreender amplamente o impacto das adições ao programa. Para tal, uma série de métricas foram empregadas para avaliação na execução do programa, de uma maneira exaustiva, para todos os modelos relevantes (excluindo-se apenas o SQLiGOT, por motivos já mencionados). Através dela foi possível obter uma ideia do impacto que os novos modelos têm, e como o \textit{wafamole++} se adapta com \textit{wrappers} novos.
 
 O parâmetro principal para tal avaliação foram \textbf{500} execuções por modelo no wafamole++. Tanto os modelos antigos como os modelos novos foram examinados. As medidas bases extraídas foram:
