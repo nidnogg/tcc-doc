@@ -13,7 +13,7 @@ Acredita-se que essa colaboração ocasionou em uma ferramenta mais abrangente, 
 O cerne do projeto encontra-se nos seguintes módulos:
 \begin{alineas}
 \item \verb+Main+ - Responsável pela lógica da linha de comando, com todos os decorators da biblioteca \verb+Click+ que facilitam o desenvolvimento de utilidades de terminal. É feito o recebimento e passagem de parâmetros para a pipeline do programa aqui, além de ser instanciada a classe principal \verb+wafamole+ e o módulo \verb+EvasionEngine+ com o modelo selecionado pelo usuário.
-\item \verb+models+ - Em models estão localizados os modelos de exemplo para experimentação de desenvolvedores novos, modelos padrões do \textit{WAF-A-MoLE} e sobretudo modelos novos (também customizáveis) introduzidos no \textit{wafamole++}, localizados na pasta \verb+/models/svc+. Modelos novos de classificadores de \textit{Web Application Firewalls} a serem testados são tipicamente arquivos .dump das classes de tais classificadores, gerados através biblioteca \verb+joblib+ após o treinamento (no caso do scikit-learn, da função \verb+.fit()+). Alternativamente, essa biblioteca permite também a geração de um arquivo .dump de uma pipeline caso o treinamento exija mais de uma etapa, como uma Tokenização para possibilitar o treinamento de um dado classificador.
+\item \verb+models+ - Em models estão localizados os modelos de exemplo para experimentação de desenvolvedores novos, modelos padrões do \textit{WAF-A-MoLE} e sobretudo modelos novos (também customizáveis) introduzidos no \textit{wafamole++}, localizados na pasta \verb+/models/svc+. Modelos novos de classificadores de \textit{Web Application Firewalls} a serem testados são tipicamente arquivos .dump das classes de tais classificadores, gerados através biblioteca \verb+joblib+ após o treinamento (no caso do \verb+scikit-learn+, da função \verb+.fit()+). Alternativamente, essa biblioteca permite também a geração de um arquivo .dump de uma pipeline caso o treinamento exija mais de uma etapa, como uma Tokenização para possibilitar o treinamento de um dado classificador.
 \item \verb+EvasionEngine+ - Essa classe contém o loop principal que requisita as mutações responsáveis pela transformação do \textit{payload} fornecido pelo usuário em um \textit{payload} considerado inócuo para o WAF avaliado. As requisições são feitas ao módulo \verb+Fuzzer+.
 \item \verb+Fuzzer+ - Nesse módulo ficam armazenados os operadores de mutação que transformam o \textit{payload} a cada rodada de mutação efetuada, e cada mutação ocorre dentro do mesmo. Um operador de mutação aleatório dentre estes é escolhido a cada iteração da pipeline principal.
 \end{alineas}
@@ -100,7 +100,11 @@ O WAF-Brain \cite{waf_brain} foi um dos primeiros firewalls a serem testados pel
 
 Seu funcionamento se dá, como anteriormente mencionado, através da estratégia de \textit{Deep Learning} com Redes Neurais, pela qual são analisados cada campo de um determinado pedido HTTP sob a ótica de um classificador treinado desta maneira, determinando se esse campo é malicioso ou não. Caso marcados como maliciosos, o pedido HTTP é bloqueado.
 
-Na adaptação \textit{WAF-A-MoLE}, esse poder de predição é aproveitado exclusivamente na forma de probabilidade - tendo a probabilidade de ser uma injeção SQL acima de um determinado limite, temos um caso malicioso. Isso requer que o classificador treinado no modelo não apenas mostre a previsão, mas também a probabilidade de aquela previsão estar correta de fato.
+Apenas uma parte é aproveitada no código do \textit{WAF-A-MoLE} e \textit{wafamole++}, no entanto, que é o código \verb+inferring.py+, responsável pela análise de fato de um \textit{payload} do algoritmo. Nele há uma série de funções que preparam o conteúdo para ser avaliado pelo modelo treinado, como \verb+row_parse()+ (para pegar apenas caracteres definidos na constante \verb+VOCABULARY+, parametrizável pelo desenvolvedor), e \verb+reduce_dimension()+ (para adaptar as dimensões das frases analisadas em um \textit{array} da biblioteca \textit{numpy}).
+
+Essas funções são utilizados dentro da rotina \verb+process_payload()+, que realiza a chamada para o modelo através de \verb+model.evaluate()+ tendo como parâmetros os dados tratados pelas funções auxiliares anteriormente mencionadas. O resultado dessa função é efetivamente a probabilidade da entrada ser maliciosa ou não.
+
+Na adaptação \textit{WAF-A-MoLE}, esse poder de predição é aproveitado exclusivamente na forma de probabilidade - tendo a probabilidade de ser uma injeção SQL acima de um determinado limite, temos um caso malicioso. Isso requer que o classificador treinado no modelo não apenas mostre a previsão como usualmente é feito, mas também a probabilidade de aquela previsão estar correta de fato.
 
 Por mais que se trate de um algoritmo sofisticado por natureza, surpreendentemente o WAF-Brain fora implementado pelos seus autores originais de uma maneira simplória o suficiente para ser um dos WAFs mais vulneráveis às estratégias de fuzzing do WAF-A-MoLE. Vários operadores de mutação isolados conseguem resultados frutíferos em pouco tempo, como será visto na seção de testes adiante.
 
@@ -162,11 +166,13 @@ Este foi o primeiro modelo implementado no \textit{wafamole++}, antes do recebim
 
 A nomenclatura \textit{moled} foi escolhida para mensurar o quão reforçado o dataset usado no treinamento é - sendo tal reforço definido como a quantia de queries fuzzeadas pelo \textit{wafamole++} acrescentadas ao dataset inicial. E é evidente uma diferença na performance de cada modelo gerado - observou-se uma progressão de aumento (em média) de rodadas mutacionais (consumidas durante a execução) para os dois últimos modelos, especialmente no último.
 
+Em termos de implementação, como fora usado no \textit{wrapper} criado em torno do ML-Based-WAF que usa a biblioteca \verb+scikit-learn+, esse modelo também a utiliza no seu funcionamento. O classificador usado no modelo é o \verb+SVC()+, definido como uma classe e trazido através de um comando de \verb+import+ - \verb+from sklearn.svm import SVC+. Essa classe é instanciada na pipeline \verb+make_pipeline+ (\verb+joblib+) com os parâmetros encontrados através de experimentação e otimização via \verb+GridSearch+ (uma espécie de força bruta para testar várias combinações de parâmetros e seus resultados subsequentes).
+
 Infelizmente um dos pontos de dificuldades foi o treinamento de um classificador deste tipo para o dataset original do \textit{WAF-A-MoLE}, recebido após os testes iniciais. Em suma, tempos de execução excederam 48 horas em alguns casos, impossibilitando a conclusão da função \verb+fit+ de treinamento, mesmo com o backend de paralelização \verb+ray+.  Com isso foram feitas pesquisas subsequentes que revelaram uma possível inadequação desse classificador ao tipo de dado fornecido, sugerindo que outros classificadores sejam usados em seu lugar.
 
 Além da testagem em cima do reforço via \textit{wafamole++}, estruturalmente buscou-se diferenciar a implementação de Support Vector Machine da utilizada anteriormente no WAF-A-MoLE. Alguns parâmetros foram modificados, e fazendo-se uso de uma busca \textit{paramgrid} (para testar exaustivamente combinações de parâmetros) complementada de experimentação após sua execução, foi possível obter uma configuração com uma série de parâmetros diferentes.
 
-Nesse contexto destaca-se um que troca o algoritmo fundamental por trás do Support Vector Machine por um com abordagem não linear (no caso, \verb+kernel = 'rbf'+) em contraste direto com o algoritmo linear empregado no modelo Token-based padrão do WAF-A-MoLE. Por fim, é amostrado sua célula de código principal contida no Python Notebook.
+Nesse contexto destaca-se um que troca o algoritmo fundamental por trás do Support Vector Machine por um com abordagem não linear (no caso, de parâmetro \verb+kernel = 'rbf'+) em contraste com o algoritmo linear empregado no modelo Token-based padrão do WAF-A-MoLE. Por fim, é amostrado sua célula de código principal contida no Python Notebook.
 
 \label{sec:codigos:modelos}
 \includecode[C]{Pipeline classificador SVC Não-Linear}{alg:codigo3}{codigos/modelos/svc_model_sqliv3.py}
@@ -175,21 +181,24 @@ Nesse contexto destaca-se um que troca o algoritmo fundamental por trás do Supp
 \subsection{Stochastic Gradient Descent}
 O segundo modelo a ser codificado pôde ser testado tanto para os datasets do kaggle como do \textit{WAF-A-MoLE} original, sem problemas de performance. No caso posterior, de fato houve uma exigência maior da máquina, requerindo um ambiente com mais memória que o desktop originalmente usado para executar os notebooks. Com isso, foi empregada a plataforma Google Colaboratory, da subdivisão de pesquisa da Google. 
 
-Essa mudança de ambiente ocasionou em uma série de vantagens, dentre as quais destacam-se: uma maior facilidade em executar um ambiente minimamente funcional, disponibilização de um link facilmente compartilhável, colaboração simultânea e principalmente mais memória RAM para executar as pipelines de treinamento. 
+Como no modelo anterior e nos subsequentes, sua implementação é realizada a partir de um comando \verb+import+ (\verb+from sklearn.linear_model import SGDClassifier+) da biblioteca \verb+scikit-learn+ e o classificador é instanciado na função \verb+make_pipeline()+. Uma diferença na sua implementação é que, como fora gerado um modelo para o dataset \textit{WAF-A-MoLE} também, este possui alguns pequenos ajustes no tratamento dos dados que servem de entrada para o treinamento.
+
+Essa mudança de ambiente ocasionou em uma série de vantagens, dentre as quais destacam-se: uma facilidade em executar um ambiente funcional, disponibilização de um link compartilhável, colaboração simultânea e principalmente mais memória RAM para executar as pipelines de treinamento. 
 
 Um fator indesejável é a impossibilidade de gerenciar com maior precisão a versão de Python e algumas dependências - ocasionando numa séria poluição de logs em virtude da deprecação de algumas técnicas empregadas em versões antigas dos pacotes \verb+numpy+, \verb+scikit-learn+ e \verb+tensorflow+, dificultando o desenvolvimento e diagnóstico de erros. 
 
 Acredita-se que a principal falha da plataforma, no entanto, seja a limitação de sua versão gratuita, no entanto, que desliga todas as células do Notebook em uso após um período fixo de 12 horas, a menos que o usuário esteja ativamente codificando na mesma. Isso dificultou o modelo discutido anteriormente, cujo fluxo de execução excedia facilmente esse intervalo para datasets suficientemente grandes.
 
-Não obstante, no caso do Stochastic Gradient Descent a performance foi satisfatória o suficiente para gerar um par de modelos a serem testados: um para o dataset \verb+SQLiV5.json+, intitulado de \verb+sgd_trained.dump+ e um para o dataset \textit{WAF-A-MoLE}, \verb+test_sgd_classifier.py+. A performance dos mesmos será comparada mais detalhadamente no capítulo de testes adiante. 
+Não obstante, no caso do \textit{Stochastic Gradient Descent} a performance foi satisfatória o suficiente para gerar um par de modelos a serem testados: um para o dataset \verb+SQLiV5.json+, intitulado de \verb+sgd_trained.dump+ e um para o dataset \textit{WAF-A-MoLE}, \verb+test_sgd_classifier.py+. A performance dos mesmos será comparada mais detalhadamente no capítulo de testes adiante. 
 
 \label{sec:codigos:modelos}
-\includecode[C]{Pipeline classificador SGD sem backend de paralelização ray (Para SQLiV5.json)}{alg:codigo3}{codigos/modelos/sgd_model_sqliv3.py}
+\includecode[C]{Pipeline classificador SGD sem backend de paralelização \verb+ray+ (Para SQLiV5.json)}{alg:codigo3}{codigos/modelos/sgd_model_sqliv3.py}
 \bigskip
 
 \subsection{AdaBoost Classifier}
 
-O último modelo, e um dos mais interessantes, é o AdaBoost Classifier, implementado apenas para o dataset do \textit{WAF-A-MoLE} no final da implementação do trabalho. Sua performance é consideravelmente promissora, superando alguns dos modelos padrões do \textit{WAF-A-MoLE} como alguns dos baseados em Token e o WAF-Brain. Para treiná-lo, foi necessário o uso do backend de paralelização \verb+ray+, tomando ainda um tempo considerável de vários minutos.
+O último modelo, e um dos mais interessantes, é o AdaBoost Classifier, implementado apenas para o dataset do \textit{WAF-A-MoLE} no final da implementação do trabalho. Sua performance é promissora, superando alguns dos modelos padrões do \textit{WAF-A-MoLE} como alguns dos baseados em Token e o WAF-Brain. Para treiná-lo, foi necessário o uso do backend de paralelização \verb+ray+, tomando ainda um tempo considerável de vários minutos. Sua respectivo \verb+import+ é do módulo \verb+ensemble+ do \verb+scikit-learn+, com o comando \verb+from sklearn.ensemble import AdaBoostClassifier+. 
+
 
 O resultado desse modelo é intitulado de \verb+test_ada_classifier.dump+. Abaixo é amostrado como é feita essa adaptação.
 
