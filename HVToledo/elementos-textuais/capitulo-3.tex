@@ -69,7 +69,7 @@ Quanto a essa plataforma, graças aos seus ricos metadados e facilidade de integ
 
 Infelizmente uma das dificuldades encontradas foi uma considerável instabilidade por parte do sistema de login do CAFe, acarretando em diversos atrasos. É comum não funcionar por longos períodos de tempo. Fora isso, uma série de artigos mesmo após providenciados pelo Scopus requeriam autenticação fora da Universidade, impossibilitando até mesmo sua visualização. Alguns raros casos foram encontrados em plataformas como as anteriormente mencionadas (Google Scholar e afins).
 
-\section{Avaliação de Propostas de Hardening}
+\section{Avaliação Qualitativa de Artigos encontrados}
 Ao fim da coleta de artigos, além do embasamento teórico e melhor enquadramento do escopo a ser estudando, buscou-se uma série de ferramentas e/ou casos reais de modelos e sistemas sugeridos na área de hardening, para que um desses pudesse ser expandido de modo a criar um impacto maior no trabalho.
 
 \subsection{nscanner}
@@ -169,9 +169,13 @@ Com esse funcionamento, a condição de parada é dada da seguinte forma:
 
 Para testagem de \textit{Web Application Firewalls} de diferentes origens e arquiteturas, uma classe abstrata \verb+Model+ foi desenvolvida como uma interface, generalizando o comportamento de modelos usados. Dois métodos abstratos \verb+classify+ e \verb+extract_features+ são instanciados para cada modelo. Ao adaptar um WAF para ser testado, o desenvolvedor precisa buscar as funções equivalentes de seu classificador interno e compará-las com os modelos de exemplo do \textit{WAF-A-MoLE} para saber quais características são usadas pelo mesmo no funcionamento de sua arquitetura.
 
-Essa necessidade de experimentação para adaptação não se mostrou muito clara, porém foi possível (como a contribuição principal deste trabalho, e com a ajuda dos autores originais) construir um \textit{wrapper} geral para modelos do scikit-learn com o wafamole++ - a extensão desse software melhor detalhada nos capítulos 4 e 5 deste documento.
+Essa necessidade de experimentação para adaptação não se mostrou muito clara, porém foi possível (como a contribuição principal deste trabalho, e com a ajuda dos autores originais) construir um \textit{wrapper} geral para modelos do \verb+scikit-learn+ com o \textit{wafamole++} - a extensão desse software melhor detalhada nos capítulos 4 e 5 deste documento.
 
-Em suma, percebe-se que o \textit{WAF-A-MoLE} é uma excelente ferramenta base para reforçar \textit{Web Application Firewalls} baseados em Aprendizado de Máquina. Configurando rotinas para gerar uma série de exemplos adversariais a partir do mesmo, especialistas de segurança podem refazer o treinamento de seus Firewalls complementando seus exemplos de base com os adversariais recém-gerados, chegando a níveis de robustez mais aceitáveis. Assim foi decidida a extensão do mesmo, nomeada de wafamole++, a fim de amenizar as dificuldades encontradas em trabalhar com o mesmo e enriquecer seu funcionamento.
+\subsection{Conclusão}
+Em suma, percebe-se que o \textit{WAF-A-MoLE} é uma excelente ferramenta base para reforçar \textit{Web Application Firewalls} baseados em Aprendizado de Máquina. Configurando rotinas para gerar uma série de exemplos adversariais a partir do mesmo, especialistas de segurança podem refazer o treinamento de seus \textit{Firewalls} complementando seus exemplos de base com os adversariais recém-gerados, chegando a níveis de robustez mais aceitáveis. 
 
+Entretanto, não é uma solução sem imperfeições - uma falha na documentação de suas dependências (em particular quanto à versões), sua arquitetura se mostrou engessada para adaptar para modelos novos, mesmo que incentivado pelos autores originais. Além disso, muitos dos detalhes de treinamento de dados se mostraram ofuscados na documentação, juntamente de estruturas de dados usadas em seu funcionamento.
+
+Por esses motivos foi decidida a extensão do mesmo, nomeada de \textit{wafamole++}, a fim de amenizar as dificuldades encontradas na sua execução e enriquecer seu funcionamento para futuros desenvolvedores e profissionais de segurança.
 
 

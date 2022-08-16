@@ -18,7 +18,7 @@ Embora o programa estivesse funcional em máquinas virtuais Debian via \textit{V
 
 O propósito inicial dos testes realizados é compreender amplamente o impacto das adições ao programa. Para tal, uma série de métricas foram empregadas para avaliação na execução do programa, de uma maneira exaustiva, para todos os modelos relevantes (excluindo-se apenas o SQLiGOT, por motivos já mencionados). Através dela foi possível obter uma ideia do impacto que os novos modelos têm, e como o \textit{wafamole++} se adapta com \textit{wrappers} novos.
 
-O parâmetro principal para tal avaliação foram \textbf{500} execuções por modelo no wafamole++. Tanto os modelos antigos como os modelos novos foram examinados. As medidas bases extraídas foram:
+O parâmetro principal para tal avaliação foram \textbf{500} execuções por modelo no \textit{wafamole++}. Tanto os modelos antigos como os modelos novos foram examinados. As medidas bases extraídas foram:
 \begin{alineas}
 \item \textbf{Número de rodadas restantes} - A partir dessas obtém-se o número de rodadas ou iterações consumidas;
 \item \textbf{Menor probabilidade de \textit{payload} encontrada} - É possível medir com essas a precisão de um determinado modelo;
@@ -26,11 +26,13 @@ O parâmetro principal para tal avaliação foram \textbf{500} execuções por m
 \item \textbf{Execuções com iterações máximas alcançadas} - Quanto mais ocorrências dessa medida, mais robusto é o modelo uma vez que não é gerado um exemplo adversarial na execução.
 \end{alineas}
 
+Os modelos antigos incluídos no \textit{WAF-A-MoLE} foram todos testados, com exceção do \verb+SQLiGOT+ (por motivos anteriormente citados de performance e tempo de execução), para fins de comparação com os novos modelos introduzidos no \textit{wafamole++}.
+
 \bigskip 
 
 \section{Resultados e discussão}
 
-Abaixo segue uma tabela com uma série de informações geradas de relevância, construídas a partir das métricas listadas acima: 
+Abaixo segue uma tabela com uma série de informações geradas de relevância, construídas a partir das métricas listadas acima. Os nomes todos dos modelos são os mesmos ilustrados no Capítulo 4 na seção de implementação, com seus respectivos parâmetros: 
 
 \begin{table}[H]
 \centering
@@ -92,7 +94,9 @@ Abaixo segue uma tabela com uma série de informações geradas de relevância, 
 \end{table}
 \bigskip
 
-Os fatores que indicam uma performance melhor são relativamente contraintuitivos - um \textit{runtime} médio grande indica dificuldade em gerar um exemplo adversarial \cite{adversarial_example}, que na verdade é um bom indicador para o \textit{Web Application Firewall} sendo avaliado. Similarmente, poucos rounds restantes ao final da execução apontam para muitas iterações sendo consumidas e um WAF robusto, e um alto número de execuções sem êxito sugere casos em que o Web Application Firewall não se mostra suscetível a um ataque naquela execução. 
+Os fatores que indicam uma performance melhor são relativamente contraintuitivos - um \textit{runtime} médio grande indica dificuldade em gerar um exemplo adversarial \cite{adversarial_example}, que na verdade é um bom indicador para o \textit{Web Application Firewall} sendo avaliado. Similarmente, poucos rounds restantes ao final da execução apontam para muitas iterações sendo consumidas e um WAF robusto, e um alto número de execuções sem êxito sugere casos em que o \textit{Web Application Firewall} não se mostra suscetível a um ataque naquela execução. 
+
+Nesse contexto, um ponto  de interesse é que todos os modelos do \textit{WAF-A-MoLE} apresentaram uma performance semelhante, com tempos de penetração rápidos e no geral mostrando-se como WAFs pouco robustos e vulneráveis, sendo superados por uma boa parcela dos modelos novos. (Em particular os reforçados).
 
 Curiosamente, o modelo \verb+test_sgd+ gerado a partir do dataset original do \textit{WAF-A-MoLE} não apresentou significativas melhorias em comparação com o modelo do dataset \verb+SQLiV3.json+, \verb+sgd_trained+. Acredita-se que seja uma questão de adequação do classificador utilizado, uma vez que com a respectiva substuição do \textit{Stochastic Gradient Descent} pelo \textit{AdaBoost} e virtualmente a mesma implementação o mesmo se torna o WAF mais robusto do wafamole++.
 

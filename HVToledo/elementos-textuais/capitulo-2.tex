@@ -1,10 +1,11 @@
 \chapter{CONCEITOS BÁSICOS\textbf{}}
 \label{chp:capitulo2}
 
+Nesse capítulo busca-se elucidar as principais terminologias, técnicas, algoritmos e tecnologias no geral que estão relacionadas a esse trabalho, realizando-se um apanhado geral e exemplificando alguns casos de uso desses assuntos.
+
 \section{SQL Injection}
 
-
-O tipo mais comum e mais prevalecente de injeção de código é o de SQL Injection, que manipula bancos de dados via \verb+SQL+ (\textit{Structured Query Language}), a linguagem clássica de manuseio de bancos de dados, para receber acesso a informações sensíveis.
+O tipo mais comum e mais prevalecente de injeção de código é o de \textit{SQL Injection}, que manipula bancos de dados via \verb+SQL+ (\textit{Structured Query Language}), a linguagem clássica de manuseio de bancos de dados, para receber acesso a informações sensíveis.
 
 Exemplificando algumas situações de SQL Injections \cite{sql_port_swigger}:
 
@@ -17,7 +18,9 @@ Exemplificando algumas situações de SQL Injections \cite{sql_port_swigger}:
         WHERE username = ‘usuario’ AND password = ‘123’
     \end{verbatim}
     
-    Como a query retorna os detalhes do usuário, o login é bem sucedido. Caso contrário  é rejeitado. Nesse caso, se o atacante usa a sequência de comentário SQL \verb+--+, ele é capaz de remover a checagem de senha da cláusula \verb+WHERE+. Exemplificando, se ele submete o usuário \verb+administrator’--+ e uma senha em branco, a seguinte query é processada:
+    Caso o usuário e senha sejam iguais a um registro na base de dados, todas as colunas da tabela \verb+user+ serão retornados. Caso contrário, os dados não serão obtidos.
+    Nesse caso, se o atacante usa a sequência de comentário SQL \verb+--+, ele é capaz de remover a checagem de senha da cláusula \verb+WHERE+.
+    A sequência de caracteres \verb+--+ representa comentário em SQL. Caso a aplicação não tenha uma higienização dos dados, é possível inserir esses caracteres como entrada e serão processados como uma instrução na query. Por exemplo, se no parâmetro que é o \verb+username+ da consulta for inserido \verb+administrator’--+ e uma senha em branco, a seguinte query é processada:
     
     \begin{verbatim}
         SELECT * FROM users 
