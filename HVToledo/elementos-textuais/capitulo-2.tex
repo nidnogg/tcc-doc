@@ -1,7 +1,7 @@
 \chapter{CONCEITOS BÁSICOS\textbf{}}
 \label{chp:capitulo2}
 
-Nesse capítulo busca-se elucidar as principais terminologias, técnicas, algoritmos e tecnologias no geral que estão relacionadas a esse trabalho, realizando-se um apanhado geral e exemplificando alguns casos de uso desses assuntos.
+Nesse capítulo busca-se elucidar as principais terminologias, técnicas, algoritmos e tecnologias no geral que estão relacionadas a esse trabalho, realizando-se um apanhado geral e incluindo alguns exemplos esclarecedores.
 
 \section{SQL Injection}
 
@@ -19,32 +19,28 @@ Exemplificando algumas situações de SQL Injections \cite{sql_port_swigger}:
     \end{verbatim}
     
     Caso o usuário e senha sejam iguais a um registro na base de dados, todas as colunas da tabela \verb+user+ serão retornados. Caso contrário, os dados não serão obtidos.
-    Nesse caso, se o atacante usa a sequência de comentário SQL \verb+--+, ele é capaz de remover a checagem de senha da cláusula \verb+WHERE+.
-    A sequência de caracteres \verb+--+ representa comentário em SQL. Caso a aplicação não tenha uma higienização dos dados, é possível inserir esses caracteres como entrada e serão processados como uma instrução na query. Por exemplo, se no parâmetro que é o \verb+username+ da consulta for inserido \verb+administrator’--+ e uma senha em branco, a seguinte query é processada:
+    A sequência de caracteres \verb+--+ representa comentário em SQL. Se a aplicação não tiver uma higienização dos dados, é possível inserir esses caracteres como entrada e eles serão processados como uma instrução na query. Nesse caso, se o atacante usa a sequência de comentário SQL \verb+--+, ele é capaz de remover a checagem de senha da cláusula \verb+WHERE+. Por exemplo, se no parâmetro que é o \verb+username+ da consulta for inserido \verb+administrator’--+ e uma senha em branco, a seguinte query é processada:
     
     \begin{verbatim}
         SELECT * FROM users 
         WHERE username = 'administrator'--' AND password = '' 
     \end{verbatim}
     
-    Isso efetivamente retorna o usuário cujo \verb+username+ é \verb+administrator+ e realiza o login do atacante como tal, expondo funções sensíveis da aplicação web inteira.
+    Isso efetivamente retorna os dados do usuário cujo \verb+username+ é \verb+administrator+ e realiza o login do atacante como tal, expondo funções sensíveis da aplicação web inteira.
 
-\end{alineas}
-
-\begin{alineas}
     \item
     Em uma aplicação de e-commerce que organiza produtos em categorias diferentes, podemos ter um caso onde o usuário clica em uma categoria \verb+‘Presentes’+, requisitando o seguinte URL do navegador web:
     
     \textbf{https://insecure-website.com/products?category=Presentes}
     
-    Isso faz com que a aplicação realize uma query SQL para resgatar detalhes de tais produtos do banco de dados:
+    Isso faz com que a aplicação realize uma query SQL para resgatar todos os detalhes (identificado por \verb+*+) da tabela de produtos, onde a categoria é \verb+‘Presentes’+ e a restrição \verb+released+ é 1:
     
     \begin{verbatim}
         SELECT * FROM products
         WHERE category = ‘Presentes' AND released = 1 
     \end{verbatim}
     
-    Tal query retorna todos os detalhes (identificado por \verb+*+) da tabela de produtos, onde a categoria é \verb+‘Presentes’+ e a restrição \verb+released+ é 1. Essa restrição, quando observada por um atacante astuto, se revela como algo usado para esconder produtos não lançados. Esse atacante pode então construir um ataque digitando a seguinte URL, dado que o site não previne contra ataques SQL:
+    A restrição, quando observada por um atacante astuto, se revela como algo usado para esconder produtos não lançados. Esse atacante pode então construir um ataque digitando a seguinte URL, dado que o site não previne contra ataques SQL:
         
     \textbf{https://insecure-website.com/products?category=Presentes’--}
     
@@ -58,9 +54,6 @@ Exemplificando algumas situações de SQL Injections \cite{sql_port_swigger}:
      Uma vez que a sequência \verb+--+ anteriormente vista denota um comentário SQL, a parte depois de 
     \verb+‘Presentes’+ é interpretada como tal e não é executada, revelando todos os produtos escondidos.
 
-\end{alineas}
-
-\begin{alineas}
     \item
     Também é possível recuperar dados de outras tabelas de um banco de dados, utilizando a \textit{keyword} \verb+UNION+ \cite{mysql_union}, que combina o resultado de múltiplas consultas \verb+SELECT+ em apenas um conjunto. Se um atacante executa a seguinte query contendo a entrada de usuário \verb+`Presentes`+, ainda no último exemplo de site:
     
@@ -80,25 +73,27 @@ Exemplificando algumas situações de SQL Injections \cite{sql_port_swigger}:
 \end{alineas}
 
 
-No contexto deste trabalho, no entanto, é estudado uma forma tanto comercial como \textit{open-source}  que têm tido crescimento no mercado: o uso de \textit{Web Application Firewalls}, mais especificamente os baseados em técnicas de Aprendizado de Máquina.
+No contexto deste trabalho, é estudado o uso de \textit{Web Application Firewalls}, mais especificamente os baseados em técnicas de Aprendizado de Máquina, como forma de prevenir ataques. O uso de \textit{firewalls} para aplicações Web, tanto comerciais como \textit{open-source}, têm tido amplo  crescimento no mercado.
 
-Forma de ataque ampla onde uma entrada de dados recebe caracteres não tratados que são executados pelo sistema com objetivo de alterar o funcionamento padrão do software.
-Além dos exemplos bases de injeção SQL, existem variantes \cite{bach_owasp2020understanding} do SQL Injection como: \textit{error-based, union-based, blind} e \textit{out-of-band} \cite{out_of_band_sql_invicti}. \textit{Error-based} são injeções que fornecem erros de SQL para o atacante, vazando informações críticas do banco de dados. \textit{Union-based} são ataques que utilizam uma query existente na lógica do sistema concatenada a outra através de um \verb+UNION+ de maneira a executar uma segunda lógica além da já estabelecida pelo sistema. Injeções às cegas (\textit{blind-based}) são aquelas que o sistema não dá nenhuma informação após a injeção, de forma que o atacante precisa ser engenhoso para obter informações e prosseguir com a ofensiva. \textit{Out-of-band} é uma injeção sem o fornecimento de uma saída para o atacante, porém é possível redirecionar a saída para um endpoint, geralmente servidor http.
+Além dos exemplos básicos de injeção SQL, existem variantes \cite{bach_owasp2020understanding} do SQL Injection como: \textit{error-based, union-based, blind} e \textit{out-of-band} \cite{out_of_band_sql_invicti}. \textit{Error-based} são injeções que fornecem erros de SQL para o atacante, vazando informações críticas do banco de dados. \textit{Union-based} são ataques que utilizam uma query existente na lógica do sistema concatenada a outra através de um \verb+UNION+ de maneira a executar uma segunda lógica além daquela já estabelecida pelo sistema. Injeções às cegas (\textit{blind-based}) são aquelas que o sistema não dá nenhuma informação após a injeção, de forma que o atacante precisa ser engenhoso para obter informações e prosseguir com a ofensiva. \textit{Out-of-band} é uma injeção sem o fornecimento de uma saída para o atacante, porém é possível redirecionar a saída para um endpoint, geralmente servidor http.
 É fundamental para mitigar as injeções ter uma validação dos caracteres e declarações válidas ao receber uma entrada de dados na aplicação web.
 
 Injeção (em especial SQL) é uma das vulnerabilidades mais comuns, de baixa complexidade para o atacante e historicamente impactante, o que motivou o trabalho em aprofundar em um problema subestimado por desenvolvedores, que tem impactos profundos na confiabilidade, integridade e disponibilidade de um serviço web.
 
 \section{Cross Site Scripting, ou XSS}
 \textit{Cross Site Scripting} é uma técnica conhecida como XSS onde geralmente há uma injeção de \textit{scripts} maliciosos na aplicação web, revelando dados sensíveis, serviços internos ou divulgação de \textit{cookies} de usuários com privilégios.
-Existem três variantes de XSS: \textit{stored} XSS, onde o atacante injeta um \textit{payload} no servidor web, de maneira que quando outro usuário faz a requisição para acessar a página, o \textit{payload} é ativado. Outro caso é o de \textit{Reflected} XSS, quando o atacante injeta dados através de um método HTTP gerando uma resposta imediata na aplicação. Este permite o malfeitor forjar uma URL específica que ao ser acessada pela vítima vaza dados sensíveis, como \textit{cookies}. E por último a variante \textit{DOM Based} XSS que consiste na inserção de código malicioso no DOM (\textit{Document Object Model}), sem refletir no código-fonte HTML, sendo ativado apenas pelo console DOM.
+Existem três variantes de XSS. A primeira, \textit{stored} XSS, onde o atacante injeta um \textit{payload} no servidor web, de maneira que quando outro usuário faz a requisição para acessar a página, o \textit{payload} é ativado. A segunda, intitulada de \textit{Reflected} XSS, ocorre quando o atacante injeta dados através de um método HTTP gerando uma resposta imediata na aplicação. Este permite o malfeitor forjar uma URL específica que ao ser acessada pela vítima vaza dados sensíveis, como \textit{cookies}. E por último a variante \textit{DOM Based} XSS que consiste na inserção de código malicioso no DOM (\textit{Document Object Model}), sem refletir no código-fonte HTML, sendo ativado apenas pelo console DOM.
 Dados obtidos de fontes não confiáveis devem ser devidamente validados e normalizados para evitar XSS.
 
-Um dos \textit{Web Application Firewalls} mais utilizados na solução proposta também oferecia avaliação para ataques XSS, sendo importante compreender qual tipo de vulnerabilidade é analisada em determinadas seções do código.
+
+Refrasear. Está confuso, pois fala de solução proposta, sem que isso tenha sido apresentado. 
+
+Esse tipo de vulnerabilidade é muito verificada por \textbf{Web Application Firewalls}, inclusive em um dos WAFs utilizados na extensão \textit{wafamole++} que será apresentado no Capítulo 4, tornando seu compreendimento importante para o melhor entendimento da solução.
 
 
 \section{Algoritmos de Fuzzing}
 
-O cerne do algoritmo por trás do \textit{WAF-A-MoLE} e o \textit{wafamole++} se encontra na técnica de \textit{fuzzing}. O termo \textit{fuzz} foi cunhado pelo professor da Universidade de Wisconsin-Madison Barton Miller nos anos 80, após sofrer uma interferência considerável de uma tempestade no funcionamento de aplicações que rodavam em um ambiente \textit{unix} remoto na época \cite{fuzzing_info}. 
+O cerne do algoritmo por trás do \textit{WAF-A-MoLE} e do \textit{wafamole++} é a técnica de \textit{fuzzing}. O termo \textit{fuzz} foi cunhado pelo professor da Universidade de Wisconsin-Madison Barton Miller nos anos 80, após sofrer uma interferência considerável de uma tempestade no funcionamento de aplicações que rodavam em um ambiente \textit{unix} remoto na época \cite{fuzzing_info}. 
 
 Pouco depois disso o mesmo passou aos seus alunos uma tarefa denominada o \textit{"Fuzz Generator"}, na qual era necessário implementar uma ferramenta que testasse a robustez de programas \textit{unix} através de um bombardeio de informações aleatoriamente geradas.
 
@@ -119,15 +114,15 @@ Nessa estratégia, a execução se inicia com uma entrada válida, e ela subsequ
 \bigskip
 O programa acima realiza, dentre três operadores de mutação, uma mutação aleatória ao chamar a função \verb+mutate()+. Na prática, são realizadas uma série de mutações para que se produzam entradas viáveis. Com um simples \textit{loop} para chamar a função \verb+mutate()+ isso é possibilitado.
 
-Essas técnicas geralmente encontram \textit{bugs} de corrupção de memória simples e a aleatoriedade, dispersão fazem com que a eficiência do ataque seja baixa, além de cobrir poucas partes do código. Por outro lado, é simples de implementar, tem boa extensibilidade e pode ser feita sem o código-fonte. O \textit{fuzzing} aumenta seu potencial quando o alvo está em execução em um ambiente real. Outro ponto positivo é o fato de poder aplicar a técnica em aplicações com pouco conhecimento prévio sobre.
+Essas técnicas geralmente encontram \textit{bugs} de corrupção de memória simples e a aleatoriedade, dispersão fazem com que a eficiência do ataque seja baixa, além de cobrir poucas partes do código. Por outro lado, é simples de implementar, tem boa extensibilidade e pode ser feita sem o código-fonte. O \textit{fuzzing} aumenta seu potencial quando o alvo está em execução em um ambiente real. Outro ponto positivo é o fato de poder aplicar a técnica em aplicações sobre as quais há pouco conhecimento prévio.
 
 Em suma \textit{fuzzing} consiste na geração massiva de entradas normais e anômalas para uma aplicação específica, seguido da detecção de exceções no algoritmo devido o processamento das entradas geradas e monitoramento dos estados de execução da aplicação. Quando comparado com outras técnicas como análise estática, dinâmica e execução simbólica, o \textit{fuzzing} apresenta facilidade em ser implementado, boa precisão (em ambientes reais) e boa escalabilidade.
 
-Expandindo um pouco o conceito, um teste de \textit{fuzzing} tipicamente consiste na geração em larga escala de entradas para um programa específico, entradas conhecidas também como \textit{testcases}. A qualidade de tais \textit{testcases} criados influencia diretamente na qualidade do teste fuzzing. As entradas precisam atender os requisitos do programa testado para o padrão de entrada. Em contrapartida, as entradas precisam ser errôneas o suficiente para gerarem falhas ou erros no processamento do programa. De acordo com o alvo, as entradas podem ser arquivos com diferentes formatos, dados de comunicação entre redes, binários executáveis específicos, entre outros. No caso do \textit{wafamole++} trabalha-se, conforme descrito anteriormente, com injeções SQL.
+Expandindo um pouco o conceito, um teste de \textit{fuzzing} tipicamente consiste na geração em larga escala de entradas para um programa específico, entradas conhecidas também como \textit{testcases}. A qualidade de tais \textit{testcases} criados influencia diretamente na qualidade do teste \textit{fuzzing}. As entradas precisam atender os requisitos do programa testado para o padrão de entrada. Em contrapartida, as entradas precisam ser errôneas o suficiente para gerarem falhas ou erros no processamento do programa. De acordo com o alvo, as entradas podem ser arquivos com diferentes formatos, dados de comunicação entre redes, binários executáveis específicos, entre outros. No caso do \textit{wafamole++} trabalha-se, conforme descrito anteriormente, com injeções SQL, nas quais é aplicada a técnica de \textit{fuzzing} iterativamente a fim de gerar um \textit{payload} que penetre um WAF avaliado.
 
 Gerar \textit{testcases} suficientemente errôneos é uma tarefa árdua, com duas variantes: \textit{generation-based} e \textit{mutation-based}, das quais a última é a adotada pelo \textit{WAF-A-MoLE} e \textit{wafamole++}. Depois de gerados, os \textit{testcases} alimentam o programa alvo, tendo variáveis de ambiente e outros parâmetros do software a ser testado devidamente configurados pelo programador. Geralmente um teste de \textit{fuzzing} tem como condição final um tempo limite (ou \textit{timeout}) pré-definido ou uma falha de execução do programa.
 
-\textit{Fuzzers} monitoram o estado de execução durante o processo, aguardando exceções ou falhas.  Formas comuns de metodologia de monitoramento de exceções incluem monitor sinais específicos do sistema, falhas e outras violações. Existem ferramentas para verificar comportamentos anormais difíceis de perceber intuitivamente, como o \verb+AddressSanitizer+, \verb+DataFlowSanitizer+, \verb+ThreadSanitizer+ e \verb+LeakSanitizer+. Quando uma violação é capturada, o \textit{fuzzer} armazena o \textit{testcase} que a causou para análise futura e replicação \cite{li2018fuzzing}.
+\textit{Fuzzers} monitoram o estado de execução durante o processo, aguardando exceções ou falhas.  Formas comuns de metodologia de monitoramento de exceções incluem monitorar sinais específicos do sistema, falhas e outras violações. Quando uma violação é capturada, o \textit{fuzzer} armazena o \textit{testcase} que a causou para análise futura e replicação \cite{li2018fuzzing}.
 
 Por fim, na fase de análise, tem-se por objetivo determinar a localidade e a causa da violação no software. A análise geralmente é feita com o auxílio de \textit{debuggers} como \verb+DGB+, \verb+windbg+ ou outras ferramentas de análise binária, como a \verb+IDA Pro+, \verb+OllyObg+ e outras. O exato estado de execução dos \textit{testcases}, informações da \textit{thread}, instruções e outras informações fazem parte do monitoramento. Para o caso do trabalho em questão, considerando-se o ambiente em \textit{Python}, o \textit{debugger} padrão \verb+pdb+ mostrou-se suficiente para diagnosticar a maioria dos \textit{bugs} encontrados.
 
@@ -142,7 +137,7 @@ Por fim, na fase de análise, tem-se por objetivo determinar a localidade e a ca
 O \textit{fuzzer} \textit{generation-based} necessita saber como é a entrada que o programa é capaz de processar. No caso de um \textit{fuzzing} para arquivos, geralmente é fornecido um arquivo de configuração com o modelo pré-definido de entrada. Os \textit{testcases} são gerados de acordo com o arquivo de configuração. Fuzzers desse tipo tem facilidade em burlar validações do software testado, permitindo ao pentester entender com mais profundidade a aplicação estudada. Por outro lado, sem uma documentação amigável, analisar o formato do arquivo pode ser uma tarefa árdua.
 Em termos de praticidade, fuzzers mutation-based são mais fáceis de utilizar, com aplicabilidade genérica, sendo geralmente o tipo adotado por testes de intrusão no estado da arte. Diferente do generation-based, o mutation-based precisa de algumas entradas iniciais válidas. As entradas vão sofrendo mutações e novos \textit{testcases} vão sendo gerados. O \textit{wafamole++} requer apenas uma entrada inicial válido - uma query que é fornecida ao final de cada chamada ao comando \verb+wafamole evade+.
 
-Para testes \textit{grey box} e \textit{black box}, os \textit{fuzzers} são \textit{mutation-based}. Para testes \textit{white box}, \textit{generation-based}.
+Para testes \textit{grey box} e \textit{black box}, os \textit{fuzzers} são \textit{mutation-based}. Para testes \textit{white box}, os \textit{fuzzers} são \textit{generation-based}.
 
 O contexto relevante para o \textit{WAF-A-MoLE} é produzir, iterativamente, múltiplas injeções SQL a serem testadas a cada "rodada" de mutação. Uma injeção SQL é usada como base inicial, e a mesma sofre mutações por um \textit{fuzzer} dedicado até ser considerada válida pelo \textit{Web Application Firewall} testado, embora seja no fundo ainda uma injeção maliciosa. Dessa maneira, o \textit{wafamole++} pode ser resumidamente descrito como um \textit{fuzzer} mutacional, operando em cima de WAFs com entradas de injeções SQL "fuzzeadas".
 
