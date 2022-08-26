@@ -143,36 +143,48 @@ O contexto relevante para o \textit{WAF-A-MoLE} é produzir, iterativamente, mú
 
 \section{Aprendizado de Máquina}
 
-Tendo seus primórdios em torno das décadas de 60 e 70, com dispositivos como o \textit{Cybertron} intitulados de "máquinas de aprendizado", esse subcampo de Inteligência Artificial teve uma tremenda ressurgência com recentes avanços em capacidade de processamento em tempos atuais. Com isso, dentre as áreas de interesse de computação enriquecidas por técnicas, naturalmente foram investigadas novas empreitadas em Segurança da Informação
+Tendo seus primórdios em torno das décadas de 60 e 70, com dispositivos como o \textit{Cybertron} intitulados de "máquinas de aprendizado", esse subcampo de Inteligência Artificial teve uma tremenda ressurgência com recentes avanços em capacidade de processamento em tempos atuais. Com isso, dentre as áreas de interesse de computação enriquecidas por técnicas, naturalmente foram investigadas novas empreitadas em segurança da informação.
 
-A ideia por trás de Aprendizado de Máquina \cite{dantas_transformers_2021} é a instrução de computadores por meio de exemplos - diferente da automação usual que envolve o programador elaborando algoritmos envolvendo manipulação de dados de entrada e saída desejados. Nesse contexto, um típico objetivo é rotular dados novos em categorias definidas nos dados iniciais. Para tal, temos dois principais procedimentos:
+A ideia por trás de Aprendizado de Máquina \cite{dantas_transformers_2021} é o ensino/aprendizado de computadores por meio de exemplos - diferente da automação usual que envolve o programador elaborando algoritmos envolvendo manipulação de dados de entrada e saída desejados. Nesse contexto, um típico objetivo é rotular dados novos em categorias definidas nos dados iniciais. Para tal, temos dois principais procedimentos:
 \begin{alineas}
 \item \textbf{Aprendizado supervisionado} - em casos nos quais dados de entrada e saída de um algoritmo desse tipo são conhecidos, e o algoritmo resultando é aprimorado com base nisto
-\item \textit{Aprendizado não-supervisionado} - casos nos quais os dados de saída não são conhecidos, sendo possível identificar padrões no próprio conjunto de entrada da aplicação.
+\item \textbf{Aprendizado não-supervisionado} - casos nos quais os dados de saída não são conhecidos, sendo possível identificar padrões no próprio conjunto de entrada da aplicação.
 \end{alineas}
 
 Alguns termos de relevância dentro de tais procedimentos podem ser elencados:
 \begin{alineas}
 \item \textbf{Classificação} - É a ação qualitativa de rotular um dado avaliado com uma categoria, feito com um algoritmo de um classificador. Aplicando a um exemplo direto de Segurança da Informação, um classificador que rotula um pacote como "malicioso" realiza essa ação.
 \item \textbf{Treinamento} - Também conhecido como \verb+fitting+, essa ação envolve o fornecimento de exemplos para um determinado classificador, para que esse programa possa realizar a eventual classificação de dados vindouros.
-\item \textbf{Dados de Validação} - Durante o treinamento, são separados dados para a orientação do mesmo. O procedimento usual é separar uma parcela dos dados original como tal. É importante que sejam distintos de dados de teste, para que o algoritmo resultante possa ter seu desempenho contra dados eventualmente completamente novos testado.
+\item \textbf{Dados de Validação} - Durante o treinamento, são separados dados para a orientação do mesmo, com uso de uma parcela dos dados originais. É importante que esta parcela seja distinta dos dados de teste, para que o algoritmo resultante possa ter seu desempenho eventualmente testado contra dados completamente novos.
 \item \textbf{Dados de Teste} - São dados usados para a avaliação de um classificador realizada logo após seu treinamento, para que seja possível averiguar a eficácia e corretude do mesmo.
 \end{alineas}
 
-Sumariamente, pode-se perceber como esse campo de pesquisa traz consigo abordagens de automatização relevantes para uma gama de aplicações. Para o contexto deste trabalho, é imprescindível o conhecimento de Aprendizado de Máquina, uma vez que as principais aplicações avaliadas no mesmo englobam diversos algoritmos oriundos desse subcampo de Inteligência Artificial.
 
-Algoritmos que vêm por padrão no \textit{WAF-A-MoLE} em modelos de exemplo são \textit{Naive Bayes}, \textit{Random Forest} e \textit{Support Vector Machine} Gaussiana/Linear, ofertados pela biblioteca \textit{scikit-learn}. Além disso, há um WAF externo \textit{open-source} embutido que faz uso de Redes Neurais.
+Sumariamente, o conhecimento de Aprendizado de Máquina traz abordagens
+de automatização relevantes para o contexto deste trabalho, pois as aplicações de segurança usam diversos algoritmos oriundos desse subcampo de
+Inteligência Artificial.
+
+Algoritmos que vêm por padrão no \textit{WAF-A-MoLE} em modelos de exemplo são \textit{Naive Bayes}, \textit{Random Forest} e \textit{Support Vector Machine} Gaussiana/Linear, ofertados pela biblioteca \textit{scikit-learn}. Além disso, há um WAF externo \textit{open-source} embutido que faz uso de Redes Neurais que é uma técnica de Inteligência Artificial que também pode ser explorada, porém não foi o foco do trabalho.
 
 \subsection{Support Vector Machine}
-SVMs ou Support Vector Machines são modelos de aprendizado supervisionado (dentro do contexto de teoria de machine learning) associado a algoritmos de aprendizado que analisam dados para classificação e análise regressiva. É um dos métodos de predição mais robustos, baseado em \textit{frameworks} de aprendizado estatístico ou na teoria VC \cite{ben2001_vapnik_support}.
+SVMs ou Support Vector Machines são modelos de aprendizado supervisionado (dentro do contexto de teoria de Aprendizado de Máquina) associado a algoritmos de aprendizado que analisam dados para classificação e análise regressiva. É um dos métodos de predição mais robustos, baseado em \textit{frameworks} de aprendizado estatístico ou na teoria de Vapnik e Chervonenkis (comumente abreviada como teoria VC) \cite{ben2001_vapnik_support}.
 
-Dado um conjunto de exemplos para treinamento, cada um é marcado em duas categorias, um algoritmo de treinamento SVM constrói um modelo que assina novos exemplos para uma categoria ou outra, sendo um classificador binário linear não-probabilístico. 
-O SVM mapeia exemplos de treinamento para pontos no espaço de maneira a maximizar a distância entre as duas categorias. Novos exemplos são então mapeados no mesmo espaço e a predição através de qual lado da diferença entra as categorias é mais provável ela cair. Em adição a performance do classificador linear, SVMs conseguem de maneira eficiente efetuar classificações não-lineares utilizando um mapeamento implícito de entradas em espaços multi-dimensionais.
-Quando os dados ainda não foram rotulados, o aprendizado supervisionado não é possível e é necessário uma abordagem não-supervisionada, que tenta encontra \textit{clusters} naturais para o grupo de dados e então mapear os novos dados nos grupos formados. O algoritmo \textit{SV clustering} aplica a estatística aos \textit{Support Vectors}, permitindo categorização de dados não-rotulados.
-Foi criado por Vladimir Vapnik com outros parceiros na AT\&T Bell Laboratories.
+Dado um conjunto de exemplos para treinamento, cada um é marcado em duas categorias, um algoritmo de treinamento SVM constrói um modelo que associa novos exemplos para uma categoria ou outra, sendo um classificador binário linear não-probabilístico. 
+ 
+O SVM mapeia exemplos de treinamento para pontos no espaço de maneira a maximizar a distância entre as duas categorias. Novos exemplos são então mapeados no mesmo espaço, sendo feita posteriormente uma predição sobre qual lado é mais provável da diferença entre categorias cair. 
+
+Quando os dados ainda não foram rotulados, o aprendizado supervisionado não é possível e é necessário uma abordagem não-supervisionada, que tenta encontra \textit{clusters} naturais para o grupo de dados e então mapear os novos dados nos grupos formados. 
+
+O algoritmo \textit{SV clustering}, criado por Vladimir Vapnik com
+outros parceiros na AT\&T Bell Laboratories, aplica a teoria estatística aos \textit{Support Vectors}, permitindo categorização de dados não-rotulados.
+
 Para exemplificar o poder do modelo de aprendizado, o artigo \cite{vapnik_svm_support} mostra a performance obtida em classificação de histogramas em níveis surpreendentemente altos, com taxas de erro por volta de 11\% (baixa) para a classificação de 14 categorias e com taxa de erro de 16\% para conjuntos de objetos mais genéricos. Esses resultados foram obtidos sem conhecimento prévio da tarefa, sabendo apenas que a entrada seria uma densidade discreta ou histograma colorido.
+
 \textit{Python} possui no pacote \textit{sklearn} um método SVC e variantes com eficácias distintas em cenários diferentes.
-O novo modelo proposto \textit{wafamole++} é a versão não-linear, diferente da proposta original de Vladimir.
+
+Além do desempenho como um classificador linear, SVMs conseguem efetuar classificações não-lineares utilizando um mapeamento implícito de entradas em espaços multi-dimensionais de maneira eficiente. O novo modelo proposto \textit{wafamole++} é a versão não-linear, diferente da proposta original de Vladimir.
+
+A figura 2 ilustra as diferenças ao variar o parâmetro do \textit{kernel} em um classicador SVM na biblioteca \textit{scikit-learn}. O \textit{kernel} RBF e polonimal de grau 3 correspondem aos não lineares, com o RBF sendo utilizado no \textit{wafamole++}. As zonas pintadas de azul e vermelho indicam elementos pertencentes a uma determinada predição feita pelo classificador, referente aos atributos de sépala de plantas na base de dados Íris (comumente usada no ensino e demonstração de Aprendizado de Máquina).
 
 \begin{figure}[ht]
     \centering
@@ -187,17 +199,19 @@ O novo modelo proposto \textit{wafamole++} é a versão não-linear, diferente d
 Gradiente descendente estocástico é um método iterativo para otimização de uma função objetivo com propriedades "suaves" (diferenciais ou subdiferenciais) adequadas. \cite{ruder2016overview}
 
 Pode ser considerada uma aproximação estocástica da otimização por gradiente descendente, uma vez que substitui o gradiente atual (calculado do dataset inteiro) por uma estimativa do mesmo calculada for um subconjunto dos dados selecionado aleatoriamente.
-Em problemas de otimização com muitas dimensões, reduz o peso computacional, tendo resultados mais rápidos com o \textit{tradeoff} de perda na taxa de convergência.
-O SGD procura encontrar o mínimo global de uma função através de ajustes de configuração a cada tentativa. Ao invés de reduzir o erro ou achar o gradiente para o dataset inteiro, o método reduz o erro através de aproximações em direção ao gradiente para um subconjunto aleatório do dataset, que pode ser tão pequeno quanto o conjunto de dados de treinamento inicial.
+
+Em problemas de otimização com muitas dimensões isso reduz o custo computacional, tendo resultados mais rápidos com o \textit{tradeoff} de perda na taxa de convergência \footnote{Definição de taxa de convergência: No aprendizado supervisionado, uma função de perda é definida, possuindo um valor mínimo global o qual busca-se através do gradiente descendente. O quanto se aproxima desse valor com cada etapa/iteração do algoritmo é a taxa de convergência.}.
+
+O SGD procura encontrar o mínimo global de uma função através de ajustes de configuração a cada tentativa. Essa função valores mínimos e máximos locais e globais e um exemplo de uma dessas pode ser visto na figura 3. Ao invés de reduzir o erro ou achar o gradiente para o dataset inteiro, o método reduz o erro através de aproximações em direção ao gradiente para um subconjunto aleatório do dataset, que pode ser tão pequeno quanto o conjunto de dados de treinamento inicial.
+
 De forma heurística, se o modelo inicial erra muito, as alterações na configuração vão tornando o modelo mais preciso. Em contrapartida, é possível que questões antes acertadas, possam passar a serem erradas ou aumento da taxa de erro geral em favor de acertos específicos. Nem toda iteração necessariamente irá fazer o modelo melhorar.
-Positivamente, o SGD consegue sair do mínimo local em direção ao mínimo global através dos ajustes de configuração com baixo custo computacional em relação ao gradiente descendente clássico.
-\cite{overview_gradient_descent_stochastic}
+Positivamente, o SGD consegue sair do mínimo local em direção ao mínimo global através dos ajustes de configuração com baixo custo computacional em relação ao gradiente descendente clássico \cite{overview_gradient_descent_stochastic}.
 
 \begin{figure}[ht]
     \centering
     \caption{Função Objetivo}
     \includegraphics[width=10cm,height=14cm,keepaspectratio]{figuras/funcao_objetivo.png} 
-    \legend{Fonte: \href{https://deepai.org/}{Função Objetivo} (2022, p. TO-DO)}
+    \legend{Fonte: \href{https://deepai.org/}{deepai.org} (2022)}
     \label{fig:internet} 
 \end{figure}
 
@@ -207,60 +221,61 @@ Positivamente, o SGD consegue sair do mínimo local em direção ao mínimo glob
 
 \subsection{AdaBoost}
 
-\textit{AdaBoost} é um algoritmo do tipo \textit{Boosting} \cite{wu2011some} com capacidade auto-adaptativa que melhora a performance de classificadores fracos por estabelecer um conjunto de múltiplos classificadores. Como o \textit{AdaBoost} adapta-se a taxa de erro do algoritmo básico em treinamento através de regulação dinâmica do peso de cada amostra, o interesse dos pesquisadores tem sido estimulado.
-
 O método de \textit{Boosting} vem da análise teórica do modelo de aprendizado chamado PAC (\textit{Probably Approximately Correct}). Os autores Kearns e Valiant propuseram os conceitos de aprendizado forte e fraco. No modelo de aprendizado do PAC, se um algoritmo de aprendizado polinomial para identificar um grupo de conceito e a acurácia do reconhecimento é muito alta, esse grupo de conceitos são considerados como aprendizado forte. Porém, se a taxa de corretude do algoritmo de aprendizado de identificação é um pouco superior a tentativa aleatória de adivinhar, então esse grupo é considerado aprendizado fraco. 
 
 Kearns e Valient perceberam uma relação de equivalência entre aprendizado fraco e forte, onde o algoritmo de aprendizado fraco pode ser promovido para aprendizado forte.
-Se existe uma equivalência entre fraco e forte, então enquanto aprende-se um conceito, pode-se elevar um algoritmo um pouco melhor que tentativas de adivinhação aleatórias para um algoritmo de aprendizado forte (desde que se saiba qual algoritmo forte em específico).
+Se existe uma equivalência entre fraco e forte, então, enquanto aprende-se um conceito, pode-se elevar um algoritmo um pouco melhor que tentativas de adivinhação aleatórias para um algoritmo de aprendizado forte (desde que se saiba qual algoritmo forte em específico).
 
-Em 1990, Schapire publicou o primeiro método de Boosting. Freund fez melhorias e criou um método muito melhor conhecido como BBM (boost-by-majority).
-\textit{Boosting} produz uma série de classificadores antes e depois do treinamento. O conjunto de treinamento utilizado em cada classificador é um subconjunto advindo do conjunto geral de treinamento e se cada amostra aparece no subconjunto ou não depende da performance dos classificadores anteriores. No caso das amostras julgadores como incorretas pelos classificadores já existentes, então ã probabilidade de surgirem no novo subconjunto de treinamento será muito maior, fazendo com que os classificadores seguintes tenham foco em lidar com as diferenças nas amostras, que é uma tarefa árdua para os classificadores já existentes.
+Em 1990, Schapire publicou o primeiro método de \textit{Boosting}. Freund fez melhorias e criou um método muito melhor conhecido como BBM (\textit{boost-by-majority}).
+
+\textit{Boosting} produz uma série de classificadores antes e depois do treinamento. O conjunto de treinamento utilizado em cada classificador é um subconjunto advindo do conjunto geral de treinamento e se cada amostra aparece no subconjunto ou não depende da performance dos classificadores anteriores. No caso das amostras julgadas como incorretas pelos classificadores já existentes, então a probabilidade de surgirem no novo subconjunto de treinamento será muito maior, fazendo com que os classificadores seguintes tenham foco em lidar com as diferenças nas amostras, que é uma tarefa árdua para os classificadores já existentes \cite{wu2011some}.
 
 O método \textit{Boosting} pode aumentar a capacidade de generalização de um dado algoritmo, mas o algoritmo precisa ter estabelecido o limite inferior da acurácia de aprendizagem de um classificador fraco, que na prática é uma tarefa difícil.
 
-\textit{AdaBoost} que surgiu em 1995 atráves de Freund e Schapire fez uma melhoria no algoritmo de \textit{Boosting}.
-Sendo o algoritmo mais representativo da família, ele mantém a distribuição de um conjunto de probabilidades para amostras de treinamento e ajusta a probabilidade de distribuição de cada amostra durante a iteração. Um algoritmo específico de aprendizado é usado para gerar o classificador-membro e calcular a taxa de erro nas amostras de treinamento. \textit{AdaBoost} irá usar a taxa de erro para ajustar a probabilidade de distribuição das amostras de treino. O papel de mudar os pesos é para aumentar o impacto das classificações incorretas e reduzir o impacto das classificações corretas. Por fim, com o ajuste dos pesos nos classificadores únicos, é obtido um classificador forte.
-O pseudoalgoritmo tem a seguinte estrutura com um conjunto de amostras iniciais:
+O \textit{AdaBoost} é um algoritmo do tipo \textit{Boosting}, concebido em 1995 e publicado em 1999 \cite{adaboostfreund1999short}, com capacidade auto-adaptativa que melhora a performance de classificadores fracos por estabelecer um conjunto de múltiplos classificadores. Como o \textit{AdaBoost} adapta-se a taxa de erro do algoritmo básico em treinamento através de regulação dinâmica do peso de cada amostra, o interesse dos pesquisadores tem sido estimulado.
 
-\begin{equation}
-    L=\left\{\left(x_{1}, y_{1}\right),\left(x_{2}, y_{2}\right) \cdots\left(x_{N}, y_{N}\right)\right\}, y_{i} \in\{+1,0\}
-\end{equation}
+Sendo o algoritmo mais representativo da família, ele mantém a distribuição de um conjunto de probabilidades para amostras de treinamento e ajusta a probabilidade de distribuição de cada amostra durante a iteração. Um algoritmo específico de aprendizado é usado para gerar o classificador-membro e calcular a taxa de erro nas amostras de treinamento. O \textit{AdaBoost} irá usar a taxa de erro para ajustar a probabilidade de distribuição das amostras de treino. O papel de mudar os pesos é para aumentar o impacto das classificações incorretas e reduzir o impacto das classificações corretas. Por fim, com o ajuste dos pesos nos classificadores únicos, é obtido um classificador forte.
 
-A distribuição inicial dos pesos é dada por:
+% O pseudoalgoritmo tem a seguinte estrutura com um conjunto de amostras iniciais:
 
-\begin{equation}
-    w_{i}^{1}=\frac{1}{N}
-\end{equation}
+% \begin{equation}
+%     L=\left\{\left(x_{1}, y_{1}\right),\left(x_{2}, y_{2}\right) \cdots\left(x_{N}, y_{N}\right)\right\}, y_{i} \in\{+1,0\}
+% \end{equation}
 
-Onde +1 é uma amostra positiva e 0 é uma amostra negativa, sendo o total de amostras N.
+% A distribuição inicial dos pesos é dada por:
 
-Considerando t = 1, ... , T, tem-se um \textit{loop} com os pesos normalizados:
+% \begin{equation}
+%     w_{i}^{1}=\frac{1}{N}
+% \end{equation}
 
-\begin{equation}
-    w_{i}^{t}=\frac{w_{i}^{t}}{\sum_{j=1}^{N} w_{j}^{t}}
-\end{equation}
+% Onde +1 é uma amostra positiva e 0 é uma amostra negativa, sendo o total de amostras N.
 
-O classificador fraco que seleciona e classifica do conjunto de amostras aquele cuja taxa de erro é a menor e a distribuição do peso atual $h_{t}$. A taxa de erro do classificador fraco é dada pela expressão:
+% Considerando t = 1, ... , T, tem-se um \textit{loop} com os pesos normalizados:
 
-\begin{equation}
-    \mathcal{E}_{t}=\sum_{i=1}^{N} w_{i}^{t}\left|h_{t}\left(x_{i}\right)-y_{i}\right|
-\end{equation}
+% \begin{equation}
+%     w_{i}^{t}=\frac{w_{i}^{t}}{\sum_{j=1}^{N} w_{j}^{t}}
+% \end{equation}
 
-A atualização do peso da amostra é dada por:
+% O classificador fraco que seleciona e classifica do conjunto de amostras aquele cuja taxa de erro é a menor e a distribuição do peso atual $h_{t}$. A taxa de erro do classificador fraco é dada pela expressão:
 
-\begin{equation}
-    w_{i}^{t+1}=w_{i}^{t} \beta_{t}^{1-e_{i}}
-\end{equation}
+% \begin{equation}
+%     \mathcal{E}_{t}=\sum_{i=1}^{N} w_{i}^{t}\left|h_{t}\left(x_{i}\right)-y_{i}\right|
+% \end{equation}
 
-$e_{i}$ = 0 representa que xi foi classificado corretamente e $e_{i}$ = 1 significa que $x_{i}$ foi classificado incorretamente.
+% A atualização do peso da amostra é dada por:
 
-Como saída final do algoritmo:
+% \begin{equation}
+%     w_{i}^{t+1}=w_{i}^{t} \beta_{t}^{1-e_{i}}
+% \end{equation}
 
-\begin{equation}
-    \begin{aligned}
-    &H(x)= \begin{cases}1, & \sum_{t=1}^{T} \alpha_{t} h_{t}(x) \geq \frac{1}{2} \sum_{t=1}^{T} \alpha_{t} \\ 0, & \text { caso contrario }\end{cases}\\
-    &\alpha_{t}=\log \frac{1}{\beta_{t}} .
-    \end{aligned}
-\end{equation}
+% $e_{i}$ = 0 representa que xi foi classificado corretamente e $e_{i}$ = 1 significa que $x_{i}$ foi classificado incorretamente.
+
+% Como saída final do algoritmo:
+
+% \begin{equation}
+%     \begin{aligned}
+%     &H(x)= \begin{cases}1, & \sum_{t=1}^{T} \alpha_{t} h_{t}(x) \geq \frac{1}{2} \sum_{t=1}^{T} \alpha_{t} \\ 0, & \text { caso contrario }\end{cases}\\
+%     &\alpha_{t}=\log \frac{1}{\beta_{t}} .
+%     \end{aligned}
+% \end{equation}
 
