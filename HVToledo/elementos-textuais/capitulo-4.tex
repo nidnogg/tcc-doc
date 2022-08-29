@@ -18,9 +18,24 @@ O \textit{wafamole++} possui uma estrutura composta de um classificador para rea
 
 Os operadores de mutação responsáveis por gerir as dadas iterações de \textit{fuzzing} ficam, idealmente, todos agrupados na classe \verb+SqlFuzzer+ dentro de seus métodos.
 
-Diferentemente do \textit{WAF-A-MoLE} no entanto, a proposta inclui também um módulo separado responsável pelo tratamento, treinamento e geração de dados para alicerçar o funcionamento da aplicação principal. Nele se encontra um gerador de \textit{queries} \verb+mole_query_generator+ que executa o programa diversas vezes para acumular casos a serem adicionados na base de dados, um programa \verb+sqli_cleaner+ para tratamento de dados brutos e formatação para o WAF a ser testado, e os dados em si.
+Diferentemente do \textit{WAF-A-MoLE} no entanto, a proposta inclui também um módulo separado responsável pelo tratamento, treinamento e geração de dados para alicerçar o funcionamento da aplicação principal. 
 
-Uma representação visual da proposta pode ser conferida no diagrama da Figura 8.
+Uma representação visual da proposta, sem especificações como linguagens usadas, extensões de arquivo e detalhes mais profundos pode ser conferida no diagrama da Figura 8. Sua versão com maior nível de detalhamento é disponibilizada na Figura 10, mais adiante na Seção de implementação.
+
+Descrevendo de forma geral essa estrutura, cada retângulo com título indica um módulo, seus subtítulos representam submódulos/métodos contidos nesses, e setas indicam ações ou comandos realizados por essas estruturas. Resumidamente, detalhando do topo da arquitetura até a base, tem-se:
+
+\begin{alineas}
+\item Um módulo \verb+Database+ - Nele se encontra um gerador de \textit{queries} \verb+mole_query_generator+ que executa o programa diversas vezes para acumular casos a serem adicionados na base de dados, um programa \verb+sqli_cleaner+ para tratamento de dados brutos e formatação para o WAF a ser testado, e os dados em si.
+
+\item O MLBasedWafClassifier - Esse módulo responsável por receber os dados do módulo de \verb+Database+, estruturar o classificador do WAF \textit{MLBasedWAF} através de treinamento, gerar seu modelo correspondente e exportá-lo para uso na aplicação principal na parte de modelos.
+
+\item Command Line Interface, ou Aplicação de linha de comando - Aqui é abrigada a típica função \textbf{main}, sendo aonde são recebidos os parâmetros a serem executados na aplicação pelo usuário como o número máximo de iterações, modelo a ser usado, e injeção SQL inicial para ser transformada em um exemplo adversarial. Esses parâmetros são melhores explicados na seção adiante.
+
+\item Models - Aonde são armazenados os modelos. Modelos são classificadores de WAFs já treinados e exportados de forma que não seja necessário realizar o treinamento a cada iteração. 
+
+\item EvasionEngine + SqlFuzzer - A classe EvasionEngine realiza cada iteração da aplicação que consiste em chamar a classe relacionada \textit{SqlFuzzer} que transforma (via \textit{fuzzing}) a entrada inicial com os operadores de mutação nela contidos, armazenar a saída dessa transformação, e chamá-la novamente para obter uma transformação mais sofisticada. A condição de parada é fornecida pelo usuário, tanto na forma de iterações máximas, como na forma de uma \textit{threshold} máxima de confiabilidade (mais explicada na Seção adiante).
+
+\end{alineas}
 
 \begin{figure}[H]
     \centering
@@ -44,7 +59,7 @@ Esses módulos, no entanto, não podem ser trivialmente estendidos sem alguns co
 \item \verb+datasets+ - Aqui são contidos os datasets SQLiV3, SQLiV4, e SQLiV5, funções de tratamento para os mesmos e uma função de geração/adaptação do dataset original do \textit{WAF-A-MoLE} para servir de treinamento para o MLBasedWAF, um \textit{Web Application Firewall} que será descrito na seção seguinte. O \verb+SQLiV3.json+ é o primeiro dataset utilizado para tal, disponibilizado pelo Kaggle \footnote{Kaggle - SQL Injection Dataset: https://www.kaggle.com/datasets/syedsaqlainhussain/sql-injection-dataset} \cite{kaggle_dataset_sql} e também está descrito adiante. Versões subsequentes (indicadas pelos números ascendentes) são incrementos realizados e testados nele com reforços de \textit{payloads} oriundos do wafamole++.
 
 \begin{alineas}
-\item \verb+mole+ - Essa função pode ser visualizada no Código 4 mais adiante. Ela executa em linha de comando o \textit{wafamole++} para cada linha do dataset SQLiV3, de modo a gerar um leque mais amplo de ataques. Como se trata de um processo iterativo, um limite superior de 7000 novos \textit{payloads} foi adotado - e o tempo de execução médio foi em torno de 8 horas para o processo todo. Para gerar novos ataques (dado que o \textit{wafamole++} produz saídas diferentes a cada execução), basta executá-lo com redireção de saída padrão (\verb+>+):
+\item \verb+mole+ - Essa função pode ser visualizada no Código 3 mais adiante. Ela executa em linha de comando o \textit{wafamole++} para cada linha do dataset SQLiV3, de modo a gerar um leque mais amplo de ataques. Como se trata de um processo iterativo, um limite superior de 7000 novos \textit{payloads} foi adotado - e o tempo de execução médio foi em torno de 8 horas para o processo todo. Para gerar novos ataques (dado que o \textit{wafamole++} produz saídas diferentes a cada execução), basta executá-lo com redireção de saída padrão (\verb+>+):
 \begin{verbatim}
 ./mole_query_generator.py > output.json
 \end{verbatim}
@@ -55,7 +70,7 @@ Esses módulos, no entanto, não podem ser trivialmente estendidos sem alguns co
 \item \verb+wafamole_dataset_generator+ - Fornecido apenas após um certo período de espera de alguns meses (compreendido entre a troca de emails com os autores originais), o dataset do wafamole encontra-se disponibilizado no seu \href{https://github.com/zangobot/wafamole_dataset}{repositório}\footnote{GitHub - wafamole\_dataset: https://github.com/zangobot/wafamole_dataset} de maneira modular - com uma série de arquivos \verb+.json+ pequenos devido ao limite imposto pela plataforma GitHub. Além disso, ele precisou ser adaptado para o formato do \textit{MLBasedWAF} assim como o \verb+SQLiV3.json+ (sem dificuldades nesse caso). Possui uma abrangência e riqueza maior no geral do que o antecessor. Essa função realiza a combinação e adaptação das partes disponibilizadas pelos autores.
 
 \end{alineas}
-\item \verb+MLBasedWafClassifier+ - Localizada na pasta dos modelos customizados (models/svc), esse arquivo \textit{Jupyter Notebook} \footnote{Jupyter Notebook ou arquivo .ipynb: Um ambiente de desenvolvimento que permite organizar uma aplicação separando em pedaços de código e trechos de texto} é responsável por uma série de funções realizadas em cima dos datasets baseados no \verb+SQLiV3.json+. É realizada a visualização dos dados contidos nos mesmos via gráficos, e os dados são agrupados de maneira a serem classificados para uso no \textit{wafamole++}. Dois tipos de classificadores são suportados: \textit{Support Vector Machine} não linear, e \textit{Stochastic Gradient Descent}. 
+\item \verb+MLBasedWafClassifier+ - Localizada na pasta dos modelos customizados (models/svc), esse arquivo \textit{Jupyter Notebook} \footnote{Jupyter Notebook ou arquivo .ipynb: Um ambiente de desenvolvimento que permite organizar uma aplicação separando em pedaços de código e trechos de texto} é responsável por uma série de funções realizadas em cima dos datasets baseados no \verb+SQLiV3.json+. É realizada a visualização dos dados contidos nos mesmos via gráficos, e os dados são agrupados de maneira a serem classificados para uso no \textit{wafamole++}. Dois tipos de classificadores são suportados: \textit{Support Vector Machine} não linear e \textit{Stochastic Gradient Descent}. 
 
 Um exemplo de um gráfico gerado pelo notebook com seu código correspondente pode ser encontrado na Figura 9.
 
@@ -66,22 +81,28 @@ Um exemplo de um gráfico gerado pelo notebook com seu código correspondente po
     \label{fig:internet} 
 \end{figure}
 
-Para cada classificador é feita uma divisão em dados de treinamento e teste, para que seja averiguada a eficácia do modelo gerado ao fim da execução do código. Também é realizado uma rotina de \textit{GridSearchCV},para exaustivamente obter parâmetros mais otimizados para uso na classificação. Por fim, é chamada a função \verb+fit()+ responsável pela classificação, e o classificador resultante é testado. 
+Para cada classificador é feita uma divisão em dados de treinamento e teste, para que seja averiguada a eficácia do modelo gerado ao fim da execução do código. Também é executada uma rotina \textit{GridSearchCV} para exaustivamente obter parâmetros mais otimizados para uso na classificação. Por fim, é chamada a função \verb+fit()+ responsável pela classificação, e o classificador resultante é testado. 
 
-Os resultados desses testes sendo colocados em métricas como a matriz de confusão e \textit{score}, e a biblioteca \textit{joblib} exporta um arquivo \verb+.dump+ com o modelo final para uso no \textit{wafamole++}. O final do componente contém testes com queries geradas pelo \textit{wafamole++} que penetram o WAF avaliado no notebook.
+Os resultados desses testes sendo colocados em métricas como a matriz de confusão \footnote{Também conhecida como \textit{Error Matrix}, essa matriz permite extrair uma série de métricas acerca da qualidade do modelo gerado, como taxas de falso positivo/negativo e verdadeiro positivo/negativo, além de acurácia e precisão.} e \textit{score}, e a biblioteca \textit{joblib} exporta um arquivo \verb+.dump+ com o modelo final para uso no \textit{wafamole++}. O final do componente contém testes com queries geradas pelo \textit{wafamole++} que penetram o WAF avaliado no notebook.
 
 Para maior detalhamento e visualização das métricas no mesmo, o notebook está disponibilizado no \href{https://github.com/nidnogg/tcc}{repositório} final \footnote{GitHub - Implementação Final: https://github.com/nidnogg/tcc}, localizado sob a pasta \verb+models/custom/svc+.
 
-\item \verb+MLClassifierWafamole+ - Trata-se de uma versão semelhante ao notebook anterior, porém fazendo uso do dataset original do wafamole, um banco consideravelmente mais robusto e amplo no geral. O tamanho deste dataset exigiu algumas alterações para que os algoritmos rodassem apropriadamente, sendo um obstáculo no desenvolvimento do trabalho no geral, pois o processamento do mesmo exigia mais recursos, tempo e algumas modificações em eficiência para que funcionasse. Destaca-se aqui o uso do \textit{back-end} paralelo \verb+ray+ \cite{ray_backend_parallel} como considerável ganho de performance. Mesmo assim, algumas execuções foram realizadas por um período maior do que 48 horas e abandonadas sem resultados na etapa de treinamento.
+\item \verb+MLClassifierWafamole+ - Trata-se de uma versão semelhante ao notebook anterior, porém fazendo uso do dataset original do wafamole, um banco consideravelmente mais robusto e amplo no geral. Por robustez, entende-se por queries em maior numerosidade (uma diferença quase 690.000 registros a mais do que o dataset do Kaggle), e por amplitude, a variedade de comandos SQL nos registros, sendo mais representativo. 
+
+O tamanho deste dataset exigiu algumas alterações para que os algoritmos rodassem apropriadamente, sendo um obstáculo no desenvolvimento do trabalho no geral, pois o processamento do mesmo exigia mais recursos, tempo e algumas modificações em eficiência para que funcionasse. Destaca-se aqui o uso do \textit{back-end} paralelo \verb+ray+ \cite{ray_backend_parallel} como considerável ganho de performance. Mesmo assim, algumas execuções foram realizadas por um período maior do que 48 horas e abandonadas sem resultados na etapa de treinamento.
 
 No geral, este notebook possui um tempo de execução consideravelmente maior  em razão do dataset utilizado, o que é de se esperar e não pode ser evitado. Outra diferença chave são os classificadores usados - foram testados além dos dois anteriores o classificador \textit{AdaBoost}, com resultados promissores. O \textit{Support Vector Machine} não Linear, no entanto, não foi frutífero, requerendo um tempo de execução que excedia 48 horas. Cabe salientar que a versão mais recente desse notebook foi disponibilizada no \textit{Google Colab} sob o nome \verb+MLClassifierColabWafamole.ipynb+, via um link providenciado no repositório final.
 \end{alineas}
 
-De forma a ilustrar a implementação de uma maneira geral e como esses módulos se comunicam, a Figura 10 é disponibilizada, e para melhor detalhamento o componente \verb+mole+ pode ser visto no Código 4 por inteiro.
+De forma a ilustrar a implementação de uma maneira geral e como esses módulos se comunicam, a Figura 10 é disponibilizada, e para melhor detalhamento o componente \verb+mole+ pode ser visto no Código 3 por inteiro.
 
 \label{sec:codigos}
 \includecode[C]{Reforço de dataset SQLiV3.json do Kaggle} {alg:codigo2}{codigos/mole_query_generator.py}
 \bigskip
+
+Na Figura 10, as principais diferenças para a Figura 8 (que ilustra a arquitetura independente de tecnologias empregadas) se encontram no nome dos módulos, na extensão de arquivos e um detalhamento maior em módulos como \verb+datasets+ e \verb+cli.py+. Destaca-se dentre os detalhes os operadores da biblioteca \textit{Python} \verb+click+, que facilitam o uso do programa através da linha de comando (localizado no módulo \verb+cli.py+), o método \verb+evade()+ que é chamado na execução principal do programa e dá início ao funcionamento do mesmo, e uma melhor ilustração à direita de \verb+evasion.py+ de como o \textit{loop} principal de mutação é feito, com o método \verb+mutation_round()+.
+
+Além desses detalhes, há uma bipartição no módulo de classificador, que se deu pela particularidade dos múltiplos datasets que foram usados no \textit{wafamole++}. Acredita-se que em uma implementação nova, tendo acesso aos dados originais no início do desenvolvimento, não seria necessário explorar mais de um banco inicial de injeções e comandos SQL, apenas aprimorá-lo com mais entradas, fazendo uso do mesmo módulo de classificador caso desejado.
 
 \begin{figure}[H]
     \centering
@@ -94,7 +115,7 @@ De forma a ilustrar a implementação de uma maneira geral e como esses módulos
 
 O papel dos Operadores de Mutação tanto no \textit{WAF-A-MoLE} quanto no \textit{wafamole++} é fundamental, atuando como as ferramentas para guiar as mudanças realizadas no \textit{payload} atual a cada iteração do algoritmo. Sendo assim, considerando-se como o primeiro desenvolvimento feito na extensão do programa original, o \textit{wafamole++} conta com três novos operadores de mutação adicionados ao montante original. Todos estes encontram-se agrupados na classe \verb+sqlfuzzer.py+, localizada na pasta \textbf{payloadfuzzer} da aplicação.
 
-A finalidade destes novos operadores é incrementar a variedade de exemplos adversariais gerados, e em certos casos foi associado com uma rapidez maior na geração de queries finais. O primeiro destes é o \verb+shuffle_integers+, mostrado no Código 5.
+A finalidade destes novos operadores é incrementar a variedade de exemplos adversariais gerados, e em certos casos foi associado com uma rapidez maior na geração de queries finais. O primeiro destes é o \verb+shuffle_integers+, mostrado no Código 4.
 
 \label{sec:codigos}
 \includecode[C]{Operador de mutação shuffle integers} {alg:codigo2}{codigos/operadores/shuffle_integers.py}
@@ -103,17 +124,19 @@ A finalidade destes novos operadores é incrementar a variedade de exemplos adve
 
 Sua implementação é a mais simples dentre os operadores novos - consistindo apenas na troca de números presentes no \textit{payload} atual que lidera a fila principal por números inteiros diferentes entre 0 e 9. Selecionam-se números no \textit{payload} (denominados de candidatos), a posição dos mesmos e seus conteúdos são armazenados e então uma substituição aleatória é escolhida e o \textit{payload} modificado é retornado.  
 
-Interessantemente, modificando-se uma parte desse funcionamento para trocar a base numérica entre binário, octal, decimal e hexadecimal, obtém-se o próximo operador de mutação, com uma performance mais robusta. Trata-se do \verb+shuffle_bases+ (Código 6).
+Interessantemente, modificando-se uma parte desse funcionamento para trocar a base numérica entre binário, octal, decimal e hexadecimal, obtém-se o próximo operador de mutação, com uma performance mais robusta. Trata-se do \verb+shuffle_bases+ (Código 5).
 
 \label{sec:codigos}
 \includecode[C]{Operador de mutação \textit{shuffle bases}} {alg:codigo3}{codigos/operadores/shuffle_bases.py}
 
 \bigskip
 
-Nessa função a seleção e armazenamento de posições a serem modificadas é virtualmente idêntico - porém a substituição conta com uma lista de modificações em potencial dentre as quais uma é amostrada aleatoriamente na hora de ser realizada a mutação. Também são considerados os casos em que a mutação não ocasiona em variações no \textit{payload} final. Finalmente, há o \verb+spaces_to_symbols+ - o operador com a performance mais interessante (Código 7).
+Nessa função a seleção e armazenamento de posições a serem modificadas é virtualmente idêntico - porém a substituição conta com uma lista de modificações em potencial dentre as quais uma é amostrada aleatoriamente na hora de ser realizada a mutação. Também são considerados os casos em que a mutação não ocasiona em variações no \textit{payload} final. Finalmente, há o \verb+spaces_to_symbols+ - o operador com a performance mais interessante (Código 6).
 
 \label{sec:codigos}
 \includecode[C]{Operador de mutação spaces to symbols} {alg:codigo3}{codigos/operadores/spaces_to_symbols.py}
+
+\bigskip
 
 O operador \verb+spaces_to_symbols+ difere dos anteriores no que tange a posições que serão potencialmente modificadas - pois busca espaços em branco e não números. Com isso, a partir de uma lista gerada no algoritmo de símbolos como sinais de pontuação para substituição, um espaço é escolhido aleatoriamente e substituído por um desses símbolos.
 
@@ -143,13 +166,13 @@ As seções a seguir podem então ser interpretadas da seguinte forma:
 
 \textbf{Autores}: Sergio D Fdez, cr0hn, Enrique Garcia. Disponível no \href{https://github.com/BBVA/waf-brain}{GitHub}. \footnote{GitHub - waf-brain: https://github.com/BBVA/waf-brain}
 
-O WAF-Brain \cite{waf_brain} foi um dos primeiros firewalls a serem testados pela equipe do \textit{WAF-A-MoLE}, e subsequentemente é o primeiro modelo de exemplo disponibilizado para testes na documentação do mesmo. Dessa maneira, foi testado com os novos operadores de mutação, sendo de ajuda para diagnosticar os incluídos no wafamole++.
+O WAF-Brain \cite{waf_brain} foi um dos primeiros firewalls a serem testados pela equipe do \textit{WAF-A-MoLE}, e subsequentemente é o primeiro modelo de exemplo disponibilizado para testes na documentação do mesmo. Dessa maneira, foi testado com os novos operadores de mutação, sendo de ajuda para diagnosticar os incluídos no wafamole++. A Figura 11 é uma captura de tela do seu repositório, destacando a versão de \textit{Python} em que foi escrito, quantia de problemas abertos e logomarca.
 
 \begin{figure}[ht]
     \centering
     \caption{Dependências e logomarca do WAF-Brain}
     \includegraphics[width=12.5cm]{figuras/WAFBrain.png} 
-    \legend{Fonte: \href{https://github.com/BBVA}{GitHub} (2019, p. TO-DO)}
+    \legend{Fonte: \href{https://github.com/BBVA}{GitHub} (2019)}
     \label{fig:internet} 
 \end{figure}
 
@@ -177,7 +200,9 @@ Conforme essa advertência no \verb+README.md+ do repositório do \textit{WAF-A-
 \subsection{MLBasedWAF}
 Todos os modelos implementados tiveram como base o firewall ML-Based-WAF, disponível por vladan-stojnic no \href{https://github.com/vladan-stojnic/ML-based-WAF}{GitHub} \footnote{GitHub - ML-based-WAF: https://github.com/vladan-stojnic/ML-based-WAF} \cite{ml_based_waf} que fora o WAF \textit{open-source} mais promissor e mais plausível de adaptar. Sua performance também era factível no contexto de recursos disponíveis para a conclusão deste projeto final, uma vez que não havia complexidade na arquitetura/implementação comparável a firewalls como o SQLiGOT \cite{kar2016sqligot}. Isso permitiu que os modelos resultantes pudessem ser executados tanto na plataforma Google Colab como localmente em alguns casos.
 
-Seu funcionamento se dá por uso de um \textit{script} (\verb+sniffing.py+) que vasculha tráfego real e/ou simulado de pacotes HTTP enviados à rede atual, que são então direcionados para um classificador baseado na biblioteca \textit{scikit-learn} que faz a predição se o pacote tem cabeçalhos maliciosos ou não. Esses cabeçalhos são agrupados entre benignos, ataques XSS, cmdi, e injeções SQL.
+A Figura 12, retirada do repositório original desse WAF, mostra de forma geral a estrutura do MLBasedWAF. A pasta \textit{Classifier} contém alguns classificadores que são treinados com dados do dataset localizado na pasta \textit{Dataset}. Esses classificadores são replicados na pasta \textit{WAF} que contém as funcionalidades de um WAF propriamente dito, e o núcleo da aplicação.
+
+Seu funcionamento se dá por uso de um \textit{script} (\verb+sniffing.py+, localizado na pasta \textit{WAF}) que vasculha tráfego real e/ou simulado de pacotes HTTP enviados à rede atual, que são então direcionados para um classificador baseado na biblioteca \textit{scikit-learn} que faz a predição se o pacote tem cabeçalhos maliciosos ou não. Esses cabeçalhos são agrupados entre benignos, ataques XSS, cmdi, e injeções SQL.
 
 \begin{figure}[ht]
     \centering
@@ -191,7 +216,7 @@ Embora esse seja um WAF orientado ao tráfego real ou simulado de uma rede de fa
 
 Para tal, foi necessário prever uma estratégia própria de treinamento para o classificador, além de um conjunto de dados especial para o mesmo. É cabível mencionar, no entanto, que isso introduziu uma série de dificuldades uma vez que sua documentação era consideravelmente modesta, e o banco novo a ser usado deveria seguir o padrão de formatação seguido pelo WAF.
 
-Dentre as opções de datasets disponíveis com injeções SQL, foi escolhido inicialmente a versão \verb+SQLiV3.json+ da coleção do Kaggle \footnote{Kaggle - SQL Injection Dataset: https://www.kaggle.com/datasets/syedsaqlainhussain/sql-injection-dataset} \cite{kaggle_dataset_sql}, que fora anteriormente mencionada na seção de arquitetura do wafamole++.
+Dentre as opções de datasets disponíveis com injeções SQL, foi escolhido inicialmente a versão \verb+SQLiV3.json+ da coleção do Kaggle \footnote{Kaggle - SQL Injection Dataset: https://www.kaggle.com/datasets/syedsaqlainhussain/sql-injection-dataset} \cite{kaggle_dataset_sql}, que foi anteriormente mencionada na seção de arquitetura do \textit{wafamole++}. A Figura 13 é uma captura de tela da página Web deste dataset, destacando alguns detalhes e metadados de relevância como número de valores únicos, categorias de dados, tamanho de arquivo e etc.
 
 \begin{figure}[ht]
     \centering
@@ -201,7 +226,7 @@ Dentre as opções de datasets disponíveis com injeções SQL, foi escolhido in
     \label{fig:internet} 
 \end{figure}
 
-A etapa de correção de uma variedade de erros de formatação, polimento de algumas queries incorretas (e de difícil proveito), e adaptação para o padrão .json utilizado pelo WAF, encontra-se codificada na função auxiliar \verb+sqli_cleaner.py+, no Código 8.
+A etapa de correção de uma variedade de erros de formatação, polimento de algumas queries incorretas (e de difícil proveito), e adaptação para o padrão .json utilizado pelo WAF, encontra-se codificada na função auxiliar \verb+sqli_cleaner.py+, no Código 7.
 
 
 \label{sec:codigos:sqli_cleaner}
@@ -210,7 +235,7 @@ A etapa de correção de uma variedade de erros de formatação, polimento de al
 
 
 \subsection{Support Vector Machine}
-Este foi o primeiro modelo implementado no \textit{wafamole++}, antes do recebimento do dataset original da equipe original. Dado isso, esse classificador foi implementado com êxito usando os datasets \verb+SQLiV3.json+, \verb+SQLiV4.json+ e \verb+SQLiV5.json+. Tais datasets correspondem, respectivamente, aos seguintes modelos:
+Este foi o primeiro modelo implementado no \textit{wafamole++}, antes do recebimento do dataset original da equipe original. Foi o único classificador que foi executado no módulo do dataset do Kaggle e no módulo do dataset original do \textit{WAF-A-MoLE}. Dado isso, esse classificador foi implementado com êxito apenas usando os datasets \verb+SQLiV3.json+, \verb+SQLiV4.json+ e \verb+SQLiV5.json+. Tais datasets correspondem, respectivamente, aos seguintes modelos:
 \begin{alineas}
 \item \verb+test_svc_classifier_no_mole.dump+
 
@@ -245,14 +270,14 @@ Resumidamente, com isso tem-se que além da testagem em cima do reforço via \te
 
 Nesse contexto destaca-se um que troca o algoritmo fundamental por trás do Support Vector Machine por um com abordagem não linear (no caso, de parâmetro \verb+kernel = 'rbf'+) em contraste com o algoritmo linear empregado no modelo Token-based padrão do WAF-A-MoLE. Isso permitiu resultados comparáveis aos originais (e, após reforço, com performance superior como indicado no Capítulo 5 adiante) com um classificador fundamentalmente diferente na mesma arquitetura, expandindo o leque de classificadores suportados na aplicação.
 
-Por fim, sua célula de código principal contida no Python Notebook pode ser vista no Código 9.
+Por fim, sua célula de código principal contida no Python Notebook pode ser vista no Código 8.
 
 \label{sec:codigos:modelos}
 \includecode[C]{Pipeline classificador SVC Não-Linear}{alg:codigo3}{codigos/modelos/svc_model_sqliv3.py}
 \bigskip
 
 \subsection{Stochastic Gradient Descent}
-O segundo modelo a ser codificado pôde ser testado tanto para os datasets do kaggle como do \textit{WAF-A-MoLE} original, sem problemas de performance. No caso posterior, de fato houve uma exigência maior da máquina, requerendo um ambiente com mais memória que o desktop originalmente usado para executar os notebooks. Com isso, foi empregada a plataforma Google Colaboratory, da subdivisão de pesquisa da Google. 
+O segundo modelo a ser programado pôde ser testado tanto para os datasets do Kaggle como do \textit{WAF-A-MoLE} original, sem problemas de performance. No caso posterior, de fato houve uma exigência maior da máquina, requerendo um ambiente com mais memória que o desktop originalmente usado para executar os notebooks. Com isso, foi empregada a plataforma Google Colaboratory, da subdivisão de pesquisa da Google. 
 
 Como no modelo anterior e nos subsequentes, sua implementação é realizada a partir de um comando \verb+import+ (\verb+from sklearn.linear_model import SGDClassifier+) da biblioteca \verb+scikit-learn+ e o classificador é instanciado na função \verb+make_pipeline()+. Uma diferença na sua implementação é que, como fora gerado um modelo para o dataset \textit{WAF-A-MoLE} também, este possui alguns pequenos ajustes no tratamento dos dados que servem de entrada para o treinamento.
 
@@ -270,7 +295,7 @@ Um fator indesejável é a impossibilidade de gerenciar com maior precisão a ve
 
 Acredita-se que a principal falha da plataforma, no entanto, seja a limitação de sua versão gratuita, no entanto, que desliga todas as células \footnote{Uma célula em um Jupyter Notebook é um pedaço qualquer do programa que pode ser ou um trecho de código em Python, ou um trecho escrito na linguagem de markup Markdown. Jupyter Notebooks são compostos inteiramente de tais células.} do Notebook em uso após um período fixo de 12 horas, a menos que o usuário esteja ativamente codificando na mesma. Isso dificultou o modelo discutido anteriormente, cujo fluxo de execução excedia facilmente esse intervalo para datasets suficientemente grandes.
 
-Não obstante, no caso do \textit{Stochastic Gradient Descent} a performance foi satisfatória o suficiente para gerar um par de modelos a serem testados: um para o dataset \verb+SQLiV5.json+, intitulado de \verb+sgd_trained.dump+ (cujos parâmetros podem ser visto no Código 10, na etapa antes de seu treinamento) e um para o dataset \textit{WAF-A-MoLE}, \verb+test_sgd_classifier.py+. A performance dos mesmos será comparada mais detalhadamente no capítulo de testes adiante. 
+Não obstante, no caso do \textit{Stochastic Gradient Descent} a performance foi satisfatória o suficiente para gerar um par de modelos a serem testados: um para o dataset \verb+SQLiV5.json+, intitulado de \verb+sgd_trained.dump+ (cujos parâmetros podem ser vistos no Código 9, na etapa antes de seu treinamento) e um para o dataset \textit{WAF-A-MoLE}, \verb+test_sgd_classifier.py+. A performance dos mesmos será comparada mais detalhadamente no capítulo de testes adiante. 
 
 \label{sec:codigos:modelos}
 \includecode[C]{Pipeline classificador SGD sem backend de paralelização ray (Para SQLiV5.json)}{alg:codigo3}{codigos/modelos/sgd_model_sqliv3.py}
@@ -282,12 +307,12 @@ O último modelo, e um dos mais interessantes, é o AdaBoost Classifier, impleme
 
 Os parâmetros deste classificador, por sua vez, precisam de ajustes pequenos:
 \begin{alineas}
-\item n\_estimators (Número máximo de estimadores que dita quando o \textit{boosting} \footnote{Boosting é melhor detalhado na Subseção 2.4.3, do Capítulo 2.} é finalizado): \textbf{100};
+\item n\_estimators (Número máximo de estimadores que dita quando o \textit{boosting} \footnote{Boosting é o algoritmo que transforma um processo de aprendizado fraco em um de aprendizado forte. Isso reduz viés e variância em aprendizado supervisionado, e é melhor detalhado na Subseção 2.4.3, do Capítulo 2.} é finalizado): \textbf{100};
 \item random\_state (Controla uma \textit{seed} aleatória dada a cada \verb+base_estimator+ em iterações de \textit{boosting}. Com um inteiro nesse parâmetro, obtêm-se uma saída reproduzível em múltiplas chamadas a funções): \textbf{0}
 \end{alineas}
 
 
-O resultado desse modelo é intitulado de \verb+test_ada_classifier.dump+. No Código 11 é demonstrado e comentado com mais detalhes como é feita essa adaptação além da etapa de treinamento (note os métodos \verb+pipe.fit()+ e \verb+pipe.score()+, responsáveis pelo treinamento e avaliação respectivamente).
+O resultado desse modelo é intitulado de \verb+test_ada_classifier.dump+. No Código 10 é demonstrado e comentado com mais detalhes como é feita essa adaptação além da etapa de treinamento (note os métodos \verb+pipe.fit()+ e \verb+pipe.score()+, responsáveis pelo treinamento e avaliação respectivamente).
 
 \label{sec:codigos:modelos}
 \includecode[C]{Pipeline classificador AdaBoost com backend de paralelização ray}{alg:codigo3}{codigos/modelos/ada_model.py}
@@ -300,7 +325,9 @@ Essa classe possui dois métodos: \verb+extract_features()+, atuando como uma fu
 
 Essa função retorna, conforme o comentário no código abaixo, a probabilidade do \textit{payload} \verb+value+ de ser uma injeção SQL. Essa probabilidade é a que é comparada com a \verb+threshold+ limite dada pelo usuário no início da execução do programa, para uma eventual condição de parada. 
 
-A classe do \textit{Wrapper} encontra-se disponibilizada no Código 12 a seguir.
+A classe do \textit{Wrapper} encontra-se disponibilizada no Código 11 a seguir. É composta por dois métodos, \verb+classify()+ e \verb+extract_features()+. O método\verb+classify()+ é responsável por realizar a predição em si, e classificar uma entrada em maliciosa ou não. Essa classificação é expressa na forma de uma probabilidade da sua entrada ser maliciosa, e é desse formato que sai a necessidade de todos os classificadores implementarem o método \verb+predict_proba()+ anteriormente discutido no detalhamento dos parâmetros. 
+
+Já o método \verb+extract_features()+ atua como uma simples função identidade, sendo usada dentro do método \verb+classify()+ também.
 
 \label{sec:codigos:modelos}
 \includecode[C]{Classe SVCClassifierWrapper para modelos novos}{alg:codigo3}{codigos/modelos/svc_wrapper.py}
