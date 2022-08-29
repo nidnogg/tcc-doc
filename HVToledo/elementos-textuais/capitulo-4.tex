@@ -29,11 +29,11 @@ Descrevendo de forma geral essa estrutura, cada retângulo com título indica um
 
 \item O MLBasedWafClassifier - Esse módulo responsável por receber os dados do módulo de \verb+Database+, estruturar o classificador do WAF \textit{MLBasedWAF} através de treinamento, gerar seu modelo correspondente e exportá-lo para uso na aplicação principal na parte de modelos.
 
-\item Command Line Interface, ou Aplicação de linha de comando - Aqui é abrigada a típica função \textbf{main}, sendo aonde são recebidos os parâmetros a serem executados na aplicação pelo usuário como o número máximo de iterações, modelo a ser usado, e injeção SQL inicial para ser transformada em um exemplo adversarial. Esses parâmetros são melhores explicados na seção adiante.
+\item Command Line Interface, ou Aplicação de linha de comando - Aqui é abrigada a típica função \textbf{main}, sendo aonde são recebidos os parâmetros a serem executados na aplicação pelo usuário como o número máximo de iterações, modelo a ser usado, e injeção SQL inicial para ser transformada em um exemplo adversarial. Esses parâmetros são explicados na Seção adiante.
 
-\item Models - Aonde são armazenados os modelos. Modelos são classificadores de WAFs já treinados e exportados de forma que não seja necessário realizar o treinamento a cada iteração. 
+\item Models - Aonde são armazenados os modelos. Modelos são classificadores de WAFs já treinados, exportados de forma que não seja necessário realizar o treinamento a cada iteração. 
 
-\item EvasionEngine + SqlFuzzer - A classe EvasionEngine realiza cada iteração da aplicação que consiste em chamar a classe relacionada \textit{SqlFuzzer} que transforma (via \textit{fuzzing}) a entrada inicial com os operadores de mutação nela contidos, armazenar a saída dessa transformação, e chamá-la novamente para obter uma transformação mais sofisticada. A condição de parada é fornecida pelo usuário, tanto na forma de iterações máximas, como na forma de uma \textit{threshold} máxima de confiabilidade (mais explicada na Seção adiante).
+\item EvasionEngine + SqlFuzzer - A classe \verb+EvasionEngine+ realiza cada iteração da aplicação que consiste em chamar a classe relacionada \verb+SqlFuzzer+ que transforma (via \textit{fuzzing}) a entrada inicial com os operadores de mutação nela contidos, armazenar a saída dessa transformação, e chamá-la novamente para obter uma transformação mais sofisticada. A condição de parada é fornecida pelo usuário, tanto na forma de iterações máximas, como na forma de uma \textit{threshold} máxima de confiabilidade (mais explicada na Seção adiante).
 
 \end{alineas}
 
@@ -49,7 +49,7 @@ Descrevendo de forma geral essa estrutura, cada retângulo com título indica um
 A solução foi implementada na linguagem \textit{Python} 3.8, seguindo as dependências encontradas nos arquivos intitulados \verb+requirements.txt+ no repositório final (disponível no GitHub \footnote{GitHub - Repositório Final: https://github.com/nidnogg/tcc}). O cerne do projeto encontra-se nos seguintes módulos:
 \begin{alineas}
 \item \verb+Main+ - Responsável pela lógica da linha de comando, com todos os decorators da biblioteca \verb+Click+ que facilitam o desenvolvimento de utilidades de terminal. Aqui é feito o recebimento e passagem de parâmetros para a pipeline do programa aqui, além de ser instanciada a classe principal \verb+wafamole+ e o módulo \verb+EvasionEngine+ com o modelo selecionado pelo usuário.
-\item \verb+models+ - Em models estão localizados os modelos de exemplo para experimentação, modelos padrões do \textit{WAF-A-MoLE} e sobretudo modelos novos (também customizáveis) introduzidos no \textit{wafamole++}, localizados na pasta \verb+/models/svc+. Modelos novos de classificadores de \textit{Web Application Firewalls} a serem testados são tipicamente arquivos .dump das classes de tais classificadores, gerados através biblioteca \verb+joblib+ após o treinamento (no caso do \verb+scikit-learn+, da função \verb+.fit()+). Alternativamente, essa biblioteca permite também a geração de um arquivo .dump de uma pipeline caso o treinamento exija mais de uma etapa, como uma tokenização para possibilitar o treinamento de um dado classificador.
+\item \verb+models+ - Em models estão localizados os modelos de exemplo para experimentação, modelos padrões do \textit{WAF-A-MoLE} e sobretudo modelos novos (também customizáveis) introduzidos no \textit{wafamole++}, localizados na pasta \verb+/models/svc+. Modelos novos de classificadores de \textit{Web Application Firewalls} a serem testados são tipicamente arquivos \verb+.dump+ das classes de tais classificadores, gerados através biblioteca \verb+joblib+ após o treinamento (no caso do \verb+scikit-learn+, da função \verb+.fit()+). Alternativamente, essa biblioteca permite também a geração de um arquivo \verb+.dump+ de uma pipeline caso o treinamento exija mais de uma etapa, como uma tokenização para possibilitar o treinamento de um dado classificador.
 \item \verb+EvasionEngine+ - Essa classe contém o loop principal que requisita as mutações responsáveis pela transformação do \textit{payload} fornecido pelo usuário em um \textit{payload} considerado inócuo para o WAF sendo avaliado. As requisições são feitas ao módulo \verb+Fuzzer+.
 \item \verb+Fuzzer+ - Nesse módulo ficam armazenados os operadores de mutação que transformam o \textit{payload} a cada rodada de mutação efetuada, sendo que cada mutação ocorre dentro do mesmo. Um operador de mutação dentre estes é escolhido aleatoriamente a cada iteração da pipeline principal.
 \end{alineas}
@@ -212,7 +212,7 @@ Seu funcionamento se dá por uso de um \textit{script} (\verb+sniffing.py+, loca
     \label{fig:internet} 
 \end{figure}
 
-Embora esse seja um WAF orientado ao tráfego real ou simulado de uma rede de fato, avaliando parâmetros HTTP em tempo real no seu componente \verb+sniffing.py+ tanto por injeções SQL como por outras formas de ataque (XSS, cmdi), ainda foi possível restringir seu funcionamento para adaptá-lo ao wafamole++ de forma que apenas injeções SQL fossem avaliadas, pois o \textit{WAF-A-MoLE} comporta apenas esse tipo de vulnerabilidade e o tempo de pesquisa e desenvolvimento para expandir para outros tipos não era viável para este trabalho.
+Embora esse seja um WAF orientado ao tráfego real ou simulado de uma rede de fato, avaliando parâmetros HTTP em tempo real no seu componente \verb+sniffing.py+ tanto por injeções SQL como por outras formas de ataque (XSS, cmdi), ainda foi possível restringir seu funcionamento para adaptá-lo ao \textit{wafamole++} de forma que apenas injeções SQL fossem avaliadas, pois o \textit{WAF-A-MoLE} comporta apenas esse tipo de vulnerabilidade e o tempo de pesquisa e desenvolvimento para expandir para outros tipos não era viável para este trabalho.
 
 Para tal, foi necessário prever uma estratégia própria de treinamento para o classificador, além de um conjunto de dados especial para o mesmo. É cabível mencionar, no entanto, que isso introduziu uma série de dificuldades uma vez que sua documentação era consideravelmente modesta, e o banco novo a ser usado deveria seguir o padrão de formatação seguido pelo WAF.
 
@@ -235,7 +235,7 @@ A etapa de correção de uma variedade de erros de formatação, polimento de al
 
 
 \subsection{Support Vector Machine}
-Este foi o primeiro modelo implementado no \textit{wafamole++}, antes do recebimento do dataset original da equipe original. Foi o único classificador que foi executado no módulo do dataset do Kaggle e no módulo do dataset original do \textit{WAF-A-MoLE}. Dado isso, esse classificador foi implementado com êxito apenas usando os datasets \verb+SQLiV3.json+, \verb+SQLiV4.json+ e \verb+SQLiV5.json+. Tais datasets correspondem, respectivamente, aos seguintes modelos:
+Este foi o primeiro modelo implementado no \textit{wafamole++}, antes do recebimento do dataset original da equipe original. Foi executado no módulo do dataset do Kaggle e no módulo do dataset original do \textit{WAF-A-MoLE}. Dado isso, esse classificador foi implementado com êxito apenas usando os datasets \verb+SQLiV3.json+, \verb+SQLiV4.json+ e \verb+SQLiV5.json+. Tais datasets correspondem, respectivamente, aos seguintes modelos:
 \begin{alineas}
 \item \verb+test_svc_classifier_no_mole.dump+
 
@@ -268,7 +268,7 @@ Infelizmente um dos pontos de dificuldades foi o treinamento de um classificador
 
 Resumidamente, com isso tem-se que além da testagem em cima do reforço via \textit{wafamole++}, estruturalmente buscou-se diferenciar a implementação de Support Vector Machine da utilizada anteriormente no WAF-A-MoLE. Diversos parâmetros foram modificados, e fazendo-se uso de uma busca \textit{paramgrid} (para testar exaustivamente combinações de parâmetros) complementada de experimentação após sua execução, foi possível obter essa configuração vista acima. 
 
-Nesse contexto destaca-se um que troca o algoritmo fundamental por trás do Support Vector Machine por um com abordagem não linear (no caso, de parâmetro \verb+kernel = 'rbf'+) em contraste com o algoritmo linear empregado no modelo Token-based padrão do WAF-A-MoLE. Isso permitiu resultados comparáveis aos originais (e, após reforço, com performance superior como indicado no Capítulo 5 adiante) com um classificador fundamentalmente diferente na mesma arquitetura, expandindo o leque de classificadores suportados na aplicação.
+Nesse contexto destaca-se um que troca o algoritmo fundamental por trás do Support Vector Machine por um com abordagem não linear (no caso, de parâmetro \verb+kernel = 'rbf'+) em contraste com o algoritmo linear empregado no modelo Token-based padrão do WAF-A-MoLE. Isso permitiu resultados comparáveis aos originais (e, após reforço, com performance superior como indicado no Capítulo 5 adiante) com um classificador fundamentalmente diferente na mesma arquitetura, expandindo o leque de classificadores suportados na aplicação. Sua escolha foi impulsionada pela experimentação e a rotina \textit{GridSearchCV} de otimização de parâmetros.
 
 Por fim, sua célula de código principal contida no Python Notebook pode ser vista no Código 8.
 
@@ -307,7 +307,7 @@ O último modelo, e um dos mais interessantes, é o AdaBoost Classifier, impleme
 
 Os parâmetros deste classificador, por sua vez, precisam de ajustes pequenos:
 \begin{alineas}
-\item n\_estimators (Número máximo de estimadores que dita quando o \textit{boosting} \footnote{Boosting é o algoritmo que transforma um processo de aprendizado fraco em um de aprendizado forte. Isso reduz viés e variância em aprendizado supervisionado, e é melhor detalhado na Subseção 2.4.3, do Capítulo 2.} é finalizado): \textbf{100};
+\item n\_estimators (Número máximo de estimadores que dita quando o \textit{boosting} \footnote{Boosting é o algoritmo que transforma um processo de aprendizado fraco em um de aprendizado forte e é melhor detalhado na Subseção 2.4.3, do Capítulo 2. Isso reduz viés e variância em aprendizado supervisionado.} é finalizado): \textbf{100};
 \item random\_state (Controla uma \textit{seed} aleatória dada a cada \verb+base_estimator+ em iterações de \textit{boosting}. Com um inteiro nesse parâmetro, obtêm-se uma saída reproduzível em múltiplas chamadas a funções): \textbf{0}
 \end{alineas}
 
@@ -325,9 +325,9 @@ Essa classe possui dois métodos: \verb+extract_features()+, atuando como uma fu
 
 Essa função retorna, conforme o comentário no código abaixo, a probabilidade do \textit{payload} \verb+value+ de ser uma injeção SQL. Essa probabilidade é a que é comparada com a \verb+threshold+ limite dada pelo usuário no início da execução do programa, para uma eventual condição de parada. 
 
-A classe do \textit{Wrapper} encontra-se disponibilizada no Código 11 a seguir. É composta por dois métodos, \verb+classify()+ e \verb+extract_features()+. O método\verb+classify()+ é responsável por realizar a predição em si, e classificar uma entrada em maliciosa ou não. Essa classificação é expressa na forma de uma probabilidade da sua entrada ser maliciosa, e é desse formato que sai a necessidade de todos os classificadores implementarem o método \verb+predict_proba()+ anteriormente discutido no detalhamento dos parâmetros. 
+A classe do \textit{Wrapper} encontra-se disponibilizada no Código 11 a seguir. É composta por dois métodos, \verb+classify()+ e \verb+extract_features()+. O método \verb+classify()+ é responsável por realizar a predição em si, e classificar uma entrada em maliciosa ou não. Essa classificação é expressa na forma de uma probabilidade da sua entrada ser maliciosa, e é desse formato que sai a necessidade de todos os classificadores implementarem o método \verb+predict_proba()+ anteriormente discutido no detalhamento dos parâmetros. 
 
-Já o método \verb+extract_features()+ atua como uma simples função identidade, sendo usada dentro do método \verb+classify()+ também.
+Já o método \verb+extract_features()+ atua como uma simples função identidade, sendo usado dentro do método \verb+classify()+ também.
 
 \label{sec:codigos:modelos}
 \includecode[C]{Classe SVCClassifierWrapper para modelos novos}{alg:codigo3}{codigos/modelos/svc_wrapper.py}

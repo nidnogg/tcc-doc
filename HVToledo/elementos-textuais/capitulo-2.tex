@@ -5,9 +5,9 @@ Nesse capítulo busca-se elucidar as principais terminologias, técnicas, algori
 
 \section{SQL Injection}
 
-O tipo mais comum e mais prevalecente de injeção de código é o de \textit{SQL Injection}, que manipula bancos de dados via \verb+SQL+ (\textit{Structured Query Language}), a linguagem clássica de manuseio de bancos de dados, para receber acesso a informações sensíveis.
+O tipo mais comum e mais prevalecente de injeção de código é o de \textit{SQL Injection} (ou injeção SQL), que manipula bancos de dados via SQL (\textit{Structured Query Language}), a linguagem clássica de manuseio de bancos de dados, para receber acesso a informações sensíveis.
 
-Exemplificando algumas situações de SQL Injections \cite{sql_port_swigger}:
+Exemplificando algumas situações de \textit{SQL Injections} \cite{sql_port_swigger}:
 
 \begin{alineas}
     \item 
@@ -81,7 +81,7 @@ Além dos exemplos básicos de injeção SQL, existem variantes \cite{bach_owasp
 Injeção (em especial SQL) é uma das vulnerabilidades mais comuns, de baixa complexidade para o atacante e historicamente impactante, o que motivou o trabalho em aprofundar em um problema subestimado por desenvolvedores, que tem impactos profundos na confiabilidade, integridade e disponibilidade de um serviço web.
 
 \section{Cross Site Scripting, ou XSS}
-\textit{Cross Site Scripting} é uma técnica conhecida como XSS onde geralmente há uma injeção de \textit{scripts} maliciosos na aplicação web, revelando dados sensíveis, serviços internos ou divulgação de \textit{cookies} de usuários com privilégios.
+\textit{Cross Site Scripting}, também conhecida como XSS, é uma técnica onde geralmente há uma injeção de \textit{scripts} maliciosos na aplicação web, revelando dados sensíveis, serviços internos ou divulgação de \textit{cookies} de usuários com privilégios.
 Existem três variantes de XSS. A primeira, \textit{stored} XSS, onde o atacante injeta um \textit{payload} no servidor web, de maneira que quando outro usuário faz a requisição para acessar a página, o \textit{payload} é ativado. A segunda, intitulada de \textit{Reflected} XSS, ocorre quando o atacante injeta dados através de um método HTTP gerando uma resposta imediata na aplicação. Este permite o malfeitor forjar uma URL específica que ao ser acessada pela vítima vaza dados sensíveis, como \textit{cookies}. E por último a variante \textit{DOM Based} XSS que consiste na inserção de código malicioso no DOM (\textit{Document Object Model}), sem refletir no código-fonte HTML, sendo ativado apenas pelo console DOM.
 Dados obtidos de fontes não confiáveis devem ser devidamente validados e normalizados para evitar XSS.
 
@@ -94,9 +94,9 @@ Pouco depois disso o mesmo passou aos seus alunos uma tarefa denominada o \texti
 Atualmente é uma técnica amplamente aceita na testagem/sondagem da segurança de diversas aplicações, com um leque de ofertas de \textit{fuzzing} comerciais no mercado. E naturalmente é empregável em WAFs, permitindo extrair informações valiosas que rendam aprimoramentos para os mesmos. Enquanto a ideia em si de \textit{fuzzing} permanece a mesma, as maneiras de efetuá-lo tiveram um grande progresso de mudança.
 
 
-Uma função elementar de \textit{fuzzing} pode ser vista no Código 1, que constrói a partir de tamanho máximo e caracteres no intervalo fornecidos pelo usuário uma \textit{string} aleatória que pode ser chamada de \textit{string} "fuzzeada".
+Uma função elementar de \textit{fuzzing} pode ser vista no Código 1, que constrói, a partir de tamanho máximo e caracteres no intervalo fornecidos pelo usuário, uma \textit{string} aleatória que pode ser chamada de \textit{string} "fuzzeada". Essa \textit{string} serviria como entrada de um programa a ser testado, a fim de quebrá-lo e expor falhas/vulnerabilidades em sua implementação.
 
-\includecode[C]{Função de um \textit{fuzzer}  elementar} {alg:codigo1}{codigos/fuzzer.py}
+\includecode[C]{Função de um \textit{fuzzer} elementar} {alg:codigo1}{codigos/fuzzer.py}
 
 \bigskip
 Tais funções de \textit{fuzzing} podem ser aprimoradas e customizadas para testar os mais diversos programas. Uma das maneiras de polir os resultados oriundos de \textit{fuzzing} elementar, que podem ser rejeitados facilmente por muitos programas inicialmente, é um processo chamado \textit{fuzzing} mutacional, ou \textit{mutational fuzzing}, projetado para melhorar as chances de obter entradas maliciosas mas que são consideradas válidas pela aplicação testada.
@@ -106,21 +106,23 @@ Na estratégia de \textit{fuzzing} mutacional, a execução se inicia com uma en
 \includecode[C]{Classe de \textit{fuzzer} mutacional} {alg:codigo1}{codigos/mutational_fuzzer.py}
 
 \bigskip
-O programa no Código 2 realiza, dentre os três métodos operadores de mutação acima do método \verb+mutate()+, uma mutação aleatória ao chamar \verb+mutate()+ propriamente dito. Realizar essa mutação consiste em executar um dos métodos (\verb+insert_random_character()+, \verb+delete_random_character()+, ou \verb+flip_random_character()+)  na entrada dada pelo usuário  \verb+mutate()+. Um desses métodos foi exemplificado e está comentado no código (\verb+flip_random_character()+), e os demais são simples o suficiente para depreender o funcionamento dos comentários e nome do método.
+O programa no Código 2 realiza, dentre os três métodos operadores de mutação acima do método \verb+mutate()+, uma mutação aleatória ao chamar \verb+mutate()+ propriamente dito. Realizar essa mutação consiste em executar um dos métodos (\verb+insert_random_character()+, \verb+delete_random_character()+, ou \verb+flip_random_character()+)  na entrada dada pelo usuário  \verb+mutate()+. 
 
-Na prática, são realizadas uma série de mutações em cadeia, com o resultado de uma mutação servindo de entrada para a seguinte, para que se produzam entradas viáveis. Com um simples \textit{loop} para chamar a função \verb+mutate()+ isso é possibilitado.
+Um desses métodos foi exemplificado e está comentado no código \linebreak (\verb+flip_random_character()+), e os demais são simples o suficiente para depreender o funcionamento dos comentários e nome do método.
+
+Na prática, são realizadas uma série de mutações em cadeia, com o resultado de uma mutação servindo de entrada para a seguinte, para que se produzam entradas viáveis. Com um simples \textit{loop} para chamar o método \verb+mutate()+ isso é possibilitado.
 
 As técnicas de \textit{fuzzing} geralmente encontram \textit{bugs} de corrupção de memória simples, mas a aleatoriedade e dispersão fazem com que a eficiência do ataque seja baixa, cobrindo poucas partes do código. O \textit{fuzzing} aumenta seu potencial quando o alvo está em execução em um ambiente real. Outro ponto positivo é o fato de poder aplicar a técnica em aplicações sobre as quais há pouco conhecimento prévio.
 
 Em suma, \textit{fuzzing} consiste na geração massiva de entradas normais e anômalas para uma aplicação específica, seguido da detecção de exceções no algoritmo devido o processamento das entradas geradas e monitoramento dos estados de execução da aplicação. Quando comparado com outras técnicas como análise estática, dinâmica e execução simbólica, o \textit{fuzzing} apresenta facilidade em ser implementado, boa precisão (em ambientes reais) e boa escalabilidade, sem acesso ao código fonte.
 
-Expandindo um pouco o conceito, um teste de \textit{fuzzing} tipicamente consiste na geração em larga escala de entradas para um programa específico, entradas conhecidas também como \textit{testcases}. A qualidade de tais \textit{testcases} criados influencia diretamente na qualidade do teste \textit{fuzzing}. As entradas precisam atender os requisitos do programa testado para o padrão de entrada. Em contrapartida, as entradas precisam ser errôneas o suficiente para gerarem falhas ou erros no processamento do programa. De acordo com o alvo, as entradas podem ser arquivos com diferentes formatos, dados de comunicação entre redes, binários executáveis específicos, entre outros. No caso do \textit{wafamole++}, que é a aplicação alvo deste trabalho, trabalha-se com injeções SQL, nas quais é aplicada a técnica de \textit{fuzzing} iterativamente a fim de gerar um \textit{payload} que penetre um WAF avaliado.
+Expandindo um pouco o conceito, um teste de \textit{fuzzing} tipicamente consiste na geração em larga escala de entradas para um programa específico, entradas conhecidas também como \textit{testcases}. A qualidade de tais \textit{testcases} criados influencia diretamente na qualidade do teste \textit{fuzzing}. As entradas precisam atender os requisitos do programa testado para o padrão de entrada. Em contrapartida, as entradas precisam ser errôneas o suficiente para gerarem falhas ou erros no processamento do programa. De acordo com o alvo, as entradas podem ser arquivos com diferentes formatos, dados de comunicação entre redes, binários executáveis específicos, entre outros. No caso do \textit{wafamole++}, que é a aplicação alvo deste trabalho, trabalha-se com injeções SQL, nas quais é aplicada a técnica de \textit{fuzzing} iterativamente a fim de gerar um \textit{payload} que consiga passar despercebido por um WAF avaliado, e seja malicioso. Esse \textit{payload} é o exemplo adversarial anteriormente mencionado.
 
 Gerar \textit{testcases} suficientemente errôneos é uma tarefa árdua, com duas variantes: \textit{generation-based} e \textit{mutation-based}, das quais a última é a adotada pelo \textit{WAF-A-MoLE} e \textit{wafamole++}. Depois de gerados, os \textit{testcases} alimentam o programa alvo, tendo variáveis de ambiente e outros parâmetros do software a ser testado devidamente configurados pelo programador. Geralmente um teste de \textit{fuzzing} tem como condição final um tempo limite (ou \textit{timeout}) pré-definido ou uma falha de execução do programa.
 
 \textit{Fuzzers} monitoram o estado de execução durante o processo, aguardando exceções ou falhas.  Formas comuns de metodologia de monitoramento de exceções incluem monitorar sinais específicos do sistema, falhas e outras violações. Quando uma violação é capturada, o \textit{fuzzer} armazena o \textit{testcase} que a causou para análise futura e replicação \cite{li2018fuzzing}.
 
-Por fim, na fase de análise, tem-se por objetivo determinar a localidade e a causa da violação no software. A análise geralmente é feita com o auxílio de \textit{debuggers} como \verb+DGB+, \verb+windbg+ ou outras ferramentas de análise binária, como a \verb+IDA Pro+, \verb+OllyObg+ e outras. O exato estado de execução dos \textit{testcases}, informações da \textit{thread}, instruções e outras informações fazem parte do monitoramento. Para o caso do trabalho em questão, considerando-se o ambiente em \textit{Python}, o \textit{debugger} padrão \verb+pdb+ mostrou-se suficiente para diagnosticar a maioria dos \textit{bugs} encontrados. 
+Por fim, na fase de análise, tem-se por objetivo determinar a localidade e a causa da violação no software. A análise geralmente é feita com o auxílio de \textit{debuggers} como \verb+GDB+, \verb+windbg+ ou outras ferramentas de análise binária, como a \verb+IDA Pro+, \verb+OllyObg+ e outras. O exato estado de execução dos \textit{testcases}, informações da \textit{thread}, instruções e outras informações fazem parte do monitoramento. Para o caso do trabalho em questão, considerando-se o ambiente em \textit{Python}, o \textit{debugger} padrão \verb+pdb+ mostrou-se suficiente para diagnosticar a maioria dos \textit{bugs} encontrados. 
 
 A Figura 1 ilustra uma visão de alto nível de um algoritmo de \textit{fuzzing}. Um caso teste é gerado, executado no programa, e caso o programa emita problemas (\textit{violation} no fluxograma), significa que existem \textit{bugs} a serem corrigidos. Caso contrário, mais casos teste são gerados até que \textit{bugs} sejam encontrados ou até o usuário parar a execução.
 
@@ -183,7 +185,7 @@ Para exemplificar o poder do modelo de aprendizado, o artigo \cite{vapnik_svm_su
 
 Além do desempenho como um classificador linear, SVMs conseguem efetuar classificações não-lineares utilizando um mapeamento implícito de entradas em espaços multi-dimensionais de maneira eficiente. O novo modelo proposto \textit{wafamole++} usa a versão não-linear, diferente da proposta original de Vladimir. Essa escolha é feita com base em experimentação de melhores resultados e uma otimização chamada \textit{GridSearchCV}, explorada mais adiante no Capítulo 4.
 
-A Figura 2 ilustra as diferenças ao variar o parâmetro do \textit{kernel} em um classicador SVM na biblioteca \textit{scikit-learn}. O \textit{kernel} RBF e polinomial de grau 3 correspondem aos não lineares, com o RBF sendo utilizado no \textit{wafamole++}. As zonas pintadas de azul e vermelho indicam elementos pertencentes a uma determinada predição feita pelo classificador, referente aos atributos de sépala de plantas na base de dados Íris (comumente usada no ensino e demonstração de Aprendizado de Máquina).
+A Figura 2 ilustra as diferenças ao variar o parâmetro do \textit{kernel} em um classicador SVM na biblioteca \textit{scikit-learn}. O \textit{kernel} RBF (\textit{Radial Basis Function}) e polinomial de grau 3 correspondem aos não lineares, com o RBF sendo utilizado no \textit{wafamole++}. As zonas pintadas de azul e vermelho indicam elementos pertencentes a uma determinada predição feita pelo classificador, referente aos atributos de sépala de plantas na base de dados Íris (comumente usada no ensino e demonstração de Aprendizado de Máquina).
 
 \begin{figure}[ht]
     \centering
@@ -195,7 +197,7 @@ A Figura 2 ilustra as diferenças ao variar o parâmetro do \textit{kernel} em u
 
 \subsection{Stochastic Gradient Descent}
 
-Gradiente descendente estocástico é um método iterativo para otimização de uma função objetivo com propriedades "suaves" (diferenciais ou subdiferenciais) adequadas. \cite{ruder2016overview}
+O \textit{Stochastic Gradient Descent} (ou Gradiente Descendente Estocástico, em português), comumente abreviado como SGD, é um método iterativo para otimização de uma função objetivo com propriedades "suaves" (diferenciais ou subdiferenciais) adequadas \cite{ruder2016overview}.
 
 Pode ser considerada uma aproximação estocástica da otimização por gradiente descendente, uma vez que substitui o gradiente atual (calculado do dataset inteiro) por uma estimativa do mesmo calculada for um subconjunto dos dados selecionado aleatoriamente.
 
