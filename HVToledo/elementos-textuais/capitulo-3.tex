@@ -4,70 +4,53 @@ Em um campo com artigos, publicações e materiais em larga parte espalhados por
 
 Neste capítulo estão alguns dos principais achados, bem como ferramentas/estratégias usadas para coletar e organizar os mesmos.
 
-\section{Levantamento de Artigos}
+% \section{Levantamento de Artigos}
 
-Para a coleta e organização de artigos em si, as principais utilidades empregadas foram o Parsifal \cite{parsifal_docs}, o Scopus e o CAFe (disponibilizado pela Universidade Federal do Rio de Janeiro). 
+% Para a coleta e organização de artigos em si, as principais utilidades empregadas foram o Parsifal \cite{parsifal_docs}, o Scopus e o CAFe (disponibilizado pela Universidade Federal do Rio de Janeiro). 
 
-Como o Parsifal pode ser de muita utilidade para a busca e seleção de artigos em quaisquer tema e pelo fato de não ser de amplo conhecimento, é dado abaixo um pouco mais de detalhe sobre esta ferramenta.
-
-\begin{figure}[ht]
-    \centering
-    \caption{Dashboard Parsifal}
-    \includegraphics[width=14cm]{figuras/parsifal.png} 
-    \legend{Fonte: \href{https://parsif.al}{parsif.al} (2022)}
-    \label{fig:internet} 
-\end{figure}
-
-\bigskip
-
-Na Figura 4 pode-se verificar no topo quatro abas principais do Parsifal - \textbf{Review, Planning, Conducting, }e \textbf{Reporting}. A primeira é simples e não muito essencial, descrevendo apenas os colaboradores registrados na plataforma na determinada pesquisa. A segunda, no entanto, é composta de três etapas interdependentes:
-
-\begin{alineas}
-
-\item \textbf{Protocol} - estabelece os objetivos, e parâmetros da pesquisa. Tais parâmetros chaves incluem PICOC (population, intervention, comparison, outcomes and context - fatores que permitem sondar o objetivo), Research Questions, Keywords + Sinônimos, Search String, Buscas e Critério de Seleção.
-
-\item \textbf{Quality Asessment Checklist} - o pesquisador estabelece uma série de perguntas sobre os artigos, e a resposta para essas (Sim, Parcialmente, Não no caso dessa pesquisa) recebe um peso que permite classificar um artigo como aceito ou rejeitado na seleção final. 
-
-As perguntas escolhidas priorizavam bons resultados descritos nos artigos, artigos na língua inglesa, problemas abertos, contexto de aplicações web e papers com download/visualização disponíveis (uma dificuldade que será discutida mais a frente).
-
-\item \textbf{Data Extraction Form} - Permite nomear agrupar dados de destaque de artigos aceitos.
-
-\end{alineas}
-
-A etapa seguinte, a de \textbf{Conducting}, é um tanto mais complexa composta de mais subetapas. São elas:
-\begin{alineas}
-\item \textbf{Search} - verifica-se a Search String definida na etapa anterior de Planning. No final optou-se por ("Web Apps" OR "Web Application") AND ("Hardening") AND ("Prevention" OR "Avoidance") AND ("Secure Coding") AND ("Vulnerability").
-
-\item \textbf{Import Studies} - nessa subetapa há a opção de importar para a plataforma metadados das publicações encontradas (studies), no formato \textit{BibTeX}. Ao total foram em torno de 74 artigos selecionados para avaliação, todos oriundos do Scopus que será descrito a seguir.
-
-\item \textbf{Study Selection} - uma das partes mais importantes - é realizada a seleção dos artigos, além da eliminação dos artigos duplicados na busca. É a seção amostrada na captura de tela acima. Uma série de metadados é mostrada e é possível filtrar por fonte, artigos aceitos, rejeitados, duplicados e ainda não classificados.
-
-\item \textbf{Quality Assessment} - as perguntas criadas na subetapa Quality Assessment Checklist da etapa anterior de Planning são respondidas aqui, o que determina o aceite ou não de determinados artigos baseados em suas "pontuações" por perguntas respondidas.
-
-\item \textbf{Data Extraction} - é feita a anotação de acordo com os grupos denominados na etapa anterior pelo pesquisador. Porém não foi muito utilizada no escopo deste trabalho.
-
-\item \textbf{Data Analysis} - como o nome descreve, o Parsifal disponibiliza nessa subetapa uma série de informações acerca dos objetivos da pesquisa, e gráficos a respeito dos dados trabalhados. Alguns são: \textit{Search strings} usadas, perguntas de pesquisa para checagem de qualidade de artigos, PICOC, planejamento, artigos aceitos por fonte, artigos por ano dentre os aceitos, dentre outros. Algumas partes de interesse dos resultados dessa seção estão contidos nos apêndices, com fins de completude da documentação.
-
-\end{alineas}
-
-Por fim, há a etapa final \textbf{Reporting}, que é permite ao pesquisador exportar um relatório final com os principais resultados do Parsifal - selecionando os dados desejados. Esse relatório encontra-se nos apêndices.
-
-% \subsection{Scopus e CAFe}
-% O Scopus é o banco de dados disponibilizado pela Elsevier de citações e \textit{abstracts}. Com a exceção de alguns artigos encontrados gratuitamente em plataformas como o Google Scholar ou Research Gate, a maioria dos artigos coletados para os fins desse trabalho foram fornecidos através dessa plataforma.
-
-% Quanto a essa plataforma, graças aos seus metadados e facilidade de integração com o Parsifal, foi possível coletar cerca de 74 artigos para análise. Além disso, é garantido um acesso robusto através da identificação que a Universidade Federal providencia com a Comunidade Acadêmica Federada (também conhecida coma CAFe), um serviço de gestão de identidade que facilita acesso web à várias instituições de ensino e pesquisa brasileiras. 
+% Como o Parsifal pode ser de muita utilidade para a busca e seleção de artigos em quaisquer tema e pelo fato de não ser de amplo conhecimento, é dado abaixo um pouco mais de detalhe sobre esta ferramenta.
 
 % \begin{figure}[ht]
 %     \centering
-%     \caption{Pesquisa por área de interesse no Scopus}
-%     \includegraphics[width=14cm]{figuras/scopus.png} 
-%     \legend{Fonte: \href{https://www.scopus.com}{Scopus} (2022)}
+%     \caption{Dashboard Parsifal}
+%     \includegraphics[width=14cm]{figuras/parsifal.png} 
+%     \legend{Fonte: \href{https://parsif.al}{parsif.al} (2022)}
 %     \label{fig:internet} 
 % \end{figure}
 
 % \bigskip
 
-% Infelizmente uma das dificuldades encontradas foi uma considerável instabilidade por parte do sistema de login do CAFe, acarretando em diversos atrasos. É comum não funcionar por longos períodos de tempo. Fora isso, uma série de artigos mesmo após providenciados pelo Scopus requeriam autenticação fora da Universidade, impossibilitando até mesmo sua visualização. Alguns raros casos foram encontrados em plataformas como as anteriormente mencionadas (Google Scholar e afins).
+% Na Figura 4 pode-se verificar no topo quatro abas principais do Parsifal - \textbf{Review, Planning, Conducting, }e \textbf{Reporting}. A primeira é simples e não muito essencial, descrevendo apenas os colaboradores registrados na plataforma na determinada pesquisa. A segunda, no entanto, é composta de três etapas interdependentes:
+
+% \begin{alineas}
+
+% \item \textbf{Protocol} - estabelece os objetivos, e parâmetros da pesquisa. Tais parâmetros chaves incluem PICOC (population, intervention, comparison, outcomes and context - fatores que permitem sondar o objetivo), Research Questions, Keywords + Sinônimos, Search String, Buscas e Critério de Seleção.
+
+% \item \textbf{Quality Asessment Checklist} - o pesquisador estabelece uma série de perguntas sobre os artigos, e a resposta para essas (Sim, Parcialmente, Não no caso dessa pesquisa) recebe um peso que permite classificar um artigo como aceito ou rejeitado na seleção final. 
+
+% As perguntas escolhidas priorizavam bons resultados descritos nos artigos, artigos na língua inglesa, problemas abertos, contexto de aplicações web e papers com download/visualização disponíveis (uma dificuldade que será discutida mais a frente).
+
+% \item \textbf{Data Extraction Form} - Permite nomear agrupar dados de destaque de artigos aceitos.
+
+% \end{alineas}
+
+% A etapa seguinte, a de \textbf{Conducting}, é um tanto mais complexa composta de mais subetapas. São elas:
+% \begin{alineas}
+% \item \textbf{Search} - verifica-se a Search String definida na etapa anterior de Planning. No final optou-se por ("Web Apps" OR "Web Application") AND ("Hardening") AND ("Prevention" OR "Avoidance") AND ("Secure Coding") AND ("Vulnerability").
+
+% \item \textbf{Import Studies} - nessa subetapa há a opção de importar para a plataforma metadados das publicações encontradas (studies), no formato \textit{BibTeX}. Ao total foram em torno de 74 artigos selecionados para avaliação, todos oriundos do Scopus que será descrito a seguir.
+
+% \item \textbf{Study Selection} - uma das partes mais importantes - é realizada a seleção dos artigos, além da eliminação dos artigos duplicados na busca. É a seção amostrada na captura de tela acima. Uma série de metadados é mostrada e é possível filtrar por fonte, artigos aceitos, rejeitados, duplicados e ainda não classificados.
+
+% \item \textbf{Quality Assessment} - as perguntas criadas na subetapa Quality Assessment Checklist da etapa anterior de Planning são respondidas aqui, o que determina o aceite ou não de determinados artigos baseados em suas "pontuações" por perguntas respondidas.
+
+% \item \textbf{Data Extraction} - é feita a anotação de acordo com os grupos denominados na etapa anterior pelo pesquisador. Porém não foi muito utilizada no escopo deste trabalho.
+
+% \item \textbf{Data Analysis} - como o nome descreve, o Parsifal disponibiliza nessa subetapa uma série de informações acerca dos objetivos da pesquisa, e gráficos a respeito dos dados trabalhados. Alguns são: \textit{Search strings} usadas, perguntas de pesquisa para checagem de qualidade de artigos, PICOC, planejamento, artigos aceitos por fonte, artigos por ano dentre os aceitos, dentre outros. Algumas partes de interesse dos resultados dessa seção estão contidos nos apêndices, com fins de completude da documentação.
+
+% \end{alineas}
+
+% Por fim, há a etapa final \textbf{Reporting}, que é permite ao pesquisador exportar um relatório final com os principais resultados do Parsifal - selecionando os dados desejados. Esse relatório encontra-se nos apêndices.
 
 \section{Avaliação de Propostas para Hardening em Aplicações Web}
 Ao fim da coleta de artigos, além do embasamento teórico e melhor enquadramento do escopo a ser estudado, buscou-se uma série de ferramentas e/ou casos reais de modelos e sistemas sugeridos na área de segurança da informação em sistemas Web, para que um desses pudesse ser expandido.
