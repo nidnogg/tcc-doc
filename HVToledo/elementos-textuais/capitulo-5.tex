@@ -7,7 +7,7 @@ O parâmetro principal para tal avaliação foram \textbf{500} execuções por m
 \begin{alineas}
 \item \textbf{Número de rodadas restantes} - A partir dessas obtém-se o número de rodadas ou iterações consumidas;
 \item \textbf{Menor probabilidade de \textit{payload} encontrada} - É possível medir com essas a precisão de um determinado modelo;
-\item \textbf{Tempo de execução em segundos} - Tanto para o tempo médio de execução como para diagnosticar a robustez. Um tempo maior indica uma maior eficiência em virtude da reforço do dataset;
+\item \textbf{Tempo de execução em segundos} - Tanto para o tempo médio de execução como para diagnosticar a robustez. Um tempo maior indica uma maior eficiência em virtude da reforço do conjunto de dados;
 \item \textbf{Execuções com iterações máximas alcançadas} - Quanto mais ocorrências dessa medida, mais robusto é o modelo uma vez que não é gerado um exemplo adversarial na execução.
 \end{alineas}
 
@@ -93,13 +93,13 @@ Nessa seção é disponibilizada a Tabela 1, com informações relevantes, assoc
 \end{table}
 \bigskip
 
-Os fatores que indicam uma performance melhor são relativamente contraintuitivos - um \textit{runtime} médio grande indica dificuldade em gerar um exemplo adversarial \cite{adversarial_example}, que na verdade é um bom indicador para o \textit{Web Application Firewall} sendo avaliado. Similarmente, poucos rounds restantes ao final da execução apontam para muitas iterações sendo consumidas e um WAF robusto, e um alto número de execuções sem êxito sugere casos em que o \textit{Web Application Firewall} não se mostra suscetível a um ataque naquela execução. 
+Os fatores que indicam uma performance melhor são relativamente contraintuitivos - um \textit{runtime} médio grande indica dificuldade em gerar um exemplo adversarial \cite{adversarial_example}, que na verdade é um bom indicador para o WAF sendo avaliado. Similarmente, poucos rounds restantes ao final da execução apontam para muitas iterações sendo consumidas e um WAF robusto, e um alto número de execuções sem êxito sugere casos em que o WAF não se mostra suscetível a um ataque naquela execução. 
 
 Nesse contexto, um ponto  de interesse é que todos os modelos do \textit{WAF-A-MoLE} apresentaram uma performance semelhante, com tempos de penetração rápidos e no geral mostrando-se como WAFs pouco robustos e vulneráveis, sendo superados por uma boa parcela dos modelos novos (em particular os reforçados).
 
-Curiosamente, o modelo \verb+test_sgd+ gerado a partir do dataset original do \textit{WAF-A-MoLE} não apresentou significativas melhorias em comparação com o modelo do dataset \verb+SQLiV3.json+, \verb+sgd_trained+. Acredita-se que seja uma questão de adequação do classificador utilizado, uma vez que com a respectiva substuição do \textit{Stochastic Gradient Descent} pelo \textit{AdaBoost} e virtualmente a mesma implementação o mesmo se torna o WAF mais robusto do \textit{wafamole++}.
+Curiosamente, o modelo \verb+test_sgd+ gerado a partir do conjunto de dados original do \textit{WAF-A-MoLE} não apresentou significativas melhorias em comparação com o modelo do conjunto de dados \verb+SQLiV3.json+, \verb+sgd_trained+. Acredita-se que seja uma questão de adequação do classificador utilizado, uma vez que com a respectiva substuição do Gradiente Descendente Estocástico pelo \textit{AdaBoost} e virtualmente a mesma implementação o mesmo se torna o WAF mais robusto do \textit{wafamole++}.
 
-Dado isso, os modelos de maior interesse com base nos dados obtidos certamente são os intitulados de \verb+test_ada+, \verb+svc_extra_moled+, \verb+svc_moled+, \verb+svc_no_mole+. Neles, é possível ver uma melhora nítida em robustez quando comparado aos demais. O primeiro conjunto de histogramas dos tempos de execução, disponibilizados na Figura 14 a seguir detalha a evolução da robustez do \textit{Firewall} alvo em função dos reforços incrementados ao dataset (indicados por \verb+no_mole+ como sem reforço, \verb+moled+ para um conjunto pequeno de reforço e \verb+extra_moled+ para um conjunto ainda maior de reforço), além de comparar com o modelo \verb+test_ada+ para perspectiva. 
+Dado isso, os modelos de maior interesse com base nos dados obtidos certamente são os intitulados de \verb+test_ada+, \verb+svc_extra_moled+, \verb+svc_moled+, \verb+svc_no_mole+. Neles, é possível ver uma melhora nítida em robustez quando comparado aos demais. O primeiro conjunto de histogramas dos tempos de execução, disponibilizados na Figura 14 a seguir detalha a evolução da robustez do \textit{Firewall} alvo em função dos reforços incrementados ao conjunto de dados (indicados por \verb+no_mole+ como sem reforço, \verb+moled+ para um conjunto pequeno de reforço e \verb+extra_moled+ para um conjunto ainda maior de reforço), além de comparar com o modelo \verb+test_ada+ para perspectiva. 
 
 \begin{figure}[ht]
     \centering
@@ -126,6 +126,6 @@ Para melhor ilustrar a amplitude de tempos de execução, a distribuição dos m
     \label{fig:min-max-ada} 
 \end{figure}
 
-Sumariamente, esses resultados permitem compreender que o classificador \textit{Stochastic Gradient Descent} possivelmente não é o mais indicado para esse tipo de modelagem, com um desempenho semelhante independente do banco usado para treiná-lo. Não obstante, fica estabelecida a capacidade de aprimoramento que os modelos gerados pelo \textit{wafamole++} e \textit{WAF-A-MoLE} oferecem a determinados dataset de treinamento. Espera-se que a abordagem deste trabalho sendo transparente permita resultados ainda mais enriquecedores de modelos novos em um breve futuro.
+Sumariamente, esses resultados permitem compreender que o classificador Gradiente Descendente Estocástico possivelmente não é o mais indicado para esse tipo de modelagem, com um desempenho semelhante independente do banco usado para treiná-lo. Não obstante, fica estabelecida a capacidade de aprimoramento que os modelos gerados pelo \textit{wafamole++} e \textit{WAF-A-MoLE} oferecem a determinados conjuntos de dados de treinamento. Espera-se que a abordagem deste trabalho sendo transparente permita resultados ainda mais enriquecedores de modelos novos em um breve futuro.
 
 % reminder {figure}[H] forces positioning!
