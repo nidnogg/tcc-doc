@@ -19,14 +19,14 @@ Exemplificando algumas situações de injeções SQL \cite{sql_port_swigger}:
     \end{verbatim}
     
     Caso o usuário e senha sejam iguais a um registro na base de dados, todas as colunas da tabela \verb+user+ serão retornados. Caso contrário, os dados não serão obtidos.
-    A sequência de caracteres \verb+--+ representa comentário em SQL. Se a aplicação não tiver uma higienização dos dados, é possível inserir esses caracteres como entrada e eles serão processados como uma instrução na consulta. Nesse caso, se o atacante usa a sequência de comentário SQL \verb+--+, ele é capaz de remover a checagem de senha da cláusula \verb+WHERE+. Por exemplo, se no parâmetro que é o \verb+username+ da consulta for inserido \verb+administrator’--+ e uma senha em branco, a seguinte consulta é processada:
+    A sequência de caracteres \verb+--+ representa comentário em SQL. Se a aplicação não tiver uma higienização dos dados, é possível inserir esses caracteres como entrada e eles serão processados como uma instrução na consulta. Nesse caso, se o atacante usa a sequência de comentário SQL \verb+--+, ele é capaz de remover a checagem de senha da cláusula \verb+WHERE+. Por exemplo, se no parâmetro que é o \verb+username+ da consulta for inserido \verb+administrator’--+ e uma senha qualquer, a seguinte consulta é processada:
     
     \begin{verbatim}
         SELECT * FROM users 
         WHERE username = 'administrator'--' AND password = '' 
     \end{verbatim}
     
-    Isso efetivamente retorna os dados do usuário cujo \verb+username+ é \verb+administrator+ e realiza o login do atacante como tal, expondo funções sensíveis da aplicação web inteira.
+    Como o comentário SQL \verb+--+ aponta para o sistema lendo a consulta SQL que tudo após ele é um comando comentado, a verificação de senha introduzida após a condição \verb+AND+ é burlada. Essa manobra não equivale a passar uma senha em branco em um formulário, mas sim à pular a própria etapa de inserção de senha no banco. Isso efetivamente retorna os dados do usuário cujo \verb+username+ é \verb+administrator+ e realiza o login do atacante como tal, expondo funções sensíveis da aplicação web inteira.
 
     \item
     Em uma aplicação de e-commerce que organiza produtos em categorias diferentes, podemos ter um caso onde o usuário clica em uma categoria \verb+‘Presentes’+, requisitando o seguinte URL do navegador web:
@@ -73,7 +73,7 @@ Exemplificando algumas situações de injeções SQL \cite{sql_port_swigger}:
 \end{alineas}
 
 
-No contexto deste trabalho, é estudado o uso de WAFs, mais especificamente os baseados em técnicas de Aprendizado de Máquina, como forma de prevenir ataques. O uso de \textit{firewalls} para aplicações Web, tanto comerciais como de código aberto, tem tido amplo crescimento no mercado.
+No contexto deste trabalho, é estudado o uso de WAFs, mais especificamente os baseados em técnicas de Aprendizado de Máquina, como forma de prevenir ataques de injeção SQL. O uso de \textit{firewalls} para aplicações Web, tanto comerciais como de código aberto, tem tido amplo crescimento no mercado.
 
 Além dos exemplos básicos de injeção SQL, existem variantes \cite{bach_owasp2020understanding} como: baseada em erro, baseada em união, às cegas e fora de banda. e \textit{out-of-band} \cite{out_of_band_sql_invicti}. Baseadas em erro são injeções que fornecem erros de SQL para o atacante, vazando informações críticas do banco de dados. Baseadas em união são ataques que utilizam uma consulta existente na lógica do sistema concatenada a outra através de um comando \verb+UNION+ de maneira a executar uma segunda lógica além daquela já estabelecida pelo sistema. Injeções às cegas (em inglês: \textit{blind-based}) são aquelas que o sistema não dá nenhuma informação após a injeção, de forma que o atacante precisa ser engenhoso para obter informações e prosseguir com a ofensiva. Uma injeção SQL fora de banda  é uma injeção sem o fornecimento de uma saída para o atacante, porém é possível tipicamente redirecionar a saída para um ponto como um servidor http.
 É fundamental para mitigar as injeções ter uma validação dos caracteres e declarações válidas ao receber uma entrada de dados na aplicação web.

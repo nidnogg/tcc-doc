@@ -115,7 +115,7 @@ Além desses detalhes, há uma bipartição no módulo de classificador, que se 
 
 O papel dos Operadores de Mutação tanto no \textit{WAF-A-MoLE} quanto no \textit{wafamole++} é fundamental, atuando como as ferramentas para guiar as mudanças realizadas no \textit{payload} atual a cada iteração do algoritmo. Sendo assim, considerando-se como o primeiro desenvolvimento feito na extensão do programa original, o \textit{wafamole++} conta com três novos operadores de mutação adicionados ao montante original. Todos estes encontram-se agrupados na classe \verb+sqlfuzzer.py+, localizada na pasta \textbf{payloadfuzzer} da aplicação.
 
-A finalidade destes novos operadores é incrementar a variedade de exemplos adversariais gerados, e em certos casos foi associado com uma rapidez maior na geração de consultas finais. O primeiro destes é o \verb+shuffle_integers+, mostrado no Código 4.
+A finalidade destes novos operadores é incrementar a variedade de exemplos adversariais gerados. O primeiro destes é o \verb+shuffle_integers+, mostrado no Código 4.
 
 \label{sec:codigos}
 \includecode[C]{Operador de mutação shuffle integers} {alg:codigo2}{codigos/operadores/shuffle_integers.py}
