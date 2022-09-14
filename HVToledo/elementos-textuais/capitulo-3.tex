@@ -2,61 +2,13 @@
 \label{chp:capitulo3}
 Em um campo com artigos, publicações e materiais em larga parte espalhados por blogs na internet, foi necessário realizar uma revisão de literatura para que as ferramentas de ponta, estratégias ainda sendo testadas e vulnerabilidades principais no mercado fossem corretamente identificadas. Isso se torna especialmente verdadeiro pela mudança no cenário de segurança dos anos 2000 para os anos 2010-2022, aonde boa parte de ameaças antigas podem ser de pouca relevância.
 
-Neste capítulo estão alguns dos principais achados, bem como ferramentas/estratégias usadas para coletar e organizar os mesmos.
+Neste capítulo estão alguns dos principais achados.
 
-% \section{Levantamento de Artigos}
-
-% Para a coleta e organização de artigos em si, as principais utilidades empregadas foram o Parsifal \cite{parsifal_docs}, o Scopus e o CAFe (disponibilizado pela Universidade Federal do Rio de Janeiro). 
-
-% Como o Parsifal pode ser de muita utilidade para a busca e seleção de artigos em quaisquer tema e pelo fato de não ser de amplo conhecimento, é dado abaixo um pouco mais de detalhe sobre esta ferramenta.
-
-% \begin{figure}[ht]
-%     \centering
-%     \caption{Dashboard Parsifal}
-%     \includegraphics[width=14cm]{figuras/parsifal.png} 
-%     \legend{Fonte: \href{https://parsif.al}{parsif.al} (2022)}
-%     \label{fig:internet} 
-% \end{figure}
-
-% \bigskip
-
-% Na Figura 4 pode-se verificar no topo quatro abas principais do Parsifal - \textbf{Review, Planning, Conducting, }e \textbf{Reporting}. A primeira é simples e não muito essencial, descrevendo apenas os colaboradores registrados na plataforma na determinada pesquisa. A segunda, no entanto, é composta de três etapas interdependentes:
-
-% \begin{alineas}
-
-% \item \textbf{Protocol} - estabelece os objetivos, e parâmetros da pesquisa. Tais parâmetros chaves incluem PICOC (population, intervention, comparison, outcomes and context - fatores que permitem sondar o objetivo), Research Questions, Keywords + Sinônimos, Search String, Buscas e Critério de Seleção.
-
-% \item \textbf{Quality Asessment Checklist} - o pesquisador estabelece uma série de perguntas sobre os artigos, e a resposta para essas (Sim, Parcialmente, Não no caso dessa pesquisa) recebe um peso que permite classificar um artigo como aceito ou rejeitado na seleção final. 
-
-% As perguntas escolhidas priorizavam bons resultados descritos nos artigos, artigos na língua inglesa, problemas abertos, contexto de aplicações web e papers com download/visualização disponíveis (uma dificuldade que será discutida mais a frente).
-
-% \item \textbf{Data Extraction Form} - Permite nomear agrupar dados de destaque de artigos aceitos.
-
-% \end{alineas}
-
-% A etapa seguinte, a de \textbf{Conducting}, é um tanto mais complexa composta de mais subetapas. São elas:
-% \begin{alineas}
-% \item \textbf{Search} - verifica-se a Search String definida na etapa anterior de Planning. No final optou-se por ("Web Apps" OR "Web Application") AND ("Hardening") AND ("Prevention" OR "Avoidance") AND ("Secure Coding") AND ("Vulnerability").
-
-% \item \textbf{Import Studies} - nessa subetapa há a opção de importar para a plataforma metadados das publicações encontradas (studies), no formato \textit{BibTeX}. Ao total foram em torno de 74 artigos selecionados para avaliação, todos oriundos do Scopus que será descrito a seguir.
-
-% \item \textbf{Study Selection} - uma das partes mais importantes - é realizada a seleção dos artigos, além da eliminação dos artigos duplicados na busca. É a seção amostrada na captura de tela acima. Uma série de metadados é mostrada e é possível filtrar por fonte, artigos aceitos, rejeitados, duplicados e ainda não classificados.
-
-% \item \textbf{Quality Assessment} - as perguntas criadas na subetapa Quality Assessment Checklist da etapa anterior de Planning são respondidas aqui, o que determina o aceite ou não de determinados artigos baseados em suas "pontuações" por perguntas respondidas.
-
-% \item \textbf{Data Extraction} - é feita a anotação de acordo com os grupos denominados na etapa anterior pelo pesquisador. Porém não foi muito utilizada no escopo deste trabalho.
-
-% \item \textbf{Data Analysis} - como o nome descreve, o Parsifal disponibiliza nessa subetapa uma série de informações acerca dos objetivos da pesquisa, e gráficos a respeito dos dados trabalhados. Alguns são: \textit{Search strings} usadas, perguntas de pesquisa para checagem de qualidade de artigos, PICOC, planejamento, artigos aceitos por fonte, artigos por ano dentre os aceitos, dentre outros. Algumas partes de interesse dos resultados dessa seção estão contidos nos apêndices, com fins de completude da documentação.
-
-% \end{alineas}
-
-% Por fim, há a etapa final \textbf{Reporting}, que é permite ao pesquisador exportar um relatório final com os principais resultados do Parsifal - selecionando os dados desejados. Esse relatório encontra-se nos apêndices.
-
-\section{Avaliação de Propostas para Hardening em Aplicações Web}
+\section{Avaliação de Propostas de Segurança para Aplicações Web}
 Ao fim da coleta de artigos, além do embasamento teórico e melhor enquadramento do escopo a ser estudado, buscou-se uma série de ferramentas e/ou casos reais de modelos e sistemas sugeridos na área de segurança da informação em sistemas Web, para que um desses pudesse ser expandido.
 
 \subsection{nscanner}
-Essa solução, publicada apenas na forma de um artigo \cite{surian_nscanner_2020}, provém de um estudo dirigido sobre uma série de outras ferramentas existentes hoje no mundo de \textit{Penetration Testing} (e de utilidade/notoriedade no mercado) como \textit{Metasploit}, \textit{Wapiti} e\textit{ Acunetix}. O Nscanner agrupa essas ferramentas e usa cada uma delas em determinadas partes de seu funcionamento, assim ganhando relevância por ter uma funcionalidade mais ampla.  Trata-se de uma aplicação dinâmica, flexível e automatizada para detectar os ataques mais comuns e problemáticos em segurança de Informação, que são \textit{SQL Injection} e \textit{Cross Site Scripting}. É capaz também de detectar malware via Aprendizado de Máquina para prevenir resultados que seriam falsos positivos ou negativos.
+Essa solução, publicada apenas na forma de um artigo \cite{surian_nscanner_2020}, provém de um estudo dirigido sobre uma série de outras ferramentas existentes hoje no mundo de segurança da informação (e de utilidade/notoriedade no mercado) como \textit{Metasploit}, \textit{Wapiti} e \textit{Acunetix}. O nscanner agrupa essas ferramentas e usa cada uma delas em determinadas partes de seu funcionamento, assim ganhando relevância por ter uma funcionalidade mais ampla.  Trata-se de uma aplicação dinâmica, flexível e automatizada para detectar os ataques mais comuns e problemáticos em segurança de Informação, que são injeções SQL e \textit{Cross Site Scripting}. É capaz também de detectar malware via Aprendizado de Máquina para prevenir resultados que seriam falsos positivos ou negativos.
 
 Há uma fase de testagem de vulnerabilidade em aplicação Web. Uma etapa independente permite o escaneamento de arquivos supostamente maliciosos fornecidos pelo usuário para detecção de malware. Todas as informações trabalhadas são armazenadas localmente, tornando desnecessário o uso de uma solução de Banco de Dados, que seria tipicamente usada com uma ferramenta dessa natureza.
 
@@ -81,7 +33,7 @@ Em particular, na etapa mais importante do fluxo de detecção de vulnerabilidad
 Como esta proposta é apenas uma ideia sem implementação e considerando as questões críticas apontadas acima, foi descartada a expansão desta proposta dentro do escopo pretendido pelo trabalho.
 
 \subsection{GraphXSS}
-A proposta do GraphXSS \cite{liu_graphxss_2022} sugere uma implementação de uma \textit{Graph Convolutional Network ou GCN} para realizar a detecção de ataques de \textit{Cross-Site Scripting} em aplicações web. A \textit{pipeline} básica envolve um pré-processamento dos dados, a composição dos mesmos em uma estrutura de grafos, e a utilização de algoritmos que realizam \textit{Deep Learning} em cima dessa estrutura para enfim realizar a detecção de maliciosidade em uma determinada entrada. A solução é mostrada no diagrama da Figura 5: 
+A proposta do GraphXSS \cite{liu_graphxss_2022} sugere uma implementação de uma Rede Convolucional de Grafos (em inglês: \textit{Graph Convolutional Network}, abreviado como GCN) para realizar a detecção de ataques de \textit{Cross-Site Scripting} (explicado anteriormente na Seção 2.2) em aplicações web. A \textit{pipeline} básica envolve um pré-processamento dos dados, a composição dos mesmos em uma estrutura de grafos, e a utilização de algoritmos que realizam \textit{Deep Learning} em cima dessa estrutura para enfim realizar a detecção de maliciosidade em uma determinada entrada. A solução é mostrada no diagrama da Figura 5: 
 
 \begin{figure}[H]
     \centering
@@ -161,9 +113,11 @@ Com esse funcionamento, a condição de parada é dada da seguinte forma:
 
 \bigskip
 
-Para testagem de WAFs de diferentes origens e arquiteturas, uma classe abstrata \verb+Model+ é disponibilizada pelos autores como uma interface, generalizando o comportamento de modelos usados. Dois métodos abstratos \verb+classify+ e \verb+extract_features+ são instanciados para cada modelo. Ao adaptar um WAF para ser testado, o desenvolvedor precisa buscar as funções equivalentes de seu classificador interno e compará-las com os modelos de exemplo do \textit{WAF-A-MoLE} para saber quais características são usadas pelo mesmo no funcionamento de sua arquitetura.
+Para testagem de WAFs de diferentes origens e arquiteturas, uma classe \verb+Model+ é disponibilizada pelos autores como uma interface, generalizando o comportamento de modelos usados. Assim, o componente amostrado na Figura 7 como \textit{Adapter} ao lado de \textit{Target WAF} pode ser criado a partir dessa classe. Ao adaptar um WAF para ser testado, o desenvolvedor precisa compará-las com os adaptadores dos modelos de exemplo do \textit{WAF-A-MoLE} para saber quais características são usadas pelo mesmo no funcionamento de sua arquitetura.
 
-Essa necessidade de experimentação para adaptação não se mostrou muito clara, porém foi possível (com a ajuda dos autores originais) construir um \textit{wrapper} geral para modelos do \verb+scikit-learn+ com o \textit{wafamole++} - a extensão desse software melhor detalhada nos capítulos 4 e 5 deste documento.
+% Para testagem de WAFs de diferentes origens e arquiteturas, uma classe \verb+Model+ é disponibilizada pelos autores como uma interface, generalizando o comportamento de modelos usados. Dois métodos abstratos \verb+classify+ e \verb+extract_features+ são instanciados para cada modelo. Ao adaptar um WAF para ser testado, o desenvolvedor precisa buscar as funções equivalentes de seu classificador interno e compará-las com os modelos de exemplo do \textit{WAF-A-MoLE} para saber quais características são usadas pelo mesmo no funcionamento de sua arquitetura.
+
+Essa necessidade de experimentação para adaptação não se mostrou muito clara, porém foi possível (com a ajuda dos autores originais) construir um \textit{wrapper}/interface geral para modelos do \verb+scikit-learn+ com o \textit{wafamole++} - a extensão desse software melhor detalhada nos capítulos 4 e 5 deste documento.
 
 \subsection{Conclusão}
 Em suma, percebe-se que o \textit{WAF-A-MoLE} é uma excelente ferramenta base para reforçar WAFs baseados em Aprendizado de Máquina. Configurando rotinas para gerar uma série de exemplos adversariais a partir do mesmo, especialistas de segurança podem refazer o treinamento de seus \textit{Firewalls} complementando seus exemplos de base com os adversariais recém-gerados, chegando a níveis de robustez mais aceitáveis. 

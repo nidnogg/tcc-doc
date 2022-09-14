@@ -5,7 +5,7 @@ Nesse capítulo busca-se elucidar as principais terminologias, técnicas, algori
 
 \section{Injeção SQL}
 
-O tipo mais comum e mais prevalecente de injeção de código é o da injeção SQL (em inglês: \textit{SQL Injection}), que manipula bancos de dados via SQL (\textit{Structured Query Language}), a linguagem clássica de manuseio de bancos de dados, para receber acesso a informações sensíveis.
+O tipo mais comum e mais prevalecente de injeção de código é o da injeção SQL (em inglês: \textit{SQL Injection}), que manipula bancos de dados via SQL (abraviado do inglês: \textit{Structured Query Language}), a linguagem clássica de manuseio de bancos de dados, para receber acesso a informações sensíveis.
 
 Exemplificando algumas situações de injeções SQL \cite{sql_port_swigger}:
 
@@ -87,14 +87,16 @@ Dados obtidos de fontes não confiáveis devem ser devidamente validados e norma
 
 \section{Algoritmos de Fuzzing}
 
- O termo \textit{fuzz} foi cunhado pelo professor da Universidade de Wisconsin-Madison Barton Miller nos anos 80, após sofrer uma interferência climática considerável no funcionamento de aplicações que rodavam em um ambiente \textit{unix} remoto na época \cite{fuzzing_info}. 
+O termo \textit{fuzz} foi cunhado pelo professor da Universidade de Wisconsin-Madison Barton Miller nos anos 80, após sofrer uma interferência por uma tempestade de raios atuando no funcionamento de aplicações que rodavam em um ambiente \textit{unix} remoto na época \cite{fuzzing_info}. 
 
 Pouco depois disso o mesmo passou aos seus alunos uma tarefa denominada o \textit{"Fuzz Generator"}, na qual era necessário implementar uma ferramenta que testasse a robustez de programas \textit{unix} através de um bombardeio de informações aleatoriamente geradas.
 
 Atualmente é uma técnica amplamente aceita na testagem/sondagem da segurança de diversas aplicações, com um leque de ofertas de \textit{fuzzing} comerciais no mercado. E naturalmente é empregável em WAFs, permitindo extrair informações valiosas que rendam aprimoramentos para os mesmos. Enquanto a ideia em si de \textit{fuzzing} permanece a mesma, as maneiras de efetuá-lo tiveram um grande progresso de mudança.
 
 
-Uma função elementar de \textit{fuzzing} pode ser vista no Código 1, que constrói, a partir de tamanho máximo e caracteres no intervalo fornecidos pelo usuário, uma \textit{string} aleatória que pode ser chamada de \textit{string} "fuzzeada". Essa \textit{string} serviria como entrada de um programa a ser testado, a fim de quebrá-lo e expor falhas/vulnerabilidades em sua implementação.
+Uma função elementar de \textit{fuzzing} pode ser vista no Código 1, que constrói, a partir de tamanho máximo e caracteres no intervalo fornecidos pelo usuário, uma \textit{string} aleatória que pode ser chamada de \textit{string} "fuzzeada". Usa-se o pacote \verb+random+ para lidar com a aleatoriedade dos pedaços da \textit{string} que são construídos iterativamente. 
+
+Essa \textit{string} serviria como entrada de um programa a ser testado, a fim de quebrá-lo e expor falhas/vulnerabilidades em sua implementação. Dependendo da complexidade do programa, pode servir como entrada tanto do fluxo de execução principal do programa ou em uma função menor do mesmo, para testar partes menores e afins. Não se usa sempre a mesma \textit{string} necessariamente, sendo comum a geração de várias delas para se ter uma testagem mais profunda.
 
 \includecode[C]{Função de um \textit{fuzzer} elementar} {alg:codigo1}{codigos/fuzzer.py}
 
@@ -118,11 +120,11 @@ Em suma, \textit{fuzzing} consiste na geração massiva de entradas normais e an
 
 Expandindo um pouco o conceito, um teste de \textit{fuzzing} tipicamente consiste na geração em larga escala de entradas para um programa específico, entradas conhecidas também como casos de teste. A qualidade de tais casos de teste criados influencia diretamente na qualidade do teste \textit{fuzzing}. As entradas precisam atender os requisitos do programa testado para o padrão de entrada. Em contrapartida, as entradas precisam ser errôneas o suficiente para gerarem falhas ou erros no processamento do programa. De acordo com o alvo, as entradas podem ser arquivos com diferentes formatos, dados de comunicação entre redes, binários executáveis específicos, entre outros. No caso do \textit{wafamole++}, que é a aplicação alvo deste trabalho, trabalha-se com injeções SQL, nas quais é aplicada a técnica de \textit{fuzzing} iterativamente a fim de gerar uma entrada que consiga passar despercebido por um WAF avaliado, e seja malicioso. Essa entrada é o exemplo adversarial anteriormente mencionado.
 
-Gerar casos de teste suficientemente errôneos é uma tarefa árdua, com duas variantes: \textit{generation-based} e \textit{mutation-based}, das quais a última é a adotada pelo \textit{WAF-A-MoLE} e \textit{wafamole++}. Depois de gerados, os casos de teste alimentam o programa alvo, tendo variáveis de ambiente e outros parâmetros do software a ser testado devidamente configurados pelo programador. Geralmente um teste de \textit{fuzzing} tem como condição final um tempo limite (ou \textit{timeout}) pré-definido ou uma falha de execução do programa.
+Gerar casos de teste suficientemente errôneos é uma tarefa árdua, com duas variantes: \textit{fuzzing} baseado em geração, e \textit{fuzzing} mutacional, das quais a última é a adotada pelo \textit{WAF-A-MoLE} e \textit{wafamole++}. Depois de gerados, os casos de teste alimentam o programa alvo, tendo variáveis de ambiente e outros parâmetros do software a ser testado devidamente configurados pelo programador. Geralmente um teste de \textit{fuzzing} tem como condição final um tempo limite pré-definido ou uma falha de execução do programa.
 
-\textit{Fuzzers} monitoram o estado de execução durante o processo, aguardando exceções ou falhas.  Formas comuns de metodologia de monitoramento de exceções incluem monitorar sinais específicos do sistema, falhas e outras violações. Quando uma violação é capturada, o \textit{fuzzer} armazena o \textit{testcase} que a causou para análise futura e replicação \cite{li2018fuzzing}.
+\textit{Fuzzers} monitoram o estado de execução durante o processo, aguardando exceções ou falhas. Formas comuns de metodologia de monitoramento de exceções incluem monitorar sinais específicos do sistema, falhas e outras violações. Quando uma violação é capturada, o \textit{fuzzer} armazena o caso de teste que a causou para análise futura e replicação \cite{li2018fuzzing}.
 
-Por fim, na fase de análise, tem-se por objetivo determinar a localidade e a causa da violação no software. A análise geralmente é feita com o auxílio de \textit{debuggers} como \verb+GDB+, \verb+windbg+ ou outras ferramentas de análise binária, como a \verb+IDA Pro+, \verb+OllyObg+ e outras. O exato estado de execução dos casos de teste, informações da \textit{thread}, instruções e outras informações fazem parte do monitoramento. Para o caso do trabalho em questão, considerando-se o ambiente em \textit{Python}, o \textit{debugger} padrão \verb+pdb+ mostrou-se suficiente para diagnosticar a maioria dos erros encontrados. 
+Por fim, na fase de análise, tem-se por objetivo determinar a localidade e a causa da violação no software. A análise geralmente é feita com o auxílio de \textit{debuggers} como \verb+GDB+ \cite{gdb_docs}, \verb+windbg+ \cite{windbg_docs} ou outras ferramentas de análise binária, como o \verb+IDA Pro+ \cite{ida_pro_docs} e outras. O exato estado de execução dos casos de teste, informações da \textit{thread}, instruções e outras informações fazem parte do monitoramento. Para o caso do trabalho em questão, considerando-se o ambiente em \textit{Python}, o \textit{debugger} padrão \verb+pdb+ mostrou-se suficiente para diagnosticar a maioria dos erros encontrados. 
 
 A Figura 1 ilustra uma visão de alto nível de um algoritmo de \textit{fuzzing}. Um caso teste é gerado, executado no programa, e caso o programa emita problemas (\textit{violation} no fluxograma), significa que existem erros a serem corrigidos. Caso contrário, mais casos teste são gerados até que erros sejam encontrados ou até o usuário parar a execução.
 
@@ -152,8 +154,8 @@ A ideia por trás de Aprendizado de Máquina \cite{dantas_transformers_2021} é 
 Alguns termos de relevância dentro de tais procedimentos podem ser elencados:
 \begin{alineas}
 \item \textbf{Classificação} - É a ação qualitativa de rotular um dado avaliado com uma categoria, feito com um algoritmo de um classificador. Aplicando a um exemplo direto de Segurança da Informação, um classificador que rotula um pacote como "malicioso" realiza essa ação.
-\item \textbf{Treinamento} - Também conhecido como \verb+fitting+, essa ação envolve o fornecimento de exemplos para um determinado classificador, para que esse programa possa realizar a eventual classificação de dados vindouros.
-\item \textbf{Dados de Teste} - São dados usados para a avaliação de um classificador realizada logo após seu treinamento, para que seja possível averiguar a eficácia e corretude do mesmo.
+\item \textbf{Treinamento} - Essa ação envolve o fornecimento de exemplos para um determinado classificador, para que esse programa possa realizar a eventual classificação de dados vindouros. Com dados de texto, para o fornecimento desses exemplos ao classificador é comum passar os dados brutos por um algoritmo conhecido como vetorizador, que os transforma em vetores numéricos que serão lidos devidamente ao longo do treinamento.
+\item \textbf{Dados de Teste} - São dados usados para a avaliação de um classificador realizada logo após seu treinamento, para que seja possível averiguar a eficácia e corretude do mesmo. É ideal ser uma porcentagem menor do que a de dados de validação, correspondendo usualmente em torno de 15\% a 30\% do conjunto de dados.
 \item \textbf{Dados de Validação} - Durante o treinamento, são separados dados para a orientação do mesmo, com uso de uma parcela dos dados originais. É importante que esta parcela seja distinta dos dados de teste, para que o algoritmo resultante possa ter seu desempenho eventualmente testado contra dados completamente novos.
 
 \end{alineas}
@@ -166,7 +168,7 @@ Inteligência Artificial.
 Algoritmos que vêm por padrão no \textit{WAF-A-MoLE} em modelos de exemplo são \textit{Naive Bayes}, Floresta Aleatória e Máquina de vetores de suporte Gaussiana/Linear, ofertados pela biblioteca \textit{scikit-learn}.
 
 \subsection{Máquina de vetores de suporte}
-Máquinas de vetores de suporte, popularmente abreviados como SVMs (do inglês \textit{Support Vector Machines}) são modelos de aprendizado supervisionado (dentro do contexto de teoria de Aprendizado de Máquina) associado a algoritmos de aprendizado que analisam dados para classificação e análise regressiva. É um dos métodos de predição mais robustos, baseado em arcabouços de aprendizado estatístico ou na teoria de Vapnik e Chervonenkis (comumente abreviada como teoria VC) \cite{ben2001_vapnik_support}.
+Máquinas de vetores de suporte, popularmente abreviados como SVMs (do inglês \textit{Support Vector Machines}) são modelos de aprendizado supervisionado (dentro do contexto de teoria de Aprendizado de Máquina) associado a algoritmos de aprendizado que analisam dados para classificação e análise regressiva. É um dos métodos de predição mais robustos, baseado em arcabouços de aprendizado estatístico ou na teoria de Vapnik e Chervonenkis (comumente abreviada como teoria VC) \cite{vapnik_svm_support} \cite{ben2001_vapnik_support}.
 
 Dado um conjunto de exemplos para treinamento, onde cada exemplo é marcado em uma de duas categorias, um algoritmo de treinamento SVM constrói um modelo que associa novos exemplos para uma categoria ou outra, sendo um classificador binário linear não-probabilístico. 
  
@@ -174,18 +176,20 @@ O SVM mapeia exemplos de treinamento para pontos no espaço de maneira a maximiz
 
 Quando os dados ainda não foram rotulados, o aprendizado supervisionado não é possível e é necessário uma abordagem não-supervisionada, que tenta encontrar \textit{clusters} naturais para o grupo de dados e então mapear os novos dados nos grupos formados. 
 
-O algoritmo \textit{SV clustering}, criado por Vladimir Vapnik com
-outros parceiros na AT\&T Bell Laboratories, aplica a teoria estatística aos \textit{Support Vectors}, permitindo categorização de dados não-rotulados.
+O algoritmo \textit{SV clustering}, criado por Vladimir Vapnik \cite{ben2001_vapnik_support} com
+outros parceiros na AT\&T Bell Laboratories, aplica a teoria estatística aos vetores de suporte, permitindo categorização de dados não-rotulados.
 
-Para exemplificar o poder do modelo de aprendizado, o artigo \cite{vapnik_svm_support} mostra a performance obtida em classificação de histogramas em níveis surpreendentemente altos, com taxas de erro por volta de 11\% (baixa) para a classificação de 14 categorias e com taxa de erro de 16\% para conjuntos de objetos mais genéricos. Esses resultados foram obtidos sem conhecimento prévio da tarefa, sabendo apenas que a entrada seria uma densidade discreta ou histograma colorido.
+% Para exemplificar o poder do modelo de aprendizado, o artigo \cite{vapnik_svm_support} mostra a performance obtida em classificação de histogramas em níveis surpreendentemente altos, com taxas de erro por volta de 11\% (baixa) para a classificação de 14 categorias e com taxa de erro de 16\% para conjuntos de objetos mais genéricos. Esses resultados foram obtidos sem conhecimento prévio da tarefa, sabendo apenas que a entrada seria uma densidade discreta ou histograma colorido.
 
-\textit{Python} possui no pacote \textit{sklearn} um método SVC e variantes com eficácias distintas em cenários diferentes.
+\textit{Python} possui no pacote \textit{sklearn} uma classe \verb+SVC+ (abreviação para \textit{Support Vector Classifier} em inglês, ou classificador de vetor de suporte) e variantes com eficácias distintas em cenários diferentes.
 
-Além do desempenho como um classificador linear, SVMs conseguem efetuar classificações não-lineares utilizando um mapeamento implícito de entradas em espaços multi-dimensionais de maneira eficiente. O novo modelo proposto \textit{wafamole++} usa a versão não-linear, diferente da proposta original de Vladimir. Essa escolha é feita com base em experimentação de melhores resultados e uma otimização chamada \textit{GridSearchCV}, explorada mais adiante no Capítulo 4.
+Além do desempenho como um classificador linear, SVMs conseguem efetuar classificações não-lineares utilizando um mapeamento implícito de entradas em espaços multi-dimensionais de maneira eficiente. O novo modelo proposto \textit{wafamole++} usa a versão não-linear, diferente da proposta no artigo original de Vladimir \cite{ben2001_vapnik_support}. Essa escolha é feita com base em experimentação de melhores resultados e uma otimização chamada \textit{GridSearchCV}, que sumariamente testa exaustivamente combinações possíveis dentro uma série de valores diferentes fornecidos para cada parâmetro de um classificador. 
 
-A Figura 2 ilustra as diferenças ao variar o parâmetro do \textit{kernel} em um classicador SVM na biblioteca \textit{scikit-learn}. O \textit{kernel} RBF (\textit{Radial Basis Function}) e polinomial de grau 3 correspondem aos não lineares, com o RBF sendo utilizado no \textit{wafamole++}. As zonas pintadas de azul e vermelho indicam elementos pertencentes a uma determinada predição feita pelo classificador, referente aos atributos de sépala de plantas na base de dados Íris (comumente usada no ensino e demonstração de Aprendizado de Máquina).
+Tomando um exemplo abstrato, com um classificador que possui um parâmetro determinado parâmetro chamado de \textbf{parametro\_a} (que pode assumir um valor numérico de 0 até 150), e um outro chamado de \textbf{parametro\_b} com um intervalo parecido. Para seu treinamento, pode-se fornecer à rotina \textit{GridSearchCV} o classificador e um conjunto de alternativas como 1, 10 e 100 no lugar desses parâmetros, e o treinamento do classificador será feito testando cada uma das possíveis combinações entre os conjuntos fornecidos para os parâmetros, sendo indicado no final qual seria o mais próximo do ideal. Essa otimização é também explorada mais adiante no Capítulo 4.
 
-\begin{figure}[ht]
+A Figura 2 ilustra visualmente as diferenças ao variar o parâmetro do \textit{kernel} em um classicador SVM na biblioteca \textit{scikit-learn}. O \textit{kernel} RBF (\textit{Radial Basis Function}) e polinomial de grau 3 correspondem aos não lineares, com o RBF sendo utilizado no \textit{wafamole++}. As zonas pintadas de azul e vermelho indicam elementos pertencentes a uma determinada predição feita pelo classificador, referente aos atributos de sépala de plantas na base de dados Íris (comumente usada no ensino e demonstração de Aprendizado de Máquina).
+
+\begin{figure}[H]
     \centering
     \caption{Gráfico com quatro variantes do SVC}
     \includegraphics[width=14cm]{figuras/plot-svc.png} 
@@ -197,13 +201,13 @@ A Figura 2 ilustra as diferenças ao variar o parâmetro do \textit{kernel} em u
 
 O Gradiente Descendente Estocástico (ou \textit{Stochastic Gradient Descent}, em inglês), comumente abreviado como SGD, é um método iterativo para otimização de uma função objetivo com propriedades "suaves" (diferenciais ou subdiferenciais) adequadas \cite{ruder2016overview}.
 
-Pode ser considerada uma aproximação estocástica da otimização por gradiente descendente, uma vez que substitui o gradiente atual (calculado do conjunto de dados inteiro) por uma estimativa do mesmo calculada for um subconjunto dos dados selecionado aleatoriamente.
+Pode ser considerada uma aproximação estocástica da otimização por gradiente descendente, uma vez que substitui o gradiente atual (calculado do conjunto de dados inteiro) por uma estimativa do mesmo calculada a partir um subconjunto dos dados selecionado aleatoriamente.
 
-Em problemas de otimização com muitas dimensões isso reduz o custo computacional, tendo resultados mais rápidos com o \textit{tradeoff} de perda na taxa de convergência \footnote{Definição de taxa de convergência: No aprendizado supervisionado, uma função de perda é definida, possuindo um valor mínimo global o qual busca-se através do gradiente descendente. O quanto se aproxima desse valor com cada etapa/iteração do algoritmo é a taxa de convergência.}.
+Em problemas de otimização com muitas dimensões isso reduz o custo computacional, tendo resultados mais rápidos com o \textit{tradeoff} de perda no que é chamado de taxa de convergência. Para melhor compreender esta taxa: no aprendizado supervisionado, uma função de perda é definida, possuindo um valor mínimo global que é buscado através do gradiente descendente. O quanto se aproxima desse valor com cada etapa/iteração do algoritmo é a taxa de convergência.
 
-O SGD procura encontrar o mínimo global de uma função através de ajustes de configuração a cada tentativa. Essa função valores mínimos e máximos locais e globais e um exemplo de uma dessas pode ser visto na figura 3. Ao invés de reduzir o erro ou achar o gradiente para o conjunto de dados inteiro, o método reduz o erro através de aproximações em direção ao gradiente para um subconjunto aleatório do conjunto de dados, que pode ser tão pequeno quanto o conjunto de dados de treinamento inicial.
+O SGD procura encontrar o mínimo global de uma função através de ajustes de configuração a cada tentativa. A Figura 3 mostra um exemplo dessa função, com valores mínimos/máximos globais e locais. Ao invés de reduzir o erro ou achar o gradiente para o conjunto de dados inteiro, o método reduz o erro através de aproximações em direção ao gradiente para um subconjunto aleatório do conjunto de dados, que pode ser tão pequeno quanto o conjunto de dados de treinamento inicial.
 
-De forma heurística, se o modelo inicial erra muito, as alterações na configuração vão tornando o modelo mais preciso. Em contrapartida, é possível que questões antes acertadas, possam passar a serem erradas ou aumento da taxa de erro geral em favor de acertos específicos. Nem toda iteração necessariamente irá fazer o modelo melhorar.
+De forma heurística, se o modelo inicial erra muito, as alterações na configuração vão tornando o modelo mais preciso. Em contrapartida, é possível que questões antes acertadas, possam passar a serem classificadas como erradas ou pode acontecer um aumento da taxa de erro geral em favor de acertos específicos. Nem toda iteração necessariamente irá fazer o modelo melhorar.
 Positivamente, o SGD consegue sair do mínimo local em direção ao mínimo global através dos ajustes de configuração com baixo custo computacional em relação ao gradiente descendente clássico \cite{overview_gradient_descent_stochastic}.
 
 \begin{figure}[ht]
@@ -222,64 +226,17 @@ No \textit{wafamole++}, um dos modelos novos é baseado em um classificador SGD,
 
 \subsection{AdaBoost}
 
-O método de \textit{Boosting} vem da análise teórica do modelo de aprendizado chamado PAC (\textit{Probably Approximately Correct}). Os autores Kearns e Valiant propuseram os conceitos de aprendizado forte e fraco. No modelo de aprendizado do PAC, se um algoritmo de aprendizado polinomial para identificar um grupo de conceito e a acurácia do reconhecimento é muito alta, esse grupo de conceitos são considerados como aprendizado forte. Porém, se a taxa de corretude do algoritmo de aprendizado de identificação é um pouco superior à tentativa aleatória de adivinhar, então esse grupo é considerado aprendizado fraco. 
+O método de \textit{Boosting} vem da análise teórica do modelo de aprendizado chamado PAC (\textit{Probably Approximately Correct}). Os autores Kearns e Valiant propuseram os conceitos de aprendizado forte e fraco. No modelo de aprendizado do PAC, se um algoritmo de aprendizado polinomial para identificar um grupo de conceito tem uma acurácia de reconhecimento muito alta, esse algoritmo é considerado como aprendizado forte. Porém, se a taxa de corretude do algoritmo de aprendizado de identificação é um pouco superior à tentativa aleatória de adivinhar, então esse grupo é considerado aprendizado fraco. 
 
-Kearns e Valient perceberam uma relação de equivalência entre aprendizado fraco e forte, onde o algoritmo de aprendizado fraco pode ser promovido para aprendizado forte.
+Kearns e Valient perceberam uma relação de equivalência entre aprendizado fraco e forte, onde o algoritmo de aprendizado fraco pode ser promovido para aprendizado forte, na qual a combinação dos resultados de uma série de algoritmos de aprendizados fracos (como tentativas de adivinhação aleatórias) gera o resultado um algoritmo de aprendizado forte. O requisito para isso é saber de antemão o algoritmo forte em específico.
 
-Uma vez que exista uma equivalência entre fraco e forte, fica possível transformar um algoritmo que consiste em tentativas de adivinhação aleatórias (tido como um algoritmo fraco) para um algoritmo de aprendizado forte. O requisito para isso é saber de antemão o algoritmo forte em específico.
-
-Em 1990, Schapire publicou o primeiro método de \textit{Boosting}. Freund fez melhorias e criou um método muito melhor conhecido como BBM (\textit{boost-by-majority}).
-
-\textit{Boosting} produz uma série de classificadores antes e depois do treinamento. O conjunto de treinamento utilizado em cada classificador é um subconjunto advindo do conjunto geral de treinamento e se cada amostra aparece no subconjunto ou não depende da performance dos classificadores anteriores. No caso das amostras julgadas como incorretas pelos classificadores produzidos anteriormente, a probabilidade de surgirem no novo subconjunto de treinamento será muito maior, fazendo com que os classificadores seguintes tenham foco em lidar com as diferenças nas amostras. Esse tratamento das diferenças seria uma tarefa árdua sem os resultados dos classificadores gerados na execução \cite{wu2011some}.
+Em 1990, Schapire publicou o primeiro método de \textit{Boosting} \cite{boosting_schapire1990strength}. \textit{Boosting} opera produzindo uma série de classificadores antes e depois do treinamento, que compartilham certos resultados durante o treinamento geral. O conjunto de treinamento utilizado em cada classificador é um subconjunto advindo do conjunto geral de treinamento e se cada amostra aparece no subconjunto ou não depende da performance dos classificadores anteriores. No caso das amostras julgadas como incorretas pelos classificadores produzidos anteriormente, a probabilidade de surgirem no novo subconjunto de treinamento será muito maior, fazendo com que os classificadores seguintes tenham foco em lidar com as diferenças nas amostras. Esse tratamento das diferenças seria uma tarefa árdua sem os resultados dos classificadores gerados na execução \cite{wu2011some}.
 
 O método \textit{Boosting} pode aumentar a capacidade de generalização de um dado algoritmo, mas o algoritmo precisa ter estabelecido o limite inferior da acurácia de aprendizagem de um classificador fraco, que na prática é uma tarefa difícil.
 
 O \textit{AdaBoost} é um algoritmo do tipo \textit{Boosting}, concebido em 1995 e publicado em 1999 \cite{adaboostfreund1999short}, com capacidade auto-adaptativa que melhora a performance de classificadores fracos por estabelecer um conjunto de múltiplos classificadores. 
 
-Sendo o algoritmo mais representativo da família, ele mantém a distribuição de um conjunto de probabilidades para amostras de treinamento e ajusta a probabilidade de distribuição de cada amostra durante a iteração. Um algoritmo específico de aprendizado é usado para gerar o classificador-membro e calcular a taxa de erro nas amostras de treinamento. O \textit{AdaBoost} irá usar a taxa de erro para ajustar a probabilidade de distribuição das amostras de treino. O papel de mudar os pesos é para aumentar o impacto das classificações incorretas e reduzir o impacto das classificações corretas. Por fim, com o ajuste dos pesos nos classificadores únicos, é obtido um classificador forte.
+Sendo o algoritmo mais representativo da família, ele mantém a distribuição de um conjunto de probabilidades para amostras de treinamento e ajusta a probabilidade de distribuição de cada amostra durante a iteração. Um algoritmo específico de aprendizado é usado para gerar um dos determinados classificadores gerados (dentre os vários anteriormente mencionados) e calcular a taxa de erro nas amostras de treinamento. O \textit{AdaBoost} irá usar a taxa de erro para ajustar a probabilidade de distribuição das amostras de treino. O papel de mudar os pesos é para aumentar o impacto das classificações incorretas e reduzir o impacto das classificações corretas. Por fim, com o ajuste dos pesos nos classificadores únicos, é obtido um classificador forte.
 
 Essas características o tornaram um bom classificador para experimentar e o \textit{AdaBoost} eventualmente foi incorporado ao \textit{wafamole++}, na forma de um dos modelos novos. Sua performance é detalhada no Capítulo 5, de experimentação, e detalhes da sua implementação podem ser encontrados no Capítulo 4.
-
-% O pseudoalgoritmo tem a seguinte estrutura com um conjunto de amostras iniciais:
-
-% \begin{equation}
-%     L=\left\{\left(x_{1}, y_{1}\right),\left(x_{2}, y_{2}\right) \cdots\left(x_{N}, y_{N}\right)\right\}, y_{i} \in\{+1,0\}
-% \end{equation}
-
-% A distribuição inicial dos pesos é dada por:
-
-% \begin{equation}
-%     w_{i}^{1}=\frac{1}{N}
-% \end{equation}
-
-% Onde +1 é uma amostra positiva e 0 é uma amostra negativa, sendo o total de amostras N.
-
-% Considerando t = 1, ... , T, tem-se um \textit{loop} com os pesos normalizados:
-
-% \begin{equation}
-%     w_{i}^{t}=\frac{w_{i}^{t}}{\sum_{j=1}^{N} w_{j}^{t}}
-% \end{equation}
-
-% O classificador fraco que seleciona e classifica do conjunto de amostras aquele cuja taxa de erro é a menor e a distribuição do peso atual $h_{t}$. A taxa de erro do classificador fraco é dada pela expressão:
-
-% \begin{equation}
-%     \mathcal{E}_{t}=\sum_{i=1}^{N} w_{i}^{t}\left|h_{t}\left(x_{i}\right)-y_{i}\right|
-% \end{equation}
-
-% A atualização do peso da amostra é dada por:
-
-% \begin{equation}
-%     w_{i}^{t+1}=w_{i}^{t} \beta_{t}^{1-e_{i}}
-% \end{equation}
-
-% $e_{i}$ = 0 representa que xi foi classificado corretamente e $e_{i}$ = 1 significa que $x_{i}$ foi classificado incorretamente.
-
-% Como saída final do algoritmo:
-
-% \begin{equation}
-%     \begin{aligned}
-%     &H(x)= \begin{cases}1, & \sum_{t=1}^{T} \alpha_{t} h_{t}(x) \geq \frac{1}{2} \sum_{t=1}^{T} \alpha_{t} \\ 0, & \text { caso contrario }\end{cases}\\
-%     &\alpha_{t}=\log \frac{1}{\beta_{t}} .
-%     \end{aligned}
-% \end{equation}
 
