@@ -20,7 +20,7 @@ Os operadores de mutação responsáveis por gerir as dadas iterações de \text
 
 Diferentemente do \textit{WAF-A-MoLE} no entanto, a proposta inclui também um módulo separado responsável pelo tratamento, treinamento e geração de dados para alicerçar o funcionamento da aplicação principal. 
 
-Uma representação visual da proposta, sem especificações como linguagens usadas, extensões de arquivo e detalhes mais profundos pode ser conferida no diagrama da Figura 8. Sua versão com maior nível de detalhamento é disponibilizada na Figura 10, mais adiante na Seção de implementação.
+Uma representação visual da proposta, sem especificações como linguagens usadas, extensões de arquivo e detalhes mais profundos pode ser conferida no diagrama da Figura 7. Sua versão com maior nível de detalhamento é disponibilizada na Figura 9, mais adiante na Seção de implementação.
 
 Descrevendo de forma geral essa estrutura, cada retângulo com título indica um módulo, seus subtítulos representam submódulos/métodos contidos nesses, e setas indicam ações ou comandos realizados por essas estruturas. Resumidamente, detalhando do topo da arquitetura até a base, tem-se:
 
@@ -72,7 +72,7 @@ Esses módulos, no entanto, não podem ser trivialmente estendidos sem alguns co
 \end{alineas}
 \item \verb+MLBasedWafClassifier+ - Localizada na pasta dos modelos customizados (models/svc), esse arquivo \textit{Jupyter Notebook} \footnote{Jupyter Notebook ou arquivo .ipynb: Um ambiente de desenvolvimento que permite organizar uma aplicação separando em pedaços de código e trechos de texto} é responsável por uma série de funções realizadas em cima dos conjuntos de dados baseados no \verb+SQLiV3.json+. É realizada a visualização dos dados contidos nos mesmos via gráficos, e os dados são agrupados de maneira a serem classificados para uso no \textit{wafamole++}. Dois tipos de classificadores são suportado Máquina de vetores de suporte não linear e Gradiente Descendente Estocástico. 
 
-Um exemplo de um gráfico gerado pelo notebook com seu código correspondente pode ser encontrado na Figura 9.
+Um exemplo de um gráfico gerado pelo notebook com seu código correspondente pode ser encontrado na Figura 8.
 
 \begin{figure}[ht]
     \centering
@@ -94,13 +94,13 @@ O tamanho deste conjunto de dados exigiu algumas alterações para que os algori
 No geral, este notebook possui um tempo de execução consideravelmente maior  em razão do conjunto de dados utilizado, o que é de se esperar e não pode ser evitado. Outra diferença chave são os classificadores usados - foram testados além dos dois anteriores o classificador \textit{AdaBoost}, com resultados promissores. A Máquina de vetores de suporte não linear, no entanto, não foi frutífera, requerendo um tempo de execução que excedia 48 horas. Cabe salientar que a versão mais recente desse notebook foi disponibilizada no \textit{Google Colab} sob o nome \verb+MLClassifierColabWafamole.ipynb+, via um link providenciado no repositório final.
 \end{alineas}
 
-De forma a ilustrar a implementação de uma maneira geral e como esses módulos se comunicam, a Figura 10 é disponibilizada, e para melhor detalhamento o componente \verb+mole+ pode ser visto no Código 3 por inteiro.
+De forma a ilustrar a implementação de uma maneira geral e como esses módulos se comunicam, a Figura 9 é disponibilizada, e para melhor detalhamento o componente \verb+mole+ pode ser visto no Código 3 por inteiro.
 
 \label{sec:codigos}
 \includecode[C]{Reforço de conjunto de dados SQLiV3.json do Kaggle} {alg:codigo2}{codigos/mole_query_generator.py}
 \bigskip
 
-Na Figura 10, as principais diferenças para a Figura 8 (que ilustra a arquitetura independente de tecnologias empregadas) se encontram no nome dos módulos, na extensão de arquivos e um detalhamento maior em módulos como \verb+datasets+ e \verb+cli.py+. Destaca-se dentre os detalhes os operadores da biblioteca \textit{Python} \verb+click+, que facilitam o uso do programa através da linha de comando (localizado no módulo \verb+cli.py+), o método \verb+evade()+ que é chamado na execução principal do programa e dá início ao funcionamento do mesmo, e uma melhor ilustração à direita de \verb+evasion.py+ de como o \textit{loop} principal de mutação é feito, com o método \verb+mutation_round()+.
+Na Figura 9, as principais diferenças para a Figura 7 (que ilustra a arquitetura independente de tecnologias empregadas) se encontram no nome dos módulos, na extensão de arquivos e um detalhamento maior em módulos como \verb+datasets+ e \verb+cli.py+. Destaca-se dentre os detalhes os operadores da biblioteca \textit{Python} \verb+click+, que facilitam o uso do programa através da linha de comando (localizado no módulo \verb+cli.py+), o método \verb+evade()+ que é chamado na execução principal do programa e dá início ao funcionamento do mesmo, e uma melhor ilustração à direita de \verb+evasion.py+ de como o \textit{loop} principal de mutação é feito, com o método \verb+mutation_round()+.
 
 Além desses detalhes, há uma bipartição no módulo de classificador, que se deu pela particularidade dos múltiplos conjuntos de dados que foram usados no \textit{wafamole++}. Acredita-se que em uma implementação nova, tendo acesso aos dados originais no início do desenvolvimento, não seria necessário explorar mais de um banco inicial de injeções e comandos SQL, apenas aprimorá-lo com mais entradas, fazendo uso do mesmo módulo de classificador caso desejado.
 
@@ -131,7 +131,7 @@ Interessantemente, modificando-se uma parte desse funcionamento para trocar a ba
 
 \bigskip
 
-Nessa função a seleção e armazenamento de posições a serem modificadas é virtualmente idêntico - porém a substituição conta com uma lista de modificações em potencial dentre as quais uma é amostrada aleatoriamente na hora de ser realizada a mutação. Também são considerados os casos em que a mutação não ocasiona em variações no \textit{payload} final. Finalmente, há o \verb+spaces_to_symbols+ - o operador com a performance mais interessante (Código 6).
+Nessa função a seleção e armazenamento de posições a serem modificadas é virtualmente idêntico - porém a substituição conta com uma lista de modificações em potencial dentre as quais uma é amostrada aleatoriamente na hora de ser realizada a mutação. Também são considerados os casos em que a mutação não ocasiona em variações no \textit{payload} final. Finalmente, há o \verb+spaces_to_symbols+ (Código 6).
 
 \label{sec:codigos}
 \includecode[C]{Operador de mutação spaces to symbols} {alg:codigo3}{codigos/operadores/spaces_to_symbols.py}
@@ -165,7 +165,7 @@ As seções a seguir podem então ser interpretadas da seguinte forma:
 
 \textbf{Autores}: Sergio D Fdez, cr0hn, Enrique Garcia. Disponível no \href{https://github.com/BBVA/waf-brain}{GitHub}. \footnote{GitHub - waf-brain: https://github.com/BBVA/waf-brain}
 
-O WAF-Brain \cite{waf_brain} foi um dos primeiros firewalls a serem testados pela equipe do \textit{WAF-A-MoLE}, e subsequentemente é o primeiro modelo de exemplo disponibilizado para testes na documentação do mesmo. Dessa maneira, foi testado com os novos operadores de mutação, sendo de ajuda para diagnosticar os incluídos no wafamole++. A Figura 11 é uma captura de tela do seu repositório, destacando a versão de \textit{Python} em que foi escrito, quantia de problemas abertos e logomarca.
+O WAF-Brain \cite{waf_brain} foi um dos primeiros firewalls a serem testados pela equipe do \textit{WAF-A-MoLE}, e subsequentemente é o primeiro modelo de exemplo disponibilizado para testes na documentação do mesmo. Dessa maneira, foi testado com os novos operadores de mutação, sendo de ajuda para diagnosticar os incluídos no wafamole++. A Figura 10 é uma captura de tela do seu repositório, destacando a versão de \textit{Python} em que foi escrito, quantia de problemas abertos e logomarca.
 
 \begin{figure}[ht]
     \centering
@@ -199,7 +199,7 @@ Conforme essa advertência no \verb+README.md+ do repositório do \textit{WAF-A-
 \subsection{MLBasedWAF}
 Todos os modelos implementados tiveram como base o firewall ML-Based-WAF, disponível por vladan-stojnic no \href{https://github.com/vladan-stojnic/ML-based-WAF}{GitHub} \footnote{GitHub - ML-based-WAF: https://github.com/vladan-stojnic/ML-based-WAF} \cite{ml_based_waf} que fora o WAF de código aberto mais promissor e mais plausível de adaptar. Sua performance também era factível no contexto de recursos disponíveis para a conclusão deste projeto final, uma vez que não havia complexidade na arquitetura/implementação comparável a firewalls como o SQLiGOT \cite{kar2016sqligot}. Isso permitiu que os modelos resultantes pudessem ser executados tanto na plataforma Google Colab como localmente em alguns casos.
 
-A Figura 12, retirada do repositório original desse WAF, mostra de forma geral a estrutura do MLBasedWAF. A pasta \textit{Classifier} contém alguns classificadores que são treinados com dados do conjunto de dados localizado na pasta \textit{Dataset}. Esses classificadores são replicados na pasta \textit{WAF} que contém as funcionalidades de um WAF propriamente dito, e o núcleo da aplicação.
+A Figura 11, retirada do repositório original desse WAF, mostra de forma geral a estrutura do MLBasedWAF. A pasta \textit{Classifier} contém alguns classificadores que são treinados com dados do conjunto de dados localizado na pasta \textit{Dataset}. Esses classificadores são replicados na pasta \textit{WAF} que contém as funcionalidades de um WAF propriamente dito, e o núcleo da aplicação.
 
 Seu funcionamento se dá por uso de um \textit{script} (\verb+sniffing.py+, localizado na pasta \textit{WAF}) que vasculha tráfego real e/ou simulado de pacotes HTTP enviados à rede atual, que são então direcionados para um classificador baseado na biblioteca \textit{scikit-learn} que faz a predição se o pacote tem cabeçalhos maliciosos ou não. Esses cabeçalhos são agrupados entre benignos, ataques XSS, cmdi, e injeções SQL.
 
@@ -215,7 +215,7 @@ Embora esse seja um WAF orientado ao tráfego real ou simulado de uma rede de fa
 
 Para tal, foi necessário prever uma estratégia própria de treinamento para o classificador, além de um conjunto de dados especial para o mesmo. É cabível mencionar, no entanto, que isso introduziu uma série de dificuldades uma vez que sua documentação era consideravelmente modesta, e o banco novo a ser usado deveria seguir o padrão de formatação seguido pelo WAF.
 
-Dentre as opções de conjuntos de dados disponíveis com injeções SQL, foi escolhido inicialmente a versão \verb+SQLiV3.json+ da coleção do Kaggle \footnote{Kaggle - SQL Injection Dataset: https://www.kaggle.com/datasets/syedsaqlainhussain/sql-injection-dataset} \cite{kaggle_dataset_sql}, que foi anteriormente mencionada na seção de arquitetura do \textit{wafamole++}. A Figura 13 é uma captura de tela da página Web deste conjunto de dados, destacando alguns detalhes e metadados de relevância como número de valores únicos, categorias de dados, tamanho de arquivo e etc.
+Dentre as opções de conjuntos de dados disponíveis com injeções SQL, foi escolhido inicialmente a versão \verb+SQLiV3.json+ da coleção do Kaggle \footnote{Kaggle - SQL Injection Dataset: https://www.kaggle.com/datasets/syedsaqlainhussain/sql-injection-dataset} \cite{kaggle_dataset_sql}, que foi anteriormente mencionada na seção de arquitetura do \textit{wafamole++}. A Figura 12 é uma captura de tela da página Web deste conjunto de dados, destacando alguns detalhes e metadados de relevância como número de valores únicos, categorias de dados, tamanho de arquivo e etc.
 
 \begin{figure}[ht]
     \centering
